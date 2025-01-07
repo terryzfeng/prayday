@@ -1,0 +1,45 @@
+<script lang="ts">
+  import Menu from "./Menu.svelte";
+  import AboutModal from "../Modals/AboutModal.svelte";
+
+  let showAbout: (state: boolean) => void;
+</script>
+
+<div
+  class="relative h-12 w-full px-4 flex justify-between items-center select-none bg-white"
+>
+  <!-- Neumorphic bottom shadow container -->
+  <div
+    class="absolute inset-x-0 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-gray-200 to-transparent"
+  ></div>
+
+  <!-- Subtle neumorphic effect for the entire header -->
+  <div
+    class="absolute inset-0 shadow-[0_2px_4px_-2px_rgba(0,0,0,0.05),0_1px_2px_-1px_rgba(0,0,0,0.02)] bg-gradient-to-b from-white to-gray-50/50"
+  ></div>
+
+  <!-- Header container -->
+  <div class="relative flex w-full justify-between items-center">
+    <!-- Logo Prayday -->
+    <button
+      class="flex gap-1.5 cursor-pointer"
+      on:click={() => showAbout(true)}
+    >
+      <img
+        src="/favicon_io/android-chrome-192x192.png"
+        alt="Prayday logo"
+        class="h-8 w-8 rounded-lg"
+      />
+      <h1
+        class="text-2xl font-black font-title select-none text-transparent bg-clip-text bg-gradient-to-b from-blue-300 to-blue-400"
+      >
+        Prayday
+      </h1>
+    </button>
+
+    <!-- Dropdown Menu -->
+    <Menu />
+  </div>
+</div>
+
+<AboutModal bind:showAbout />
