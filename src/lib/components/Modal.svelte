@@ -1,23 +1,39 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
   import { portal } from "lib/actions/portal.js";
+  
   let modalDialog: HTMLDialogElement;
-
+  let isClosing = false;
+  
+  // Focus on the modal first or the first focusable element
+  export let focusOnShow = false;
+  
   /**
    * Set modal state
    * @param state change modal to this state
    */
   export function showModal(state: boolean) {
     if (state) {
+      isClosing = false;
       modalDialog.showModal();
       document.body.style.overflow = "hidden";
       modalDialog.scrollTop = 0;
+      if (focusOnShow) {
+        modalDialog.focus();
+      }
     } else {
-      modalDialog.close();
-      document.body.style.overflow = "";
+      // Start closing animation instead of immediately closing
+      isClosing = true;
+      
+      // Wait for animation to complete before actually closing
+      setTimeout(() => {
+        modalDialog.close();
+        document.body.style.overflow = "";
+        isClosing = false;
+      }, 200); // Match this with your CSS transition duration
     }
   }
-
+  
   /**
    * Hide the modal if click outside
    * @param event
@@ -27,7 +43,7 @@
       showModal(false);
     }
   }
-
+  
   // Cleanup if component is destroyed while modal is open
   onDestroy(() => {
     document.body.style.overflow = "";
@@ -43,6 +59,10 @@
     border border-gray-100
     backdrop:bg-white/50 backdrop:backdrop-blur-sm
     focus:outline-none"
+  class:closing={isClosing}
+  aria-modal="true"
+  aria-labelledby="modal-title"
+  aria-describedby="modal-description"
   bind:this={modalDialog}
   on:click={handleClick}
   use:portal
@@ -53,21 +73,26 @@
 <style lang="postcss">
   dialog {
     transition:
-      display 0.2s allow-discrete,
-      overlay 0.3s allow-discrete;
+      display 0.2s,
+      overlay 0.3s;
     animation: appear 0.2s forwards;
   }
+  
   dialog[open] {
     scroll-top: 0;
   }
-  dialog:not([open]) {
+  
+  /* Use closing class instead of :not([open]) for Safari compatibility */
+  dialog.closing {
     animation: disappear 0.2s forwards;
   }
+  
   dialog::backdrop {
     /* background: rgba(255, 255, 255, 0.8); */
     /* backdrop-filter: blur(4px); */
     /* transition: opacity 0.3s ease; */
   }
+  
   @keyframes appear {
     from {
       opacity: 0;
@@ -78,6 +103,7 @@
       transform: translateY(0);
     }
   }
+  
   @keyframes disappear {
     from {
       opacity: 1;
