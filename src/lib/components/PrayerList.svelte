@@ -1,13 +1,13 @@
 <script lang="ts">
   import PrayerCard from "lib/components/PrayerCard.svelte";
   import PrayerRequest from "lib/utils/prayer-request";
-  import { sortedPrayersStore } from "lib/stores/prayerStore";
+  import { sortFilterPrayersView } from "lib/stores/filterStatesStore";
   import { flip } from "svelte/animate";
 
   let sortedPrayers: PrayerRequest[] = [];
 
   // Subscribe to the derived store
-  sortedPrayersStore.subscribe((value: PrayerRequest[]) => {
+  sortFilterPrayersView.subscribe((value: PrayerRequest[]) => {
     sortedPrayers = value;
   });
 

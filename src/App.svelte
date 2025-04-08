@@ -4,7 +4,7 @@
   import PrayerList from "lib/components/PrayerList.svelte";
 </script>
 
-<main class="container">
+<main class="container relative">
   <Header />
   <AddPrayer />
   <PrayerList />

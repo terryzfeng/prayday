@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
+import {readFileSync} from 'node:fs';
 import path from 'path';
 
 // https://vite.dev/config/
@@ -11,4 +12,7 @@ export default defineConfig({
       lib: path.resolve(__dirname, 'src/lib'),
     },
   },
+  define: {
+    meta: {version: JSON.parse(readFileSync('package.json', 'utf8')).version},
+  }
 });

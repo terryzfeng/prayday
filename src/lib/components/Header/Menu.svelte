@@ -4,18 +4,30 @@
   import MenuItem from "./MenuItem.svelte";
   import SignUpModal from "../Modals/SignUpModal.svelte";
   import LogInModal from "../Modals/LogInModal.svelte";
+  import ForgotPasswordModal from "../Modals/ForgotPasswordModal.svelte";
   import AboutModal from "../Modals/AboutModal.svelte";
+  import PrivacyModal from "../Modals/PrivacyModal.svelte";
   import ProfileModal from "../Modals/ProfileModal.svelte";
   import { user } from "lib/stores/auth";
   import { logOut } from "lib/utils/firebase/auth";
-
-  let showLogIn: (state: boolean) => void;
-  let showSignUp: (state: boolean) => void;
-  let showAbout: (state: boolean) => void;
-  let showProfile: (state: boolean) => void;
+  import { filterStatesStore } from "lib/stores/filterStatesStore";
 
   let isMenuOpen = false;
 
+  // Modal state
+  let showLogIn: (state: boolean) => void;
+  let showSignUp: (state: boolean) => void;
+  let showForgotPassword: (state: boolean) => void;
+  let showAbout: (state: boolean) => void;
+  let showPrivacy: (state: boolean) => void;
+  let showProfile: (state: boolean) => void;
+
+  // Filter defaults
+  let hideAnsweredText = "Hide Answered";
+
+  /**
+   * Handle log out
+   */
   async function handleLogout() {
     try {
       const result = await logOut();
@@ -29,6 +41,9 @@
     }
   }
 
+  /**
+   * Close Menu Container
+   */
   function handleOutsideClick(event: MouseEvent) {
     const target = event.target as HTMLElement;
     if (!target.closest(".menu-container")) {
@@ -42,6 +57,9 @@
     } else {
       document.removeEventListener("click", handleOutsideClick);
     }
+    hideAnsweredText = filterStatesStore.getFilterState("hideAnswered")
+      ? "Show Answered"
+      : "Hide Answered";
   }
 </script>
 
@@ -73,6 +91,12 @@
           bind:isMenuOpen
         />
         <MenuItem
+          value={hideAnsweredText}
+          callback={() => filterStatesStore.toggleFilterState("hideAnswered")}
+          bind:isMenuOpen
+        />
+
+        <MenuItem
           value="Log Out"
           callback={handleLogout}
           type="danger"
@@ -101,7 +125,9 @@
 </div>
 
 <!-- Modals -->
-<AboutModal bind:showAbout />
+<AboutModal bind:showAbout bind:showPrivacy />
+<PrivacyModal bind:showPrivacy bind:showAbout />
 <ProfileModal bind:showProfile />
-<LogInModal bind:showLogIn bind:showSignUp />
+<LogInModal bind:showLogIn bind:showSignUp bind:showForgotPassword />
+<ForgotPasswordModal bind:showForgotPassword bind:showLogIn />
 <SignUpModal bind:showSignUp bind:showLogIn />

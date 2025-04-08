@@ -5,6 +5,7 @@
 
   export let showLogIn: (state: boolean) => void;
   export let showSignUp: (state: boolean) => void;
+  export let showForgotPassword: (state: boolean) => void;
 
   let email = "";
   let password = "";
@@ -37,6 +38,12 @@
     showLogIn(false);
     email = "";
     password = "";
+  }
+
+  function forgotPassword() {
+    showForgotPassword(true);
+    showLogIn(false);
+    console.log("Forgot password");
   }
 </script>
 
@@ -89,8 +96,8 @@
         <Button color="blue" className="w-full" text="Log In" />
       </form>
 
-      <div class="pt-4 flex flex-col justify-between items-center">
-        <div class="text-center text-sm text-gray-500 pb-2">
+      <div class="pt-4 flex flex-col justify-between items-center text-sm">
+        <div class="text-center text-gray-500 pb-2">
           Don't have an account?
           <button
             type="button"
@@ -100,6 +107,13 @@
             <b>Sign Up</b>
           </button>
         </div>
+        <button
+          type="button"
+          class="text-blue-500 hover:text-blue-600 ml-1"
+          on:click={forgotPassword}
+        >
+          Forgot Password
+        </button>
       </div>
 
       <div class="my-1 border-b border-gray-200"></div>

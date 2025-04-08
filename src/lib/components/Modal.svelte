@@ -11,6 +11,7 @@
     if (state) {
       modalDialog.showModal();
       document.body.style.overflow = "hidden";
+      modalDialog.scrollTop = 0;
     } else {
       modalDialog.close();
       document.body.style.overflow = "";
@@ -36,12 +37,12 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <dialog
-  class="absolute bg-white w-full max-w-[90%] md:max-w-xl max-h-[80%] md:max-h-[75vh]
+  class="fixed inset-0 p-6 m-auto !scroll-top bg-white w-full max-w-[90%] md:max-w-xl max-h-[80%] md:max-h-[75vh]
     rounded-xl overflow-x-hidden overflow-y-auto
     shadow-[8px_8px_16px_0px_rgba(0,0,0,0.08),-8px_-8px_16px_0px_rgba(255,255,255,0.8)]
     border border-gray-100
     backdrop:bg-white/50 backdrop:backdrop-blur-sm
-    p-6"
+    focus:outline-none"
   bind:this={modalDialog}
   on:click={handleClick}
   use:portal
@@ -55,6 +56,9 @@
       display 0.2s allow-discrete,
       overlay 0.3s allow-discrete;
     animation: appear 0.2s forwards;
+  }
+  dialog[open] {
+    scroll-top: 0;
   }
   dialog:not([open]) {
     animation: disappear 0.2s forwards;

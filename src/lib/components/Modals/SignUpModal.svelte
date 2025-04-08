@@ -10,6 +10,7 @@
   let name = "";
   let email = "";
   let password = "";
+  let password2 = "";
   let errorMessage = "";
   let loading = false;
 
@@ -19,6 +20,10 @@
     name = name.trim();
 
     try {
+      if (password !== password2) {
+        throw new Error("Passwords do not match. Please try again.");
+      }
+
       const result = await signUp(email, password, name);
 
       if (result.success) {
@@ -26,12 +31,13 @@
         name = "";
         email = "";
         password = "";
+        password2 = "";
         showSignUp(false);
       } else {
-        errorMessage = result.error;
+        throw new Error(result.error);
       }
-    } catch (error) {
-      errorMessage = "An unexpected error occurred. Please try again.";
+    } catch (error: any) {
+      errorMessage = error.message;
     } finally {
       loading = false;
     }
@@ -110,6 +116,18 @@
             type="password"
             placeholder="Password"
             bind:value={password}
+            required
+            minlength="6"
+            class="text-sm w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-300"
+            disabled={loading}
+          />
+        </div>
+
+        <div class="space-y-2">
+          <input
+            type="password"
+            placeholder="Re-enter password"
+            bind:value={password2}
             required
             minlength="6"
             class="text-sm w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-300"

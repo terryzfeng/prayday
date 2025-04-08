@@ -121,12 +121,10 @@ function createPrayerStore() {
 
 export const PrayerStore = createPrayerStore();
 
+//-----------------------------------------------------------------------------
 // Derived stores
-export const sortedPrayersStore = derived(PrayerStore, (prayers) => {
-  return prayers.slice().sort((a: PrayerRequest, b: PrayerRequest) => {
-    return PrayerRequest.sort(a, b);
-  });
-});
+//-----------------------------------------------------------------------------
+// Stats
 export const prayerCount = derived(PrayerStore, ($prayers) =>
   $prayers.reduce((total, prayer) => total + prayer.prayCount, 0),
 );
