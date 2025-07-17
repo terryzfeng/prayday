@@ -61,15 +61,19 @@ async function calculateGlobalPrayerCount(): Promise<number> {
       const prayersSnapshot = await getDocs(
         collection(db, "users", userDoc.id, "prayers"),
       );
+      console.log(userDoc.id)
 
       // Sum up pray counts from each prayer document
       for (const prayerDoc of prayersSnapshot.docs) {
         const prayerData = prayerDoc.data();
         if (prayerData.prayCount) {
           totalCount += prayerData.prayCount;
+          console.log("counts", prayerData.prayCount);
         }
       }
     }
+
+    console.log("Calculated global prayer count:", totalCount)
 
     return totalCount;
   } catch (error) {
@@ -77,3 +81,7 @@ async function calculateGlobalPrayerCount(): Promise<number> {
     return -1;
   }
 }
+
+// DANGEROUS: CALCULATE GLOBAL PRAYER COUNT
+// NOTE: NEED TO UPDATE PERMISSION
+// calculateGlobalPrayerCount();

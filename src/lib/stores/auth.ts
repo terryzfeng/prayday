@@ -37,9 +37,9 @@ function createAuthStore() {
         user,
         userData: userData.success ? (userData.data as UserData) : null,
       });
+      console.log("Logged in", userData.data?.name);
       await PrayerSync.initialize(user.uid);
       userLoggedIn = true;
-      console.log("logged in", userData.data?.name);
     } else {
       // Log Out
       // stop syncing before deleting everything
@@ -51,7 +51,7 @@ function createAuthStore() {
         PrayerStore.clearStorage();
         userLoggedIn = false;
       }
-      console.log("log out");
+      console.log("Log out");
     }
   });
 

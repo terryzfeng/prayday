@@ -47,8 +47,8 @@
   }
 </script>
 
-<Modal bind:showModal={showLogIn}>
-  <div class="flex flex-col items-center space-y-8 p-4">
+<Modal bind:showModal={showLogIn} showClosePrompt={false}>
+  <div class="flex flex-col items-center space-y-8 px-4 py-6">
     <h1
       class="text-4xl font-black font-title select-none text-transparent bg-clip-text bg-gradient-to-b from-blue-300 to-blue-400"
     >

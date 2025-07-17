@@ -36,7 +36,7 @@
   }
 </script>
 
-<Modal bind:showModal={showForgotPassword}>
+<Modal bind:showModal={showForgotPassword} showClosePrompt={false}>
   <div class="flex flex-col items-center space-y-8 p-4">
     <h1
       class="text-4xl font-black font-title select-none text-transparent bg-clip-text bg-gradient-to-b from-blue-300 to-blue-400"
@@ -80,11 +80,10 @@
       </form>
 
       <div class="pt-4 flex flex-col justify-between items-center text-sm">
-        <div class="text-center text-gray-500 pb-2">
-          Return to
-          <button
+        <div class="text-center// text-gray-500 pb-2">
+          Return to <button
             type="button"
-            class="text-blue-500 hover:text-blue-600 ml-1"
+            class="text-blue-500 hover:text-blue-600 ml-0.5" 
             on:click={toggleToLogIn}
           >
             <b>Log In</b>

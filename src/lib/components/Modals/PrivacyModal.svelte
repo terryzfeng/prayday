@@ -20,7 +20,7 @@
   }
 </script>
 
-<Modal bind:showModal={showPrivacy}>
+<Modal bind:showModal={showPrivacy} focusOnShow={true}>
   <div
     class="flex flex-col items-center space-y-8 py-6 px-2 md:max-w-2xl mx-auto"
   >

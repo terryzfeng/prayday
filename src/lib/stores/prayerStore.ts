@@ -1,4 +1,4 @@
-import { writable, derived } from "svelte/store";
+import { writable, derived, get } from "svelte/store";
 import PrayerRequest from "lib/utils/prayer-request";
 import { incrementGlobalPrayerCount } from "../utils/firebase/prayer-stats";
 
@@ -87,22 +87,32 @@ function createPrayerStore() {
         });
         return updatedPrayers;
       });
-
       localStorage.setItem(STORAGE_DATE_KEY, new Date().toISOString());
     },
-    mergePrayers: (prayers: PrayerRequest[]) =>
+    mergePrayers: (incomingPrayers: PrayerRequest[]) =>
+      // Will do a merge in (merging incoming into current prayers)
       update((existingPrayers) => {
-        const prayerMap = new Map(existingPrayers.map((p) => [p.uuid, p]));
-        prayers.forEach((prayer) =>
-          prayerMap.set(
-            prayer.uuid,
-            PrayerRequest.resolveConflict(prayerMap.get(prayer.uuid), prayer),
+        // Get current prayers in prayerStore
+        const currentPrayerMap = new Map(
+          existingPrayers.map((p) => [p.uuid, p]),
+        );
+        // Iterate through new prayers and add to current map or resolve conflicts
+        incomingPrayers.forEach((incomingPrayer) =>
+          currentPrayerMap.set(
+            incomingPrayer.uuid,
+            PrayerRequest.resolveConflict(
+              currentPrayerMap.get(incomingPrayer.uuid),
+              incomingPrayer,
+            ),
           ),
         );
-        return Array.from(prayerMap.values());
+        return Array.from(currentPrayerMap.values());
       }),
     setPrayers: (prayers: PrayerRequest[]) => {
       set(prayers);
+    },
+    getPrayers: () => {
+      return get(PrayerStore);
     },
     setLastUpdated(newDate: Date) {
       localStorage.setItem(STORAGE_DATE_KEY, newDate.toISOString());

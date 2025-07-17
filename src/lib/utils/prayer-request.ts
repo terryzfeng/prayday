@@ -77,14 +77,11 @@ export default class PrayerRequest {
    * @returns a merged PrayerRequest
    */
   static resolveConflict(
-    localPrayer: PrayerRequest,
+    localPrayer: PrayerRequest | undefined,
     remotePrayer: PrayerRequest,
   ): PrayerRequest {
     if (localPrayer === undefined) {
       return remotePrayer;
-    }
-    if (remotePrayer === undefined) {
-      return localPrayer;
     }
     return {
       ...localPrayer,

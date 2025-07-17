@@ -36,7 +36,6 @@
     event.stopPropagation();
     playFx("ERROR");
     PrayerStore.deletePrayer(prayer.uuid);
-    // subtractGlobalPrayerCount(prayer.prayCount);
   }
 
   /**
@@ -89,7 +88,7 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
   bind:this={cardElement}
-  class="relative bg-white rounded-lg shadow-sm p-3 transition-all duration-200
+  class="relative bg-white rounded-lg shadow-sm p-3 pt-4 transition-all duration-200
   ease-in-out hover:shadow-lg hover:-translate-y-0.5 cursor-default
   {prayer.answered ? '!bg-green-50 border-2 border-green-300' : ''} 
   {highlight && !prayer.answered

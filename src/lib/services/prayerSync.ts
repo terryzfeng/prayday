@@ -1,11 +1,4 @@
-import {
-  collection,
-  doc,
-  getDocs,
-  onSnapshot,
-  writeBatch,
-  getDoc,
-} from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, onSnapshot, writeBatch } from "firebase/firestore";
 import { db } from "lib/utils/firebase/config";
 import { PrayerStore } from "lib/stores/prayerStore";
 import PrayerRequest from "lib/utils/prayer-request";
@@ -16,12 +9,14 @@ class PrayerSyncService {
   private unsubscribeStore?: () => void;
   private syncing = false;
   private initialized = false;
+  private initialSnapshot = true;
   private userId: string = "";
 
   // Track changes that neeed to be synced
   private lastKnownState = new Map<string, PrayerRequest>();
   private pendingChanges = new Set<string>();
   private pendingDeletions = new Set<string>();
+
 
   /**
    * Initialize syncing to Firebase
@@ -38,6 +33,11 @@ class PrayerSyncService {
     // Set up real-time sync with Firebase
     const prayersRef = collection(db, "users", this.userId, "prayers");
     this.unsubscribeFirestore = onSnapshot(prayersRef, (snapshot) => {
+      // Skip initial snapshot load because we manually loaded
+      if (this.initialSnapshot) {
+        this.initialSnapshot = false;
+        return;
+      }
       if (this.syncing) return;
       this.syncing = true;
       const changedPrayers: PrayerRequest[] = [];
@@ -45,6 +45,7 @@ class PrayerSyncService {
         const data = change.doc.data();
         if (change.type === "removed") {
           PrayerStore.deletePrayer(data.uuid);
+          this.lastKnownState.delete(data.uuid);
         } else {
           // Added or modified
           changedPrayers.push(
@@ -64,6 +65,11 @@ class PrayerSyncService {
       if (changedPrayers.length > 0) {
         PrayerStore.mergePrayers(changedPrayers);
       }
+
+      // Update lastKnownState with new prayer changes
+      changedPrayers.forEach((prayer) => {
+        this.lastKnownState.set(prayer.uuid, prayer);
+      })
 
       this.syncing = false;
     });
@@ -105,6 +111,7 @@ class PrayerSyncService {
       if (!currentIds.has(uuid)) {
         this.pendingDeletions.add(uuid);
         this.pendingChanges.delete(uuid);
+        this.lastKnownState.delete(uuid);
       }
     }
     // Check for changes or additions
@@ -112,12 +119,9 @@ class PrayerSyncService {
       const lastKnown = this.lastKnownState.get(prayer.uuid);
       if (!lastKnown || this.hasPrayerChanged(prayer, lastKnown)) {
         this.pendingChanges.add(prayer.uuid);
+        this.lastKnownState.set(prayer.uuid, prayer);
       }
     }
-    // Update last known state
-    this.lastKnownState = new Map(
-      currentPrayers.map((prayer) => [prayer.uuid, prayer]),
-    );
   }
 
   /**
@@ -162,7 +166,57 @@ class PrayerSyncService {
   }
 
   /**
-   * Load prayers from firebase and return as a PrayerRequest[]
+   * Sync prayer changes to firebase
+   * @param prayers to sync
+   */
+  private async syncToFirebase(prayers: PrayerRequest[]) {
+    if (this.pendingChanges.size === 0 && this.pendingDeletions.size === 0) {
+      return; // Nothing to sync
+    }
+
+    const batch = writeBatch(db);
+
+    // Handle deletions of prayers
+    for (const uuid of this.pendingDeletions) {
+      const prayerRef = doc(db, "users", this.userId, "prayers", uuid);
+      batch.delete(prayerRef);
+    }
+
+    // Handle changes to prayers
+    for (const uuid of this.pendingChanges) {
+      const prayer = prayers.find((p) => p.uuid === uuid);
+      if (prayer) {
+        const prayerRef = doc(db, "users", this.userId, "prayers", prayer.uuid);
+        batch.set(prayerRef, {
+          prayer: prayer.prayer,
+          uuid: prayer.uuid,
+          prayCount: prayer.prayCount,
+          date: prayer.date.toISOString(),
+          lastPrayed: prayer.lastPrayed.toISOString(),
+          answered: prayer.answered,
+        });
+      }
+    }
+
+    const lastUpdated = PrayerStore.getLastUpdated();
+    if (lastUpdated) {
+      batch.update(doc(db, "users", this.userId), {
+        lastUpdated: lastUpdated.toISOString(),
+      });
+    }
+
+    try {
+      await batch.commit();
+      // Clear pending changes after successful sync
+      this.pendingChanges.clear();
+      this.pendingDeletions.clear();
+    } catch (error: any) {
+      console.error("Error trying to sync to firebase");
+    }
+  }
+
+  /**
+   * Do a clean prayer request load from firebase and return as a PrayerRequest[]
    * @returns Promise<PrayerRequest[]>
    */
   private async loadFromFirebase(): Promise<PrayerRequest[]> {
@@ -188,54 +242,6 @@ class PrayerSyncService {
   }
 
   /**
-   * Sync prayer changes to firebase
-   * @param prayers to sync
-   */
-  private async syncToFirebase(prayers: PrayerRequest[]) {
-    if (this.pendingChanges.size === 0 && this.pendingDeletions.size === 0) {
-      return; // Nothing to sync
-    }
-
-    const batch = writeBatch(db);
-
-    // Handle deletions
-    for (const uuid of this.pendingDeletions) {
-      const prayerRef = doc(db, "users", this.userId, "prayers", uuid);
-      batch.delete(prayerRef);
-    }
-
-    // Handle changes
-    for (const uuid of this.pendingChanges) {
-      const prayer = prayers.find((p) => p.uuid === uuid);
-      if (prayer) {
-        const prayerRef = doc(db, "users", this.userId, "prayers", prayer.uuid);
-        batch.set(prayerRef, {
-          prayer: prayer.prayer,
-          uuid: prayer.uuid,
-          prayCount: prayer.prayCount,
-          date: prayer.date.toISOString(),
-          lastPrayed: prayer.lastPrayed.toISOString(),
-          answered: prayer.answered,
-        });
-      }
-    }
-
-    batch.update(doc(db, "users", this.userId), {
-      lastUpdated: PrayerStore.getLastUpdated().toISOString(),
-    });
-
-    try {
-      await batch.commit();
-    } catch (error: any) {
-      console.error("Error trying to sync to firebase");
-    }
-
-    // Clear pending changes after successful sync
-    this.pendingChanges.clear();
-    this.pendingDeletions.clear();
-  }
-
-  /**
    * Handle merge conflicts between local and firebase prayer store
    * @param firebasePrayers to merge into local
    */
@@ -247,12 +253,20 @@ class PrayerSyncService {
     const firebaseDate = new Date(userDoc.data()?.lastUpdated || 0);
 
     if (firebaseDate.getTime() > localDate.getTime()) {
+      console.warn("Remote newer than local, merging");
       PrayerStore.setPrayers(firebasePrayers);
       PrayerStore.setLastUpdated(firebaseDate);
-    } else {
+    } else if (firebaseDate.getTime() < localDate.getTime()) {
       console.warn("Local newer than sync, merging");
       PrayerStore.mergePrayers(firebasePrayers);
+    } else {
+      // console.log("Prayers are in sync")
     }
+
+    // Snapshot prayers after merge/sync
+    this.lastKnownState = new Map(
+      PrayerStore.getPrayers().map((p) => [p.uuid, p]),
+    )
   }
 }
 

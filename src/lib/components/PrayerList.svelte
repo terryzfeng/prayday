@@ -35,6 +35,6 @@
     display: grid;
     grid-template-columns: 1fr;
     padding: 1rem;
-    gap: 1rem;
+    gap: 1.5rem;
   }
 </style>
