@@ -7,11 +7,12 @@ import {
 } from "../utils/firebase/prayer-stats";
 
 /**
- * Create a writable store for global prayer count
+ * Create a writable store for global prayer count.
  */
 function createGlobalPrayerStore() {
   const { subscribe, set } = writable<number>(0);
 
+  // Get count from firebase
   getGlobalPrayerCount().then((count) => {
     if (count !== -1) {
       set(count);
@@ -41,4 +42,3 @@ function createGlobalPrayerStore() {
 }
 
 export const globalPrayerCount = createGlobalPrayerStore();
-export default globalPrayerCount;

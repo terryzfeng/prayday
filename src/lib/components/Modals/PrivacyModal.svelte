@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
   import Modal from "../Modal.svelte";
-  import globalPrayerCount from "lib/stores/globalPrayerCount";
+  import { globalPrayerCount } from "lib/stores/globalPrayerCount";
 
   let prayerCount: number;
   const unsubscribe = globalPrayerCount.subscribe((value: number) => {

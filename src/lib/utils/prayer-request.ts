@@ -28,10 +28,10 @@ export default class PrayerRequest {
   }
 
   /**
-   * Algorithm to sort PrayerRequests
+   * Algorithm to sort PrayerRequests.
    * @param a PrayerRequest A
    * @param b PrayerRequest B
-   * @returns + if A > B, - if A < B
+   * @returns (+) if A > B, (-) if A < B
    */
   static sort(a: PrayerRequest, b: PrayerRequest): number {
     // Answered
@@ -73,7 +73,7 @@ export default class PrayerRequest {
   }
 
   /**
-   * Return the merge of two conflicting prayer requests
+   * Return the merge of two conflicting prayer requests.
    * @returns a merged PrayerRequest
    */
   static resolveConflict(

@@ -33,9 +33,14 @@
    * @param MouseEvent
    */
   function deletePrayer(event: Event) {
-    event.stopPropagation();
-    playFx("ERROR");
-    PrayerStore.deletePrayer(prayer.uuid);
+    const confirmDelete = confirm(
+      "Are you sure you want to delete this prayer request?",
+    );
+    if (confirmDelete) {
+      event.stopPropagation();
+      playFx("ERROR");
+      PrayerStore.deletePrayer(prayer.uuid);
+    }
   }
 
   /**

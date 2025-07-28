@@ -1,4 +1,11 @@
-import { collection, doc, getDoc, getDocs, onSnapshot, writeBatch } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  onSnapshot,
+  writeBatch,
+} from "firebase/firestore";
 import { db } from "lib/utils/firebase/config";
 import { PrayerStore } from "lib/stores/prayerStore";
 import PrayerRequest from "lib/utils/prayer-request";
@@ -16,7 +23,6 @@ class PrayerSyncService {
   private lastKnownState = new Map<string, PrayerRequest>();
   private pendingChanges = new Set<string>();
   private pendingDeletions = new Set<string>();
-
 
   /**
    * Initialize syncing to Firebase
@@ -69,7 +75,7 @@ class PrayerSyncService {
       // Update lastKnownState with new prayer changes
       changedPrayers.forEach((prayer) => {
         this.lastKnownState.set(prayer.uuid, prayer);
-      })
+      });
 
       this.syncing = false;
     });
@@ -258,7 +264,7 @@ class PrayerSyncService {
       PrayerStore.setLastUpdated(firebaseDate);
     } else if (firebaseDate.getTime() < localDate.getTime()) {
       console.warn("Local newer than sync, merging");
-      PrayerStore.mergePrayers(firebasePrayers);
+      PrayerStore.mergePrayers(firebasePrayers, firebaseDate);
     } else {
       // console.log("Prayers are in sync")
     }
@@ -266,7 +272,7 @@ class PrayerSyncService {
     // Snapshot prayers after merge/sync
     this.lastKnownState = new Map(
       PrayerStore.getPrayers().map((p) => [p.uuid, p]),
-    )
+    );
   }
 }
 

@@ -10,6 +10,10 @@ import { db } from "./config";
 
 export const globalStatsRef = doc(db, "global", "stats");
 
+/**
+ * Get global prayer count from firebase.
+ * @returns global prayer count
+ */
 export async function getGlobalPrayerCount(): Promise<number> {
   try {
     const globalStatsDoc = await getDoc(globalStatsRef);
@@ -25,6 +29,9 @@ export async function getGlobalPrayerCount(): Promise<number> {
   return -1;
 }
 
+/**
+ * Increment the firebase global prayer count.
+ */
 export async function incrementGlobalPrayerCount() {
   try {
     await updateDoc(globalStatsRef, {
@@ -35,6 +42,10 @@ export async function incrementGlobalPrayerCount() {
   }
 }
 
+/**
+ * Subtract the firebase global prayer count.
+ * @param amount to subtract
+ */
 export async function subtractGlobalPrayerCount(amount: number) {
   try {
     await updateDoc(globalStatsRef, {
@@ -45,10 +56,10 @@ export async function subtractGlobalPrayerCount(amount: number) {
   }
 }
 
-// NOTE: When prayer requests are deleted, the global prayer count won't decrement
-
-// TODO: Calculate through every user and compute the number of prayers prayed
-async function calculateGlobalPrayerCount(): Promise<number> {
+/**
+ * Go through every user and manually compute the number of prayers prayed.
+ */
+async function calculateGlobalPrayerCount() {
   try {
     let totalCount = 0;
 
@@ -57,31 +68,30 @@ async function calculateGlobalPrayerCount(): Promise<number> {
 
     // Iterate through each user
     for (const userDoc of usersSnapshot.docs) {
-      // Get all prayers for this user
+      let userPrayerCount = 0;
+      // Get all prayers from this user
       const prayersSnapshot = await getDocs(
         collection(db, "users", userDoc.id, "prayers"),
       );
-      console.log(userDoc.id)
-
-      // Sum up pray counts from each prayer document
+      // Tally the prayCount from each prayer document
       for (const prayerDoc of prayersSnapshot.docs) {
         const prayerData = prayerDoc.data();
         if (prayerData.prayCount) {
-          totalCount += prayerData.prayCount;
-          console.log("counts", prayerData.prayCount);
+          userPrayerCount += prayerData.prayCount;
         }
       }
+      console.log(`User: ${userDoc.id}, Pray Count: ${userPrayerCount}`);
+
+      totalCount += userPrayerCount;
     }
-
-    console.log("Calculated global prayer count:", totalCount)
-
-    return totalCount;
+    console.log("Calculated global prayer count:", totalCount);
   } catch (error) {
     console.error("Error calculating global prayer count:", error);
-    return -1;
   }
 }
 
-// DANGEROUS: CALCULATE GLOBAL PRAYER COUNT
-// NOTE: NEED TO UPDATE PERMISSION
+// NOTE: When prayer requests are deleted, the global prayer count won't decrement
+
+// CAUTION: READ ALL USERS TO COUNT GLOBAL PRAYER COUNT
+// NOTE: NEED TO UPDATE RULES PERMISSION
 // calculateGlobalPrayerCount();

@@ -6,8 +6,8 @@ const STORAGE_KEY = "prayers";
 const STORAGE_DATE_KEY = "lastUpdated";
 
 /**
- * Load user prayers from localStorage
- * @returns
+ * Load user prayers from localStorage.
+ * @returns array of prayer requests
  */
 function loadStoredPrayers(): PrayerRequest[] {
   try {
@@ -15,7 +15,7 @@ function loadStoredPrayers(): PrayerRequest[] {
     if (!storedData) return [];
 
     const parsedData = JSON.parse(storedData);
-    // Convert plain objects back to PrayerRequest instances
+    // Convert array of plain objects to array of PrayerRequest
     return parsedData.map((p: any) => {
       const prayer = new PrayerRequest(
         p.prayer,
@@ -89,8 +89,8 @@ function createPrayerStore() {
       });
       localStorage.setItem(STORAGE_DATE_KEY, new Date().toISOString());
     },
-    mergePrayers: (incomingPrayers: PrayerRequest[]) =>
-      // Will do a merge in (merging incoming into current prayers)
+    mergePrayers: (incomingPrayers: PrayerRequest[], firebaseDate: Date) =>
+      // Will do a merge in (merging incoming into local prayers)
       update((existingPrayers) => {
         // Get current prayers in prayerStore
         const currentPrayerMap = new Map(
@@ -106,6 +106,7 @@ function createPrayerStore() {
             ),
           ),
         );
+        localStorage.setItem(STORAGE_DATE_KEY, firebaseDate.toISOString());
         return Array.from(currentPrayerMap.values());
       }),
     setPrayers: (prayers: PrayerRequest[]) => {

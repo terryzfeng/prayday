@@ -39,7 +39,7 @@ class UserHistoryService {
   }
 
   /**
-   * Disconned Prayer history tracking to firebase
+   * Disconnect prayer history tracking from firebase
    */
   async uninitialize() {
     this.userId = "";
@@ -47,7 +47,7 @@ class UserHistoryService {
   }
 
   /**
-   * Actions to take when user hit's pray for history tracking
+   * Actions to take when user hits "pray" for history tracking
    */
   pray() {
     if (!this.userId) {

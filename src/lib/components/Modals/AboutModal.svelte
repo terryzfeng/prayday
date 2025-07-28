@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
   import Modal from "../Modal.svelte";
-  import globalPrayerCount from "lib/stores/globalPrayerCount";
+  import { globalPrayerCount } from "lib/stores/globalPrayerCount";
   import shareiOSSVG from "lib/assets/share-ios.svg";
 
   let prayerCount: number;
@@ -51,7 +51,7 @@
           requests and reminds you to pray! Create a prayer card with a topic
           that you want to pray for: a personal prayer item, a prayer request
           for a friend, or even a prayer of thanksgiving! Prayday will highlight
-          a topic in need of prayer. Just remember to pray everyday!
+          a topic most in need of prayer. Just remember to pray everyday!
         </p>
         <p class="text-gray-600 leading-relaxed">
           <em>
@@ -97,7 +97,7 @@
             Special Thanks
           </h2>
           <p class="text-gray-600 leading-relaxed">
-            Prayday was created with love by terry feng for all who seek to
+            Prayday was created with love by Terry Feng for all who seek to
             cultivate a life of prayer.
           </p>
           <p class="text-gray-600 leading-relaxed">

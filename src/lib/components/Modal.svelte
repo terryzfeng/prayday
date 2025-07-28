@@ -69,12 +69,12 @@
   on:click={handleClick}
   use:portal
 >
-<slot />
-{#if showClosePrompt}
-  <p class="text-center text-gray-400 pb-4">Click outside to close</p>
-{:else}
-  <div class="h-6"></div>
-{/if} 
+  <slot />
+  {#if showClosePrompt}
+    <p class="text-center text-gray-400 pb-4">Click outside to close</p>
+  {:else}
+    <div class="h-6"></div>
+  {/if}
 </dialog>
 
 <style lang="postcss">

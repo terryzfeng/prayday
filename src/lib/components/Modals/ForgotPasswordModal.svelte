@@ -83,7 +83,7 @@
         <div class="text-center// text-gray-500 pb-2">
           Return to <button
             type="button"
-            class="text-blue-500 hover:text-blue-600 ml-0.5" 
+            class="text-blue-500 hover:text-blue-600 ml-0.5"
             on:click={toggleToLogIn}
           >
             <b>Log In</b>

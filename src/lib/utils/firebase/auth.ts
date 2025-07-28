@@ -8,7 +8,7 @@ import { doc, setDoc } from "firebase/firestore";
 import { auth, db } from "./config";
 
 /**
- * Sign up a new user for Prayday
+ * Sign up a new user for Prayday.
  * @param email
  * @param password
  * @param name
@@ -35,7 +35,7 @@ export const signUp = async (email: string, password: string, name: string) => {
 };
 
 /**
- * Log in to firebase auth
+ * Log in to firebase auth.
  * @param email
  * @param password
  * @returns succes/fail
@@ -57,7 +57,7 @@ export const logIn = async (email: string, password: string) => {
 };
 
 /**
- * Log out from firebase auth
+ * Log out from firebase auth.
  * @returns {success: boolean, error?: string}
  */
 export const logOut = async () => {
@@ -71,7 +71,7 @@ export const logOut = async () => {
 };
 
 /**
- *
+ * Send password reset email.
  */
 export const forgotPassword = async (email: string) => {
   try {

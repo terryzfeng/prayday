@@ -20,6 +20,11 @@ export interface PrayHistoryItem {
   prayCount: number;
 }
 
+/**
+ * Fetch user information from firebase.
+ * @param userId userId
+ * @returns success and data for user document
+ */
 export async function getUserData(userId: string) {
   try {
     const userDoc = await getDoc(doc(db, "users", userId));
@@ -34,7 +39,7 @@ export async function getUserData(userId: string) {
 }
 
 /**
- * Get userId's prayHistory in the last USER_HISTORY_SIZE days, ordered by date
+ * Get userId's prayHistory in the last USER_HISTORY_SIZE days, ordered by date.
  * @param userId userId
  * @returns JSON of success, error, and data: Promise<PrayHistoryItem[]>
  */
@@ -67,7 +72,7 @@ export async function queryPrayerHistory(userId: string) {
 }
 
 /**
- * Add a prayer history entry on a specific day. If nothing is passed in, for today
+ * Add a prayer history entry on a specific day. Default date is today.
  * @param userId userId
  * @param date date which user prayer, default today
  */

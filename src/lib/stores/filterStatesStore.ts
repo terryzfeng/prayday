@@ -1,6 +1,5 @@
-// filterStatesStore.ts
-// Used to filter prayer store via a filter bank and a boolean array
-// for active filters
+// Used to filter the prayer store via a filter bank and a boolean array
+// representing filters that are active
 
 import { writable, derived, type Readable, get } from "svelte/store";
 import { PrayerStore } from "./prayerStore";
