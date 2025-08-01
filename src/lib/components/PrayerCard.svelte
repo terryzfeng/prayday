@@ -33,7 +33,7 @@
    * @param MouseEvent
    */
   function deletePrayer(event: Event) {
-    const confirmDelete = confirm(
+    const confirmDelete = true || confirm(
       "Are you sure you want to delete this prayer request?",
     );
     if (confirmDelete) {

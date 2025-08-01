@@ -1,7 +1,7 @@
 <!-- src/lib/components/auth/SignUpModal.svelte -->
 <script lang="ts">
   import { signUp } from "lib/utils/firebase/auth";
-  import Modal from "../Modal.svelte";
+  import Modal from "./Modal.svelte";
   import Button from "../Button.svelte";
 
   export let showSignUp: (state: boolean) => void;
@@ -106,6 +106,7 @@
             placeholder="Email"
             bind:value={email}
             required
+            autocomplete="email"
             class="text-sm w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-300"
             disabled={loading}
           />
@@ -118,6 +119,7 @@
             bind:value={password}
             required
             minlength="6"
+            autocomplete="new-password"
             class="text-sm w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-300"
             disabled={loading}
           />
@@ -130,6 +132,7 @@
             bind:value={password2}
             required
             minlength="6"
+            autocomplete="new-password"
             class="text-sm w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-300"
             disabled={loading}
           />

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Modal from "../Modal.svelte";
+  import Modal from "./Modal.svelte";
   import ContributionGrid from "../ContributionGrid.svelte";
   import {
     prayerCount,

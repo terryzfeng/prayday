@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { portal } from "lib/actions/portal.js";
 
   let modalDialog: HTMLDialogElement;
   let isClosing = false;
 
-  // Focus on the modal first or the first focusable element
-  export let focusOnShow = false;
+  // When modal opens, focus on the first focusable element (e.g. form fill, button)
+  export let disableInitialFocus = false;
   // Show click outside model to close help prompt
   export let showClosePrompt = true;
 
@@ -15,12 +15,14 @@
    * @param state change modal to this state
    */
   export function showModal(state: boolean) {
+    if (!modalDialog) return; // Ensure modalDialog is assigned
+
     if (state) {
       isClosing = false;
       modalDialog.showModal();
       document.body.style.overflow = "hidden";
       modalDialog.scrollTop = 0;
-      if (focusOnShow) {
+      if (disableInitialFocus) {
         modalDialog.focus();
       }
     } else {
@@ -45,6 +47,15 @@
       showModal(false);
     }
   }
+
+  onMount(() => {
+    // Ensure modalDialog is assigned after the component is mounted
+    // and potentially synchronize state if needed
+    if (modalDialog && modalDialog.open) {
+      // If modal is open after hot reload, ensure body overflow is hidden
+      document.body.style.overflow = "hidden";
+    }
+  });
 
   // Cleanup if component is destroyed while modal is open
   onDestroy(() => {

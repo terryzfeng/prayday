@@ -38,7 +38,7 @@ class PrayerSyncService {
 
     // Set up real-time sync with Firebase
     const prayersRef = collection(db, "users", this.userId, "prayers");
-    this.unsubscribeFirestore = onSnapshot(prayersRef, (snapshot) => {
+    this.unsubscribeFirestore = onSnapshot(prayersRef, async (snapshot) => {
       // Skip initial snapshot load because we manually loaded
       if (this.initialSnapshot) {
         this.initialSnapshot = false;
@@ -67,9 +67,13 @@ class PrayerSyncService {
         }
       });
 
+      const userRef = doc(db, "users", this.userId!);
+      const userDoc = await getDoc(userRef);
+      const firebaseDate = new Date(userDoc.data()?.lastUpdated || 0);
+
       // Batch merge all changed prayers
       if (changedPrayers.length > 0) {
-        PrayerStore.mergePrayers(changedPrayers);
+        PrayerStore.mergePrayers(changedPrayers, firebaseDate);
       }
 
       // Update lastKnownState with new prayer changes
@@ -193,8 +197,11 @@ class PrayerSyncService {
       const prayer = prayers.find((p) => p.uuid === uuid);
       if (prayer) {
         const prayerRef = doc(db, "users", this.userId, "prayers", prayer.uuid);
+        // const prayerEncrypted, iv = encryptPrayer(prayer.prayer);
         batch.set(prayerRef, {
           prayer: prayer.prayer,
+          // prayerEncrypted: prayerEncrypted,
+          // iv: iv,
           uuid: prayer.uuid,
           prayCount: prayer.prayCount,
           date: prayer.date.toISOString(),

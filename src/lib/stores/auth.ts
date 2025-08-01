@@ -6,9 +6,14 @@ import { getUserData } from "../utils/firebase/users";
 import { prayerSync as PrayerSync } from "../services/prayerSync";
 import { PrayerStore } from "lib/stores/prayerStore";
 
+// User Doc fields on Firebase
 interface UserData {
   name: string;
   email: string;
+  dek: string | null;
+  e_dek: string | null;
+  // iv: string | null; 
+  e2ee_enabled: boolean;
 }
 
 interface AuthStore {

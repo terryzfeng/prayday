@@ -8,6 +8,7 @@
   import AboutModal from "../Modals/AboutModal.svelte";
   import PrivacyModal from "../Modals/PrivacyModal.svelte";
   import ProfileModal from "../Modals/ProfileModal.svelte";
+  import SettingsModal from "../Modals/SettingsModal.svelte";
   import { user } from "lib/stores/auth";
   import { logOut } from "lib/utils/firebase/auth";
   import { filterStatesStore } from "lib/stores/filterStatesStore";
@@ -21,6 +22,7 @@
   let showAbout: (state: boolean) => void;
   let showPrivacy: (state: boolean) => void;
   let showProfile: (state: boolean) => void;
+  let showSettings: (state: boolean) => void;
 
   // Filter defaults
   let hideAnsweredText = "Hide Answered";
@@ -95,11 +97,9 @@
           callback={() => filterStatesStore.toggleFilterState("hideAnswered")}
           bind:isMenuOpen
         />
-
         <MenuItem
-          value="Log Out"
-          callback={handleLogout}
-          type="danger"
+          value={"Settings"}
+          callback={() => showSettings(true)}
           bind:isMenuOpen
         />
       {:else}
@@ -125,9 +125,11 @@
 </div>
 
 <!-- Modals -->
+<ProfileModal bind:showProfile />
 <AboutModal bind:showAbout bind:showPrivacy />
 <PrivacyModal bind:showPrivacy bind:showAbout />
-<ProfileModal bind:showProfile />
+<SettingsModal bind:showSettings />
+
 <LogInModal bind:showLogIn bind:showSignUp bind:showForgotPassword />
 <ForgotPasswordModal bind:showForgotPassword bind:showLogIn />
 <SignUpModal bind:showSignUp bind:showLogIn />

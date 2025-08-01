@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
-  import Modal from "../Modal.svelte";
+  import Modal from "./Modal.svelte";
   import { globalPrayerCount } from "lib/stores/globalPrayerCount";
   import shareiOSSVG from "lib/assets/share-ios.svg";
 
@@ -21,7 +21,7 @@
   }
 </script>
 
-<Modal bind:showModal={showAbout} focusOnShow={true}>
+<Modal bind:showModal={showAbout} disableInitialFocus={true}>
   <div
     class="flex flex-col items-center space-y-8 py-10 px-2 md:max-w-2xl mx-auto"
   >

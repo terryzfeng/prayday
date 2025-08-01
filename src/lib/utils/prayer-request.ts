@@ -11,6 +11,15 @@ export default class PrayerRequest {
   public lastPrayed: Date;
   public answered: boolean;
 
+  /**
+   * Construct a Prayer Request
+   * @param prayer prayer text
+   * @param uuid for prayer
+   * @param prayCount number of times prayer has been prayed
+   * @param date date created
+   * @param lastPrayed date last prayed
+   * @param answered boolean is prayer has been answered
+   */
   constructor(
     prayer: string,
     uuid: string = crypto.randomUUID(),

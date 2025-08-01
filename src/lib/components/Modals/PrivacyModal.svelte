@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
-  import Modal from "../Modal.svelte";
+  import Modal from "./Modal.svelte";
   import { globalPrayerCount } from "lib/stores/globalPrayerCount";
 
   let prayerCount: number;
@@ -20,10 +20,8 @@
   }
 </script>
 
-<Modal bind:showModal={showPrivacy} focusOnShow={true}>
-  <div
-    class="flex flex-col items-center space-y-8 py-6 px-2 md:max-w-2xl mx-auto"
-  >
+<Modal bind:showModal={showPrivacy} disableInitialFocus={true}>
+  <div class="flex flex-col items-center space-y-8 py-6 px-2 md:max-w-2xl mx-auto" >
     <!-- Privacy Policy Content -->
     <div class="w-full md:max-w-md space-y-6">
       <button class="text-blue-500 hover:text-blue-600" on:click={viewAbout}>

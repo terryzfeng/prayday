@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Modal from "../Modal.svelte";
+  import Modal from "./Modal.svelte";
   import Button from "../Button.svelte";
   import { forgotPassword } from "lib/utils/firebase/auth";
 
