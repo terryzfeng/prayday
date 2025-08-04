@@ -26,9 +26,15 @@
   >
     <!-- Privacy Policy Content -->
     <div class="w-full md:max-w-md space-y-6">
-      <button class="text-blue-500 hover:text-blue-600" on:click={viewAbout}>
-        ← Back to About
-      </button>
+      <div class="flex items-center space-x-3 line-section">
+        <button
+          class="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+          aria-label="Go back"
+        >
+          <!-- <img src={backChevron} alt="Go back" class="w-5 h-5" /> -->
+        </button>
+        <h1 class="h1">Advanced Prayer Protection</h1>
+      </div>
 
       <div class="space-y-6">
         <h1 class="h1">Privacy Policy</h1>

@@ -12,6 +12,15 @@
   export let onClose: (() => void) | undefined = undefined;
 
   /**
+   * Reset scroll position to top
+   */
+  export function resetScroll() {
+    if (modalDialog) {
+      modalDialog.scrollTop = 0;
+    }
+  }
+
+  /**
    * Set modal state
    * @param state change modal to this state
    */
@@ -21,6 +30,7 @@
       isClosing = false;
       modalDialog.showModal();
       document.body.style.overflow = "hidden";
+      resetScroll(); // Use the new method
       modalDialog.focus(); // Disable focus on first modal element
     } else {
       // Start closing animation instead of immediately closing

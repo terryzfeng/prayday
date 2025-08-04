@@ -4,6 +4,7 @@
   import Modal from "./Modal.svelte";
 
   let showModal = (state: boolean) => {};
+  let modalRef: Modal;
 
   export let currentPage: string = "main"; // Default page
   export let pages: Record<string, any> = {};
@@ -40,7 +41,10 @@
 
   export function navigateToPage(page: string) {
     currentPage = page;
-
+    
+    // Reset scroll position when navigating to a new page
+    modalRef?.resetScroll();
+    
     // Push new state to history
     history.pushState(
       { modalPage: page },
@@ -99,7 +103,7 @@
   }
 </script>
 
-<Modal bind:showModal onClose={closeModal}>
+<Modal bind:this={modalRef} bind:showModal onClose={closeModal}>
   <div class="max-w-2xl mx-auto">
     <slot {currentPage} {navigateToPage} {navigateBack} {closeModal} {pages} />
   </div>

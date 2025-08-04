@@ -1,10 +1,8 @@
 <script lang="ts">
   import Menu from "./Menu.svelte";
-  import AboutModal from "../Modals/AboutModal.svelte";
-  import PrivacyModal from "../Modals/PrivacyModal.svelte";
+  import AboutModal from "../Modals/About/AboutModal.svelte";
 
-  let showAbout: (state: boolean) => void;
-  let showPrivacy: (state: boolean) => void;
+  let openAbout: () => {};
 </script>
 
 <div
@@ -25,9 +23,7 @@
     <!-- Logo Prayday -->
     <button
       class="flex gap-1.5 cursor-pointer"
-      on:click={() => {
-        showAbout(true);
-      }}
+      on:click={openAbout}
     >
       <img
         src="/favicon_io/android-chrome-192x192.png"
@@ -46,5 +42,4 @@
   </div>
 </div>
 
-<AboutModal bind:showAbout bind:showPrivacy />
-<PrivacyModal bind:showPrivacy bind:showAbout />
+<AboutModal bind:openAbout />

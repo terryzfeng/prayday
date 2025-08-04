@@ -5,8 +5,7 @@
   import SignUpModal from "../Modals/SignUpModal.svelte";
   import LogInModal from "../Modals/LogInModal.svelte";
   import ForgotPasswordModal from "../Modals/ForgotPasswordModal.svelte";
-  import AboutModal from "../Modals/AboutModal.svelte";
-  import PrivacyModal from "../Modals/PrivacyModal.svelte";
+  import AboutModal from "../Modals/About/AboutModal.svelte";
   import ProfileModal from "../Modals/ProfileModal.svelte";
   import SettingsModal from "../Modals/Settings/SettingsModal.svelte";
   import { user } from "lib/stores/auth";
@@ -18,9 +17,9 @@
   let showLogIn: (state: boolean) => void;
   let showSignUp: (state: boolean) => void;
   let showForgotPassword: (state: boolean) => void;
-  let showAbout: (state: boolean) => void;
-  let showPrivacy: (state: boolean) => void;
   let showProfile: (state: boolean) => void;
+
+  let openAbout: () => {};
   let openSettings: () => {};
 
   // Filter defaults
@@ -72,7 +71,7 @@
         />
         <MenuItem
           value="What is Prayday?"
-          callback={() => showAbout(true)}
+          callback={openAbout}
           bind:isMenuOpen
         />
         <MenuItem
@@ -95,7 +94,7 @@
         />
         <MenuItem
           value="What is Prayday?"
-          callback={() => showAbout(true)}
+          callback={openAbout}
           bind:isMenuOpen
         />
         <MenuItem value={"Settings"} callback={openSettings} bind:isMenuOpen />
@@ -106,8 +105,7 @@
 
 <!-- Modals -->
 <ProfileModal bind:showProfile />
-<AboutModal bind:showAbout bind:showPrivacy />
-<PrivacyModal bind:showPrivacy bind:showAbout />
+<AboutModal bind:openAbout />
 <SettingsModal bind:openSettings />
 
 <LogInModal bind:showLogIn bind:showSignUp bind:showForgotPassword />

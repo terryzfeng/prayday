@@ -24,15 +24,16 @@
   }
 </script>
 
-<div class="flex flex-col space-y-3 p-6">
+<div class="modal-page">
+  <div class="w-full space-y-6">
+
   <h1 class="h1 line-section">Settings</h1>
 
   <!-- Account Section -->
   <div class="space-y-3">
     <h2 class="h2">
-      <span>Account</span>
+      <span>Manage Your Account</span>
     </h2>
-
     <SettingsItem
       headline="Advanced Prayer Protection"
       description="Encrypt your prayers to keep them secure"
@@ -49,5 +50,6 @@
       onClick={handleLogout}
       className="w-full"
     />
+  </div>
   </div>
 </div>
