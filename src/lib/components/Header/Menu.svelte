@@ -8,9 +8,8 @@
   import AboutModal from "../Modals/AboutModal.svelte";
   import PrivacyModal from "../Modals/PrivacyModal.svelte";
   import ProfileModal from "../Modals/ProfileModal.svelte";
-  import SettingsModal from "../Modals/SettingsModal.svelte";
+  import SettingsModal from "../Modals/Settings/SettingsModal.svelte";
   import { user } from "lib/stores/auth";
-  import { logOut } from "lib/utils/firebase/auth";
   import { filterStatesStore } from "lib/stores/filterStatesStore";
 
   let isMenuOpen = false;
@@ -22,26 +21,10 @@
   let showAbout: (state: boolean) => void;
   let showPrivacy: (state: boolean) => void;
   let showProfile: (state: boolean) => void;
-  let showSettings: (state: boolean) => void;
+  let openSettings: () => {};
 
   // Filter defaults
   let hideAnsweredText = "Hide Answered";
-
-  /**
-   * Handle log out
-   */
-  async function handleLogout() {
-    try {
-      const result = await logOut();
-      if (result.success) {
-        isMenuOpen = false;
-      } else {
-        console.error("Logout failed:", result.error);
-      }
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
-  }
 
   /**
    * Close Menu Container
@@ -66,7 +49,7 @@
 </script>
 
 <!-- Dropdown menu container -->
-<div class="menu-container relative overflow-none">
+<div class="menu-container relative">
   <button
     on:click={() => (isMenuOpen = !isMenuOpen)}
     class="p-2 rounded-lg shadow-[2px_2px_4px_0px_rgba(0,0,0,0.08),-2px_-2px_4px_0px_rgba(255,255,255,0.8)] hover:shadow-[3px_3px_6px_0px_rgba(0,0,0,0.08),-3px_-3px_6px_0px_rgba(255,255,255,0.8)] active:shadow-[inset_2px_2px_4px_0px_rgba(0,0,0,0.08),inset_-2px_-2px_4px_0px_rgba(255,255,255,0.8)] transition-all duration-200"
@@ -78,7 +61,7 @@
   {#if isMenuOpen}
     <div
       transition:fade={{ duration: 75 }}
-      class="absolute right-0 mt-2 w-48 md:w-40 rounded-lg bg-white shadow-[4px_4px_8px_0px_rgba(0,0,0,0.08),-4px_-4px_8px_0px_rgba(255,255,255,0.8)] py-0 z-50"
+      class="absolute right-0 mt-2 w-48 md:w-40 rounded-lg bg-white shadow-[4px_4px_8px_0px_rgba(0,0,0,0.08),-4px_-4px_8px_0px_rgba(255,255,255,0.8)] py-0 z-50 overflow-hidden"
     >
       {#if $user.user}
         <!-- Logged in state -->
@@ -97,11 +80,7 @@
           callback={() => filterStatesStore.toggleFilterState("hideAnswered")}
           bind:isMenuOpen
         />
-        <MenuItem
-          value={"Settings"}
-          callback={() => showSettings(true)}
-          bind:isMenuOpen
-        />
+        <MenuItem value={"Settings"} callback={openSettings} bind:isMenuOpen />
       {:else}
         <!-- Logged out state -->
         <MenuItem
@@ -119,6 +98,7 @@
           callback={() => showAbout(true)}
           bind:isMenuOpen
         />
+        <MenuItem value={"Settings"} callback={openSettings} bind:isMenuOpen />
       {/if}
     </div>
   {/if}
@@ -128,7 +108,7 @@
 <ProfileModal bind:showProfile />
 <AboutModal bind:showAbout bind:showPrivacy />
 <PrivacyModal bind:showPrivacy bind:showAbout />
-<SettingsModal bind:showSettings />
+<SettingsModal bind:openSettings />
 
 <LogInModal bind:showLogIn bind:showSignUp bind:showForgotPassword />
 <ForgotPasswordModal bind:showForgotPassword bind:showLogIn />

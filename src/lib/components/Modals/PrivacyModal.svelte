@@ -20,8 +20,10 @@
   }
 </script>
 
-<Modal bind:showModal={showPrivacy} disableInitialFocus={true}>
-  <div class="flex flex-col items-center space-y-8 py-6 px-2 md:max-w-2xl mx-auto" >
+<Modal bind:showModal={showPrivacy}>
+  <div
+    class="flex flex-col items-center space-y-8 py-6 px-2 md:max-w-2xl mx-auto"
+  >
     <!-- Privacy Policy Content -->
     <div class="w-full md:max-w-md space-y-6">
       <button class="text-blue-500 hover:text-blue-600" on:click={viewAbout}>
@@ -29,11 +31,7 @@
       </button>
 
       <div class="space-y-6">
-        <h2
-          class="text-2xl font-semibold text-gray-800 border-b border-gray-200 pb-2"
-        >
-          Privacy Policy
-        </h2>
+        <h1 class="h1">Privacy Policy</h1>
         <p class="text-gray-600 leading-relaxed">
           Prayday is committed to protecting your privacy. We collect two types
           of data:

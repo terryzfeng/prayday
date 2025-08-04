@@ -1,3 +1,4 @@
+<!-- Modal.svelte -->
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
   import { portal } from "lib/actions/portal.js";
@@ -5,10 +6,10 @@
   let modalDialog: HTMLDialogElement;
   let isClosing = false;
 
-  // When modal opens, focus on the first focusable element (e.g. form fill, button)
-  export let disableInitialFocus = false;
-  // Show click outside model to close help prompt
+  // Show click outside modal to close help prompt
   export let showClosePrompt = true;
+  // Callback for when modal should close (outside click, escape key, etc.)
+  export let onClose: (() => void) | undefined = undefined;
 
   /**
    * Set modal state
@@ -16,24 +17,22 @@
    */
   export function showModal(state: boolean) {
     if (!modalDialog) return; // Ensure modalDialog is assigned
-
     if (state) {
       isClosing = false;
       modalDialog.showModal();
       document.body.style.overflow = "hidden";
-      modalDialog.scrollTop = 0;
-      if (disableInitialFocus) {
-        modalDialog.focus();
-      }
+      modalDialog.focus(); // Disable focus on first modal element
     } else {
       // Start closing animation instead of immediately closing
       isClosing = true;
       document.body.style.overflow = "";
-
       // Wait for animation to complete before actually closing
       setTimeout(() => {
-        modalDialog.close();
-        isClosing = false;
+        if (modalDialog) {
+          // Add safety check
+          modalDialog.close();
+          isClosing = false;
+        }
       }, 200); // Match this with your CSS transition duration
     }
   }
@@ -44,22 +43,48 @@
    */
   function handleClick(event: any) {
     if (event.target === modalDialog) {
-      showModal(false);
+      // Call the onClose callback instead of directly calling showModal
+      if (onClose) {
+        onClose();
+      } else {
+        // Fallback to direct close if no callback provided
+        showModal(false);
+      }
+    }
+  }
+
+  /**
+   * Handle escape key press
+   * @param event
+   */
+  function handleKeydown(event: KeyboardEvent) {
+    if (event.key === "Escape") {
+      // Call the onClose callback for escape key as well
+      if (onClose) {
+        onClose();
+      } else {
+        // Fallback to direct close if no callback provided
+        showModal(false);
+      }
     }
   }
 
   onMount(() => {
-    // Ensure modalDialog is assigned after the component is mounted
-    // and potentially synchronize state if needed
-    if (modalDialog && modalDialog.open) {
-      // If modal is open after hot reload, ensure body overflow is hidden
-      document.body.style.overflow = "hidden";
+    if (modalDialog) {
+      if (modalDialog.open) {
+        // Modal was open before hot reload - sync the state
+        showModal(true);
+      } else {
+        // Modal was closed - ensure everything is clean
+        showModal(false);
+      }
     }
   });
 
   // Cleanup if component is destroyed while modal is open
   onDestroy(() => {
-    document.body.style.overflow = "";
+    console.log("on destroy");
+    showModal(false);
   });
 </script>
 
@@ -78,6 +103,7 @@
   aria-describedby="modal-description"
   bind:this={modalDialog}
   on:click={handleClick}
+  on:keydown={handleKeydown}
   use:portal
 >
   <slot />
@@ -95,18 +121,15 @@
       overlay 0.3s;
     animation: appear 0.2s forwards;
   }
-
   /* Use closing class instead of :not([open]) for Safari compatibility */
   dialog.closing {
     animation: disappear 0.2s forwards;
   }
-
   dialog::backdrop {
     /* background: rgba(255, 255, 255, 0.8); */
     /* backdrop-filter: blur(4px); */
     /* transition: opacity 0.3s ease; */
   }
-
   @keyframes appear {
     from {
       opacity: 0;
@@ -117,7 +140,6 @@
       transform: translateY(0);
     }
   }
-
   @keyframes disappear {
     from {
       opacity: 1;

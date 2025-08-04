@@ -21,7 +21,7 @@
   }
 </script>
 
-<Modal bind:showModal={showAbout} disableInitialFocus={true}>
+<Modal bind:showModal={showAbout}>
   <div
     class="flex flex-col items-center space-y-8 py-10 px-2 md:max-w-2xl mx-auto"
   >
@@ -41,11 +41,7 @@
 
     <div class="w-full md:max-w-md space-y-6">
       <div class="space-y-3">
-        <h2
-          class="text-2xl font-semibold text-gray-800 border-b border-gray-200 pb-2"
-        >
-          What is Prayday?
-        </h2>
+        <h1 class="h1">What is Prayday?</h1>
         <p class="text-gray-600 leading-relaxed">
           Prayday is a personal prayer companion app that organizes prayer
           requests and reminds you to pray! Create a prayer card with a topic
@@ -63,11 +59,7 @@
       </div>
 
       <div class="space-y-3">
-        <h2
-          class="text-2xl font-semibold text-gray-800 border-b border-gray-200 pb-2"
-        >
-          Prayday on Mobile
-        </h2>
+        <h1 class="h1">Prayday on Mobile</h1>
         <p class="text-gray-600 leading-relaxed">
           Get the Prayday app by simply adding this website to your mobile home
           screen! On iOS, tap the share
@@ -91,11 +83,7 @@
           icon and then select "Add to Home Screen."
         </p>
         <div class="space-y-3">
-          <h2
-            class="text-2xl font-semibold text-gray-800 border-b border-gray-200 pb-2"
-          >
-            Special Thanks
-          </h2>
+          <h1 class="h1">Special Thanks</h1>
           <p class="text-gray-600 leading-relaxed">
             Prayday was created with love by Terry Feng for all who seek to
             cultivate a life of prayer.

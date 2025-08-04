@@ -14,12 +14,10 @@
 <Modal bind:showModal={showProfile}>
   <div class="flex flex-col items-center space-y-6 p-5 max-w-2xl mx-auto">
     <!-- Header Section -->
-    <div class="flex items-center space-x-4">
-      <div>
-        <h1 class="text-2xl text-gray-700 font-semibold">
-          {$user.userData?.name}'s Prayer Journey
-        </h1>
-      </div>
+    <div class="w-full flex items-center justify-center">
+      <h1 class="title">
+        {$user.userData?.name}'s Prayer Journey
+      </h1>
     </div>
 
     <!-- Stats Grid -->

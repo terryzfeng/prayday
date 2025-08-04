@@ -12,7 +12,7 @@ interface UserData {
   email: string;
   dek: string | null;
   e_dek: string | null;
-  // iv: string | null; 
+  // iv: string | null;
   e2ee_enabled: boolean;
 }
 

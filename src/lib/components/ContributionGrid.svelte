@@ -61,7 +61,7 @@
   }
 </script>
 
-<div class="w-full bg-white rounded-lg pt-4">
+<div class="w-full bg-white rounded-lg pt-4 pb-2">
   <div class="flex flex-col sm:flex-row sm:justify-between align-middle pb-2">
     <div class="items-center pb-1 sm:pb-2">
       <span class="text-gray-600 font-medium"
