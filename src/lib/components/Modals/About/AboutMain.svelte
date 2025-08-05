@@ -15,7 +15,9 @@
   onDestroy(unsubscribe);
 </script>
 
-<div class="flex flex-col items-center space-y-8 pt-10 pb-3 px-2 md:max-w-2xl mx-auto;">
+<div
+  class="flex flex-col items-center space-y-8 pt-10 pb-3 px-2 md:max-w-2xl mx-auto;"
+>
   <!-- About Header -->
   <h1 class="prayday-title animate-fade-in">Prayday</h1>
 
@@ -85,7 +87,10 @@
       </div>
 
       <!-- Privacy Policy Button -->
-      <button class="text-blue-500 hover:text-blue-600" on:click={() => onNavigate("privacy-page")}>
+      <button
+        class="text-blue-500 hover:text-blue-600"
+        on:click={() => onNavigate("privacy-page")}
+      >
         View Privacy Policy
       </button>
     </div>

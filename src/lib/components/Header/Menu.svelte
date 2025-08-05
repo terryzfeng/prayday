@@ -8,6 +8,7 @@
   import AboutModal from "../Modals/About/AboutModal.svelte";
   import ProfileModal from "../Modals/ProfileModal.svelte";
   import SettingsModal from "../Modals/Settings/SettingsModal.svelte";
+  import InputDataPassphrase from "../Modals/Settings/InputDataPassphrase.svelte";
   import { user } from "lib/stores/auth";
   import { filterStatesStore } from "lib/stores/filterStatesStore";
 
@@ -18,6 +19,7 @@
   let showSignUp: (state: boolean) => void;
   let showForgotPassword: (state: boolean) => void;
   let showProfile: (state: boolean) => void;
+  let showInputPassphrase: (state: boolean) => void;
 
   let openAbout: () => {};
   let openSettings: () => {};
@@ -103,7 +105,7 @@
   {/if}
 </div>
 
-<!-- Modals -->
+<!-- Menu Modals -->
 <ProfileModal bind:showProfile />
 <AboutModal bind:openAbout />
 <SettingsModal bind:openSettings />
@@ -111,3 +113,6 @@
 <LogInModal bind:showLogIn bind:showSignUp bind:showForgotPassword />
 <ForgotPasswordModal bind:showForgotPassword bind:showLogIn />
 <SignUpModal bind:showSignUp bind:showLogIn />
+
+<!-- Other Modals -->
+<InputDataPassphrase bind:showInputPassphrase />

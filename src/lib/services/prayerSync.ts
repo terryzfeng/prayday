@@ -47,6 +47,7 @@ class PrayerSyncService {
       if (this.syncing) return;
       this.syncing = true;
       const changedPrayers: PrayerRequest[] = [];
+
       snapshot.docChanges().forEach((change) => {
         const data = change.doc.data();
         if (change.type === "removed") {
@@ -88,7 +89,7 @@ class PrayerSyncService {
     this.unsubscribeStore = PrayerStore.subscribe(
       async ($prayers: PrayerRequest[]) => {
         if (this.syncing) return;
-        this.trackChanges($prayers);
+        this.trackChanges($prayers); // Compute delta of changed prayers
         // If we have changes and a userId, sync them
         if (
           this.userId &&

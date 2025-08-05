@@ -5,6 +5,8 @@ import { onAuthStateChanged } from "firebase/auth";
 import { getUserData } from "../utils/firebase/users";
 import { prayerSync as PrayerSync } from "../services/prayerSync";
 import { PrayerStore } from "lib/stores/prayerStore";
+import { setDek } from "../utils/encryption";
+import { e2eeEnabledStore } from "./e2eeEnabledStore";
 
 // User Doc fields on Firebase
 interface UserData {
@@ -38,6 +40,8 @@ function createAuthStore() {
     if (user) {
       // Log In
       const userData = await getUserData(user.uid);
+      e2eeEnabledStore.set(userData.data?.e2ee_enabled ?? false);
+      setDek(userData.data?.dek ?? "");
       set({
         user,
         userData: userData.success ? (userData.data as UserData) : null,

@@ -16,7 +16,6 @@
   export const openAbout = () => {
     modalRef?.openModal();
   };
-
 </script>
 
 <NavigableModal bind:this={modalRef} bind:currentPage {pages}>

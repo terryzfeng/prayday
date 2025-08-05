@@ -53,6 +53,7 @@
    */
   function handleClick(event: any) {
     if (event.target === modalDialog) {
+      console.log("close outside");
       // Call the onClose callback instead of directly calling showModal
       if (onClose) {
         onClose();

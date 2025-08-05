@@ -21,10 +21,7 @@
   <!-- Header container -->
   <div class="relative flex w-full justify-between items-center">
     <!-- Logo Prayday -->
-    <button
-      class="flex gap-1.5 cursor-pointer"
-      on:click={openAbout}
-    >
+    <button class="flex gap-1.5 cursor-pointer" on:click={openAbout}>
       <img
         src="/favicon_io/android-chrome-192x192.png"
         alt="Prayday logo"

@@ -23,6 +23,9 @@
       if (password !== password2) {
         throw new Error("Passwords do not match. Please try again.");
       }
+      if (password.length < 8) {
+        throw new Error("Password must be at least 8 characters long.");
+      }
 
       const result = await signUp(email, password, name);
 
@@ -118,7 +121,6 @@
             placeholder="Password"
             bind:value={password}
             required
-            minlength="6"
             autocomplete="new-password"
             class="text-sm w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-300"
             disabled={loading}
@@ -128,10 +130,9 @@
         <div class="space-y-2">
           <input
             type="password"
-            placeholder="Re-enter password"
+            placeholder="Confirm password"
             bind:value={password2}
             required
-            minlength="6"
             autocomplete="new-password"
             class="text-sm w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-300"
             disabled={loading}
