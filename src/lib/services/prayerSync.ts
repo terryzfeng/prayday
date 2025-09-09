@@ -31,6 +31,7 @@ class PrayerSyncService {
     if (this.initialized) return;
     this.userId = userId;
 
+    // TODO: CHECK DATE BEFORE PULLING ANY PRAYERS
     // Load synced data from Firebase
     const firebasePrayers = await this.loadFromFirebase();
     // Merge Firebase and local PrayerStore

@@ -33,7 +33,9 @@
    * @param MouseEvent
    */
   function deletePrayer(event: Event) {
-    const confirmDelete = confirm("Are you sure you want to delete this prayer request?");
+    const confirmDelete = confirm(
+      "Are you sure you want to delete this prayer request?",
+    );
     if (confirmDelete) {
       event.stopPropagation();
       playFx("ERROR");

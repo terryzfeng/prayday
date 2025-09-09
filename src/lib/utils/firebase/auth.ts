@@ -6,6 +6,7 @@ import {
 } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { auth, db } from "./config";
+// import { Account } from "../account/account";
 
 /**
  * Sign up a new user for Prayday.
@@ -16,6 +17,8 @@ import { auth, db } from "./config";
  */
 export const signUp = async (email: string, password: string, name: string) => {
   try {
+    // Get current guest key
+    // const currentKey = getKeys().dek!;
     const userCredential = await createUserWithEmailAndPassword(
       auth,
       email,
@@ -24,6 +27,7 @@ export const signUp = async (email: string, password: string, name: string) => {
     await setDoc(doc(db, "users", userCredential.user.uid), {
       name: name,
       email: email,
+      // dek_base_64: encodeBase64(currentKey),
     });
     return { success: true, user: userCredential.user };
   } catch (error: any) {
@@ -47,6 +51,7 @@ export const logIn = async (email: string, password: string) => {
       email,
       password,
     );
+
     return { success: true, user: userCredential.user };
   } catch (error: any) {
     if (error.code === "auth/invalid-credential") {

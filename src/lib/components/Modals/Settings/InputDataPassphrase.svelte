@@ -3,7 +3,6 @@
   import Modal from "lib/components/Modals/Modal.svelte";
   import Button from "lib/components/Button.svelte";
   import { user } from "lib/stores/auth";
-  import { getDek, setDek } from "lib/utils/encryption";
   import { e2eeEnabledStore } from "lib/stores/e2eeEnabledStore";
 
   export let showInputPassphrase: (state: boolean) => void;
@@ -32,8 +31,8 @@
         throw new Error("Incorrect passphrase. Please try again.");
       }
 
-      // TODO: Fix me
-      setDek("0");
+      // TODO: Fix Account Keys
+      // setDek("0", null);
 
       // Success - reset form and close modal
       password = "";
@@ -53,10 +52,11 @@
     // Once user logs in and if e2ee is enabled
     if ($user.user !== null && $e2eeEnabledStore) {
       // If we don't have a dek, show input passphrase to decrypt e_dek
-      if (!getDek()) {
-        showInputPassphrase(true);
-        console.log("show input passphrase");
-      }
+      // TODO: Fix Account Keys
+      // if (!getDek()) {
+      //   showInputPassphrase(true);
+      //   console.log("show input passphrase");
+      // }
     }
   }
 </script>
