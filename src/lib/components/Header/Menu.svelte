@@ -9,7 +9,7 @@
   import ProfileModal from "../Modals/ProfileModal.svelte";
   import SettingsModal from "../Modals/Settings/SettingsModal.svelte";
   import InputDataPassphrase from "../Modals/Settings/InputDataPassphrase.svelte";
-  import { user } from "lib/stores/auth";
+  import { account } from "lib/stores/accountStore";
   import { filterStatesStore } from "lib/stores/filterStatesStore";
 
   let isMenuOpen = false;
@@ -64,7 +64,7 @@
       transition:fade={{ duration: 75 }}
       class="absolute right-0 mt-2 w-48 md:w-40 rounded-lg bg-white shadow-[4px_4px_8px_0px_rgba(0,0,0,0.08),-4px_-4px_8px_0px_rgba(255,255,255,0.8)] py-0 z-50 overflow-hidden"
     >
-      {#if $user.user}
+      {#if $account!.isCloudAccount}
         <!-- Logged in state -->
         <MenuItem
           value="View Profile"

@@ -6,7 +6,7 @@
     answeredCount,
     unansweredCount,
   } from "lib/stores/prayerStore";
-  import { user } from "lib/stores/auth";
+  import { account } from "lib/stores/accountStore";
 
   export let showProfile: (state: boolean) => void;
 </script>
@@ -16,7 +16,7 @@
     <!-- Header Section -->
     <div class="w-full flex items-center justify-center">
       <h1 class="title">
-        {$user.userData?.name}'s Prayer Journey
+        {$account?.name}'s Prayer Journey
       </h1>
     </div>
 

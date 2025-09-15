@@ -2,7 +2,7 @@
   import Button from "lib/components/Button.svelte";
   import { PrayerStore } from "lib/stores/prayerStore";
   import { onMount } from "svelte";
-  import { user } from "lib/stores/auth";
+  import { account } from "lib/stores/accountStore";
   import { playFx } from "lib/utils/audio-host";
 
   let prayerInput = "";
@@ -78,8 +78,8 @@
 
 <div class="w-full p-5">
   <label class="block text-gray-700 font-semibold mb-2" for="pray-input">
-    {#if $user.user}
-      Hi {$user.userData.name}! Add a prayer request:
+    {#if $account?.isCloudAccount}
+      Hi {$account?.name}! Add a prayer request:
     {:else}
       Prayer request:
     {/if}

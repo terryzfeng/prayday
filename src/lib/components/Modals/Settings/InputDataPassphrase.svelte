@@ -2,7 +2,7 @@
 <script lang="ts">
   import Modal from "lib/components/Modals/Modal.svelte";
   import Button from "lib/components/Button.svelte";
-  import { user } from "lib/stores/auth";
+  import { account } from "lib/stores/accountStore";
   import { e2eeEnabledStore } from "lib/stores/e2eeEnabledStore";
 
   export let showInputPassphrase: (state: boolean) => void;
@@ -50,7 +50,7 @@
 
   $: {
     // Once user logs in and if e2ee is enabled
-    if ($user.user !== null && $e2eeEnabledStore) {
+    if ($account?.isCloudAccount === true && $e2eeEnabledStore) {
       // If we don't have a dek, show input passphrase to decrypt e_dek
       // TODO: Fix Account Keys
       // if (!getDek()) {

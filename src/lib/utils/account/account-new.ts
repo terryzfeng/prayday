@@ -1,55 +1,109 @@
-import {
-  computeKeyCheckValue,
-  exportAccountKey,
-  generateAccountKey,
-} from "./encryption-new";
-import type { Keys } from "./keys-new";
+import type { User as FirebaseAuthUser } from "firebase/auth";
+import { prayerSync } from "lib/services/prayerSyncManager";
+import { PrayerStore } from "lib/stores/prayerStore";
+
+// Firebase Firestore User Doc fields
+export interface FirebaseAccountSettings {
+  name: string;
+  email: string;
+}
+
+const LOCAL_ACCOUNT_KEY = "account";
 
 export default class Account {
-  id: string;
+  id: string; // Firebase UID or Local ID
   isCloudAccount: boolean;
-  private keys: Keys;
+  name: string;
 
-  constructor(id: string, isCloudAccount: boolean, keys: Keys) {
+  private firebaseAuthUser: FirebaseAuthUser | undefined;
+  private email: string | undefined;
+  // private keys: Keys;
+
+  constructor(
+    id: string,
+    isCloudAccount: boolean,
+    name: string,
+    firebaseAuthUser?: FirebaseAuthUser | undefined,
+    email?: string | undefined,
+  ) {
     this.id = id;
     this.isCloudAccount = isCloudAccount;
-    this.keys = keys;
+    this.name = name;
+
+    this.firebaseAuthUser = firebaseAuthUser;
+    this.email = email;
   }
 
-  static establishAccount(id: string, isCloudAccount: boolean = false) {}
+  static createCloudAccount(
+    firebaseAuthUser: FirebaseAuthUser,
+    firebaseAccountSettings: FirebaseAccountSettings,
+  ) {
+    return new Account(
+      firebaseAuthUser.uid,
+      /*isCloudAccount=*/ true,
+      firebaseAccountSettings.name,
+      firebaseAuthUser,
+      firebaseAccountSettings.email,
+    );
+  }
 
-  static async createAccountKeys(id: string): Promise<Keys> {
-    let accountKey = await generateAccountKey();
-    return {
-      key: accountKey,
-      keySettings: {
-        id: id,
-        accountKeyCheckValue: computeKeyCheckValue(accountKey),
-        unprotectedAccountKey: JSON.stringify(exportAccountKey(accountKey)),
-      },
-    };
+  static createLocalAccount(id: string) {
+    return new Account(id, /*isCloudAccount=*/ false, "Guest");
+  }
+
+  static clearAccount() {
+    prayerSync.uninitialize();
+    PrayerStore.clearStorage();
+  }
+
+  static loadLocalAccount() {
+    const localAccountId = localStorage.getItem(LOCAL_ACCOUNT_KEY);
+    if (localAccountId === null) {
+      return null;
+    }
+    return Account.createLocalAccount(localAccountId);
+  }
+
+  static async establishAccount(
+    isCloudAccount: boolean,
+    firebaseAuthUser?: FirebaseAuthUser,
+    firebaseAccountSettings?: FirebaseAccountSettings,
+  ): Promise<Account | undefined> {
+    // No cloud account exists
+    let account = null;
+    if (isCloudAccount) {
+      if (
+        firebaseAuthUser === undefined ||
+        firebaseAccountSettings === undefined
+      ) {
+        console.error("No cloud account exists");
+        return undefined;
+      }
+      account = Account.createCloudAccount(
+        firebaseAuthUser,
+        firebaseAccountSettings,
+      );
+    } else {
+      account = loadLocalAccount();
+      if (account === null) {
+        account = Account.createLocalAccount(crypto.randomUUID());
+      }
+    }
+    // Establish Services and Keys
+    if (prayerSync.isInitialized()) {
+      prayerSync.uninitialize();
+    }
+    await prayerSync.initialize(account);
+    PrayerStore.setPrayers(prayerSync.pull());
+
+    return account;
   }
 }
 
-let accounts: Record<string, Account>;
-
-export async function createAccount(
-  isCloudAccount: boolean = false,
-  id: string = "",
-): Promise<string> {
-  if (!isCloudAccount) {
-    id = "guest";
+function loadLocalAccount(): Account | null {
+  const localAccountId = localStorage.getItem(LOCAL_ACCOUNT_KEY);
+  if (localAccountId === null) {
+    return null;
   }
-  let newKeys = await Account.createAccountKeys(id);
-  let newAccount = new Account(id, isCloudAccount, newKeys);
-  accounts[newAccount.id] = newAccount;
-  return newAccount.id;
-}
-
-export function accountExist(id: string | null) {
-  return id !== null && accounts[id] !== undefined;
-}
-
-export function logOutAccount(id: string) {
-  delete accounts[id];
+  return Account.createLocalAccount(localAccountId);
 }

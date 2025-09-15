@@ -21,11 +21,11 @@ export interface PrayHistoryItem {
 }
 
 /**
- * Fetch user information from firebase.
+ * Fetch user account settings from firebase
  * @param userId userId
  * @returns success and data for user document
  */
-export async function getUserData(userId: string) {
+export async function getAccountSettings(userId: string) {
   try {
     const userDoc = await getDoc(doc(db, "users", userId));
     if (userDoc.exists()) {
