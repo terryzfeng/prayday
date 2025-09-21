@@ -50,13 +50,12 @@ async function getAccountSettingsFromServer(userDocRef: DocumentReference) {
  * @returns success and data for user document
  */
 export async function getAccountSettings(userId: string) {
+  // Try to pull account data settings from Firestore cache
+  const userDocRef = doc(db, "users", userId);
+
   try {
-    // Try to pull account data settings from Firestore cache
-    const userDocRef = doc(db, "users", userId);
-
-    // First, try to get from cache only
+    // First, try to get from cache only, will throw error if not in cache
     const cachedDoc = await getDocFromCache(userDocRef);
-
     if (cachedDoc.exists()) {
       return {
         success: true,
@@ -65,7 +64,8 @@ export async function getAccountSettings(userId: string) {
         getAccountSettingsFromServer: getAccountSettingsFromServer(userDocRef),
       };
     }
-
+    throw new Error();
+  } catch (error: any) {
     // If not in cache, fall back to server
     const serverDoc = await getDocFromServer(userDocRef);
 
@@ -76,9 +76,9 @@ export async function getAccountSettings(userId: string) {
         fromCache: false,
       };
     }
-    throw new Error("User account settings not found");
-  } catch (error: any) {
-    return { success: false, error: error.message };
+    // Otherwise we failed to initialize firebase account settings when we had 
+    // a firebase account
+    return { success: false, error: "Failed to load user account settings. Please contact Prayday support." };
   }
 }
 

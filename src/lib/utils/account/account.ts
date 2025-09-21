@@ -115,6 +115,10 @@ export default class Account {
   }
 }
 
+/**
+ * Load guest account from localStorage
+ * @returns local guest account
+ */
 function loadLocalAccount(): Account | null {
   const localAccountId = localStorage.getItem(LOCAL_ACCOUNT_KEY);
   if (localAccountId === null) {

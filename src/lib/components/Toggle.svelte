@@ -12,6 +12,7 @@
   <button
     type="button"
     role="switch"
+    title={label}
     on:click={onClick}
     class={`
     ${toggleClasses}

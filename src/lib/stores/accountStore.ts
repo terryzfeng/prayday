@@ -34,7 +34,9 @@ function createAccountStore() {
         );
         cloudAccountLoggedIn = true;
       } else {
-        console.error("Firebase failed to log in");
+        // Firebase failed to log in, fallback to guest account
+        console.error(firebaseAccountSettingsPromise.error)
+        account = await Account.establishAccount(/*isCloudAccount=*/false);
       }
     } else {
       // Switching from logged in to log out

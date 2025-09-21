@@ -6,7 +6,6 @@ import {
 } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { auth, db } from "./config";
-// import { Account } from "../account/account";
 
 /**
  * Sign up a new user for Prayday.
