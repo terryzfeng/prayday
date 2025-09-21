@@ -1,11 +1,11 @@
 import { writable, derived, get } from "svelte/store";
 import PrayerRequest from "lib/utils/prayer-request";
 import { incrementGlobalPrayerCount } from "../utils/firebase/prayer-stats";
-import { prayerSync } from "../services/prayerSyncManager";
+import { prayerSync } from "../services/prayerSync/prayerSyncManager";
 import {
   PrayerOperation,
   PrayerUpdateType,
-} from "../services/prayerSyncService";
+} from "../services/prayerSync/prayerSyncService";
 const STORAGE_DATE_KEY = "lastUpdated";
 
 /**

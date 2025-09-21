@@ -9,8 +9,8 @@ import {
 import { db } from "lib/utils/firebase/config";
 import { PrayerStore } from "lib/stores/prayerStore";
 import PrayerRequest from "lib/utils/prayer-request";
-import { userHistoryService } from "./userHistoryService";
-import { createPrayerFromFirebaseData } from "../utils/firebase/firebase-prayer-request";
+import { userHistoryService } from "../userHistoryService";
+import { createPrayerFromFirebaseData } from "../../utils/firebase/firebase-prayer-request";
 import {
   PrayerOperation,
   PrayerUpdateType,

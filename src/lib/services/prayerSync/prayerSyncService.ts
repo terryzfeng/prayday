@@ -1,4 +1,4 @@
-import type PrayerRequest from "../utils/prayer-request";
+import type PrayerRequest from "../../utils/prayer-request";
 
 export enum PrayerOperation {
   CREATE = "create",

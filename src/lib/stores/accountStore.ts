@@ -1,14 +1,11 @@
 import { writable } from "svelte/store";
-import type { User } from "firebase/auth";
 import { auth } from "lib/utils/firebase/config";
 import { onAuthStateChanged } from "firebase/auth";
 import { getAccountSettings } from "../utils/firebase/users";
-import { prayerSync } from "../services/prayerSyncManager";
-import { PrayerStore } from "lib/stores/prayerStore";
-import { e2eeEnabledStore } from "./e2eeEnabledStore";
 import Account, {
   type FirebaseAccountSettings,
-} from "../utils/account/account-new";
+} from "../utils/account/account";
+import { getAccountSettingsAsync } from "../services/accountSettingsSyncService";
 
 let cloudAccountLoggedIn = false;
 
@@ -17,21 +14,23 @@ let cloudAccountLoggedIn = false;
  * @returns user auth store
  */
 function createAccountStore() {
-  const { subscribe, set } = writable<Account | undefined>(undefined);
+  const { subscribe, set, update } = writable<Account | undefined>(undefined);
 
   // Initialize the store with the current auth state
-  onAuthStateChanged(auth, async (firebaseUser) => {
+  onAuthStateChanged(auth, async (firebaseAuthUser) => {
     let account = undefined;
-    if (firebaseUser) {
+    if (firebaseAuthUser) {
       // Site load and user is logged in
       const firebaseAccountSettingsPromise = await getAccountSettings(
-        firebaseUser.uid,
+        firebaseAuthUser.uid,
       );
       if (firebaseAccountSettingsPromise.success) {
         account = await Account.establishAccount(
           /*isCloudAccount=*/ true,
-          firebaseUser,
+          firebaseAuthUser,
           firebaseAccountSettingsPromise.data as FirebaseAccountSettings,
+          firebaseAccountSettingsPromise.fromCache,
+          firebaseAccountSettingsPromise.getAccountSettingsFromServer
         );
         cloudAccountLoggedIn = true;
       } else {
@@ -46,7 +45,7 @@ function createAccountStore() {
       }
 
       // Establish guest account
-      account = await Account.establishAccount(/*isCloudAccount=*/ false);
+      account = await Account.establishAccount(/*isCloudAccount=*/false);
     }
 
     set(account);
@@ -54,6 +53,22 @@ function createAccountStore() {
 
   return {
     subscribe,
+    updateName: (newName: string) => {
+      update((account) => {
+        if (account) {
+          account.setName(newName);
+        }
+        return account;
+      });
+    },
+    updateEmail: (newEmail: string) => {
+      update((account) => {
+        if (account) {
+          account.setEmail(newEmail);
+        }
+        return account;
+      });
+    },
   };
 }
 

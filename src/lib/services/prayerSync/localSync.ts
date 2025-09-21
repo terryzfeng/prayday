@@ -1,5 +1,5 @@
-import { PrayerStore } from "../stores/prayerStore";
-import PrayerRequest from "../utils/prayer-request";
+import { PrayerStore } from "../../stores/prayerStore";
+import PrayerRequest from "../../utils/prayer-request";
 import {
   PrayerOperation,
   type PrayerSyncService,

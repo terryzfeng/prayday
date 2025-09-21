@@ -1,5 +1,5 @@
-import Account from "../utils/account/account-new";
-import type PrayerRequest from "../utils/prayer-request";
+import Account from "../../utils/account/account";
+import type PrayerRequest from "../../utils/prayer-request";
 import { FirebaseSyncService } from "./firebaseSync";
 import { LocalSyncService } from "./localSync";
 import type {

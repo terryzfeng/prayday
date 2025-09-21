@@ -1,8 +1,11 @@
 import {
+  DocumentReference,
   Timestamp,
   collection,
   doc,
   getDoc,
+  getDocFromCache,
+  getDocFromServer,
   getDocs,
   increment,
   orderBy,
@@ -21,18 +24,59 @@ export interface PrayHistoryItem {
 }
 
 /**
+ * Get account settings from server asynchronous
+ * @param userDocRef user doc reference
+ * @returns Box<firebaseAccountSettings>
+ */
+async function getAccountSettingsFromServer(userDocRef: DocumentReference) {
+  try {
+    const serverDoc = await getDocFromServer(userDocRef);
+    if (serverDoc.exists()) {
+      return {
+        success: true,
+        data: serverDoc.data(),
+        fromCache: false,
+      };
+    }
+    throw new Error("User account settings not found");
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+/**
  * Fetch user account settings from firebase
  * @param userId userId
  * @returns success and data for user document
  */
 export async function getAccountSettings(userId: string) {
   try {
-    const userDoc = await getDoc(doc(db, "users", userId));
-    if (userDoc.exists()) {
-      return { success: true, data: userDoc.data() };
-    } else {
-      return { success: false, error: "User not found" };
+    // Try to pull account data settings from Firestore cache
+    const userDocRef = doc(db, "users", userId);
+
+    // First, try to get from cache only
+    const cachedDoc = await getDocFromCache(userDocRef);
+
+    if (cachedDoc.exists()) {
+      return {
+        success: true,
+        data: cachedDoc.data(),
+        fromCache: true,
+        getAccountSettingsFromServer: getAccountSettingsFromServer(userDocRef),
+      };
     }
+
+    // If not in cache, fall back to server
+    const serverDoc = await getDocFromServer(userDocRef);
+
+    if (serverDoc.exists()) {
+      return {
+        success: true,
+        data: serverDoc.data(),
+        fromCache: false,
+      };
+    }
+    throw new Error("User account settings not found");
   } catch (error: any) {
     return { success: false, error: error.message };
   }

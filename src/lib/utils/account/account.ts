@@ -1,111 +1,124 @@
-import {
-  createKey,
-  deserializeKeys,
-  serializeKeys,
-  syncKeys,
-  type Keys,
-  type SerializedKeys,
-} from "./keys";
-import { decodeBase64, encodeBase64, generateDek } from "./encryption";
+import type { User as FirebaseAuthUser } from "firebase/auth";
+import { prayerSync } from "lib/services/prayerSync/prayerSyncManager";
+import { PrayerStore } from "lib/stores/prayerStore";
+import { getAccountSettingsAsync } from "lib/services/accountSettingsSyncService";
 
-// Account class for handling keys and syncing to localStorage/cloud
+// Firebase Firestore User Doc fields
+export interface FirebaseAccountSettings {
+  name: string;
+  email: string;
+}
+
+const LOCAL_ACCOUNT_KEY = "account";
+
 export default class Account {
-  private uid: string;
-  private keys: Keys;
-  private isCloudAccount: boolean;
-  private e2ee: boolean;
+  id: string; // Firebase UID or Local ID
+  isCloudAccount: boolean;
+  name: string;
 
-  // Private Constructor
-  constructor(uid: string, keys: Keys, isCloudAccount: boolean = false) {
-    this.uid = uid;
-    this.keys = keys;
-    this.isCloudAccount = isCloudAccount;
-    this.e2ee = keys.e_dek !== null;
-  }
+  private firebaseAuthUser: FirebaseAuthUser | undefined;
+  private email: string | undefined;
+  // private keys: Keys;
 
-  static establishKeysForAccount(
-    new_user: string,
-    isCloudAccount: boolean = false,
-    dek_base64: string = "",
-    e_dek_base64: string = "",
+  constructor(
+    id: string,
+    isCloudAccount: boolean,
+    name: string,
+    firebaseAuthUser?: FirebaseAuthUser | undefined,
+    email?: string | undefined,
   ) {
-    // Default empty keys
-    let initialKeys: Keys = createKey();
+    this.id = id;
+    this.isCloudAccount = isCloudAccount;
+    this.name = name;
 
-    // If we already have local keys for this user (aka refresh)
-    const localKeys = loadKeysLocal();
-    if (localKeys.user === new_user) {
-      initialKeys = localKeys;
+    this.firebaseAuthUser = firebaseAuthUser;
+    this.email = email;
+  }
+
+  setName(name: string) {
+    this.name = name;
+  }
+
+  setEmail(email: string) {
+    this.email = email;
+  }
+
+  static createCloudAccount(
+    firebaseAuthUser: FirebaseAuthUser,
+    firebaseAccountSettings: FirebaseAccountSettings,
+  ) {
+    return new Account(
+      firebaseAuthUser.uid,
+      /*isCloudAccount=*/ true,
+      firebaseAccountSettings.name,
+      firebaseAuthUser,
+      firebaseAccountSettings.email,
+    );
+  }
+
+  static createLocalAccount(id: string) {
+    return new Account(id, /*isCloudAccount=*/ false, "Guest");
+  }
+
+  static clearAccount() {
+    prayerSync.uninitialize();
+    PrayerStore.clearStorage();
+  }
+
+  static loadLocalAccount() {
+    const localAccountId = localStorage.getItem(LOCAL_ACCOUNT_KEY);
+    if (localAccountId === null) {
+      return null;
     }
+    return Account.createLocalAccount(localAccountId);
+  }
 
-    // If we are a cloud account, sync with the cloud
+  static async establishAccount(
+    isCloudAccount: boolean,
+    firebaseAuthUser?: FirebaseAuthUser,
+    firebaseAccountSettings?: FirebaseAccountSettings,
+    fromCache?: boolean,
+    getAccountSettingsFromServer?: Promise<any>
+  ): Promise<Account | undefined> {
+    // No cloud account exists
+    let account = null;
     if (isCloudAccount) {
-      const cloudKeys = createKey(
-        new_user,
-        decodeBase64(dek_base64),
-        decodeBase64(e_dek_base64),
+      if (
+        firebaseAuthUser === undefined ||
+        firebaseAccountSettings === undefined
+      ) {
+        console.error("No cloud account exists");
+        return undefined;
+      }
+      account = Account.createCloudAccount(
+        firebaseAuthUser,
+        firebaseAccountSettings,
       );
-      initialKeys = syncKeys(initialKeys, cloudKeys);
+      // If we loaded from cache, will need to sync account from server later
+      if (fromCache && getAccountSettingsFromServer) {
+        getAccountSettingsAsync(getAccountSettingsFromServer);
+      }
+    } else {
+      account = loadLocalAccount();
+      if (account === null) {
+        account = Account.createLocalAccount(crypto.randomUUID());
+      }
     }
-
-    // Initial keys are now synchronized with LocalStorage and Cloud
-    // Create an account and initialize
-    let account = new Account(new_user, initialKeys, isCloudAccount);
-
-    // If we don't have any prior account keys
-    if (account.getKeys().dek === null && account.getKeys().e_dek === null) {
-      account.createNewKeysForAccount();
+    // Establish Services and Keys
+    if (prayerSync.isInitialized()) {
+      prayerSync.uninitialize();
     }
+    await prayerSync.initialize(account);
+    PrayerStore.setPrayers(prayerSync.pull());
 
-    writeKeysLocal(account.getKeys());
-  }
-
-  /**
-   * Create new keys for an account
-   */
-  createNewKeysForAccount() {
-    this.keys = {
-      user: this.uid,
-      dek: generateDek(),
-      e_dek: undefined,
-    };
-    this.e2ee = false;
-  }
-
-  getKeys(): Keys {
-    return this.keys;
-  }
-  getIsCloudAccount(): boolean {
-    return this.isCloudAccount;
-  }
-  getE2EE(): boolean {
-    return this.e2ee;
+    return account;
   }
 }
 
-//------------------------------------------------------------------------------
-// LocalStoage Account Management
-//------------------------------------------------------------------------------
-// LocalStorage key where we store the user's `keys`
-const KEYS = "keys";
-
-export function loadKeysLocal(): Keys {
-  const localKeysJSON = localStorage.getItem(KEYS);
-  if (localKeysJSON) {
-    const parsedKeys = JSON.parse(localKeysJSON);
-    return deserializeKeys(parsedKeys);
+function loadLocalAccount(): Account | null {
+  const localAccountId = localStorage.getItem(LOCAL_ACCOUNT_KEY);
+  if (localAccountId === null) {
+    return null;
   }
-  // No key found in localStorage
-  return createKey();
-}
-
-/**
- * Takes Keys and serializes them before writing to localStorage
- * @param keys Keys to write to localStorage
- */
-export function writeKeysLocal(keys: Keys) {
-  if (keys.dek === undefined && keys.e_dek === undefined) {
-    return;
-  }
-  localStorage.setItem(KEYS, JSON.stringify(serializeKeys(keys)));
+  return Account.createLocalAccount(localAccountId);
 }
