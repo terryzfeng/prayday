@@ -99,8 +99,6 @@
   });
 </script>
 
-<!-- svelte-ignore a11y_click_events_have_key_events -->
-<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <dialog
   class="fixed inset-0 px-6 pt-6 m-auto !scroll-top bg-white w-full max-w-[90%] md:max-w-xl max-h-[80%] md:max-h-[75vh]
     rounded-xl overflow-x-hidden overflow-y-auto

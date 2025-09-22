@@ -18,7 +18,7 @@ export async function getAccountSettingsAsync(
     } else {
       throw new Error();
     }
-  } catch (error: any) {
+  } catch (_: unknown) {
     console.warn("Failed to get account settings from server, may be offline");
   }
 }

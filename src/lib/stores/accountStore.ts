@@ -5,7 +5,6 @@ import { getAccountSettings } from "../utils/firebase/users";
 import Account, {
   type FirebaseAccountSettings,
 } from "../utils/account/account";
-import { getAccountSettingsAsync } from "../services/accountSettingsSyncService";
 
 let cloudAccountLoggedIn = false;
 

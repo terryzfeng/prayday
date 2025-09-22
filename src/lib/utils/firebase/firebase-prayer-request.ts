@@ -10,7 +10,7 @@ export interface FirebasePrayerData {
 }
 
 export function validateFirebasePrayerData(
-  data: any,
+  data: unknown,
 ): data is FirebasePrayerData {
   return (
     data &&
@@ -23,7 +23,7 @@ export function validateFirebasePrayerData(
   );
 }
 
-export function createPrayerFromFirebaseData(data: any): PrayerRequest | null {
+export function createPrayerFromFirebaseData(data: unknown): PrayerRequest | null {
   if (!validateFirebasePrayerData(data)) {
     console.error("Invalid Firebase prayer data");
     return null;

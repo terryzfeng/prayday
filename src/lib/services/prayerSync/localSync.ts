@@ -32,7 +32,7 @@ export class LocalSyncService implements PrayerSyncService {
   update(
     prayerOperation: PrayerOperation,
     prayerRequest: PrayerRequest,
-    updateType: PrayerUpdateType | undefined,
+    _updateType: PrayerUpdateType | undefined,
   ): void {
     const prayers = PrayerStore.getPrayers();
     let updatedPrayers: PrayerRequest[] = [];
@@ -62,6 +62,7 @@ export class LocalSyncService implements PrayerSyncService {
 
       const parsedData = JSON.parse(storedData);
       // Convert array of plain objects to array of PrayerRequest
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return parsedData.map((p: any) => {
         const prayer = new PrayerRequest(
           p.prayer,

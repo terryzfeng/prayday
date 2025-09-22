@@ -2,6 +2,7 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import {
   CACHE_SIZE_UNLIMITED,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   disableNetwork,
   initializeFirestore,
   persistentLocalCache,

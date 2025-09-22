@@ -39,8 +39,8 @@
       } else {
         throw new Error(result.error);
       }
-    } catch (error: any) {
-      errorMessage = error.message;
+    } catch (error: unknown) {
+      errorMessage = (error as Error).message;
     } finally {
       loading = false;
     }

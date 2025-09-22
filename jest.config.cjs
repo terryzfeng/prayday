@@ -1,5 +1,3 @@
-const { pathsToModuleNameMapper } = require("ts-jest");
-
 module.exports = {
   transform: {'^.+\\.ts?$': 'ts-jest'},
   testEnvironment: 'node',

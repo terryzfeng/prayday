@@ -30,8 +30,8 @@ async function getAudioBufferFromUrl(
     const arrayBuffer = await response.arrayBuffer();
     const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
     return audioBuffer;
-  } catch (error: any) {
-    throw new Error(`Failed to load audio ${url}: ${error.message}`);
+  } catch (error: unknown) {
+    throw new Error(`Failed to load audio ${url}: ${(error as Error).message}`);
   }
 }
 

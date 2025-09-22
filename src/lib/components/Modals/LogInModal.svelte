@@ -26,7 +26,7 @@
       } else {
         errorMessage = result.error;
       }
-    } catch (error) {
+    } catch (_: unknown) {
       errorMessage = "An unexpected error occurred. Please try again.";
     } finally {
       loading = false;

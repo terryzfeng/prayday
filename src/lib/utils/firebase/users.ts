@@ -39,8 +39,8 @@ async function getAccountSettingsFromServer(userDocRef: DocumentReference) {
       };
     }
     throw new Error("User account settings not found");
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: (error as Error).message };
   }
 }
 
@@ -65,7 +65,8 @@ export async function getAccountSettings(userId: string) {
       };
     }
     throw new Error();
-  } catch (error: any) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (error: unknown) {
     // If not in cache, fall back to server
     const serverDoc = await getDocFromServer(userDocRef);
 
@@ -110,8 +111,8 @@ export async function queryPrayerHistory(userId: string) {
       results.push(doc.data() as PrayHistoryItem);
     });
     return { success: true, data: results };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: (error as Error).message};
   }
 }
 

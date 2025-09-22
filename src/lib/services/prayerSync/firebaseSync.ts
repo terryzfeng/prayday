@@ -56,7 +56,7 @@ export class FirebaseSyncService implements PrayerSyncService {
     if (this.initialized || userId === "") return;
     this.userId = userId;
 
-    this.initialSyncPromise = new Promise<void>((resolve, reject) => {
+    this.initialSyncPromise = new Promise<void>((resolve, _) => {
       this.initialSyncResolve = resolve;
     });
 
@@ -234,7 +234,7 @@ export class FirebaseSyncService implements PrayerSyncService {
             batch.delete(prayerRef);
             break;
           case PrayerOperation.CREATE:
-            const prayer = prayerChange.prayerRequest;
+            { const prayer = prayerChange.prayerRequest;
             batch.set(prayerRef, {
               prayer: prayer.prayer,
               uuid: prayer.uuid,
@@ -243,7 +243,7 @@ export class FirebaseSyncService implements PrayerSyncService {
               lastPrayed: prayer.lastPrayed.toISOString(),
               answered: prayer.answered,
             });
-            break;
+            break; }
           case PrayerOperation.UPDATE:
             if (prayerChange.updateType === undefined) continue;
             if (prayerChange.updateType === PrayerUpdateType.PRAY_COUNT) {
@@ -277,7 +277,7 @@ export class FirebaseSyncService implements PrayerSyncService {
       for (const prayerUUID of changesCopy.keys()) {
         this.outgoingPrayerChanges.delete(prayerUUID);
       }
-    } catch (error: any) {
+    } catch (_: unknown) {
       console.error("Error trying to sync to firebase");
 
       // Retry logic

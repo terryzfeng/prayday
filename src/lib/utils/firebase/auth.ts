@@ -29,11 +29,12 @@ export const signUp = async (email: string, password: string, name: string) => {
       // dek_base_64: encodeBase64(currentKey),
     });
     return { success: true, user: userCredential.user };
-  } catch (error: any) {
-    if (error.code === "auth/email-already-in-use") {
+  } catch (error: unknown) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ((error as any).code === "auth/email-already-in-use") {
       return { success: false, error: "Account already exists" };
     }
-    return { success: false, error: error.message };
+    return { success: false, error: (error as Error).message };
   }
 };
 
@@ -82,7 +83,7 @@ export const forgotPassword = async (email: string) => {
     // Note: will never throw an error
     await sendPasswordResetEmail(auth, email);
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: (error as Error).message };
   }
 };

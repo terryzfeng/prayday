@@ -10,7 +10,7 @@
     "check": "svelte-check --tsconfig ./tsconfig.json && tsc -p tsconfig.node.json",
     "format": "prettier --write src tests",
     "test": "jest",
-    "lint": "eslint . -- fix"
+    "lint": "eslint . --fix"
   },
   "devDependencies": {
     "@eslint/compat": "^1.2.5",

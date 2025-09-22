@@ -37,8 +37,8 @@
       // Success - reset form and close modal
       password = "";
       showInputPassphrase(false);
-    } catch (error: any) {
-      errorMessage = error.message;
+    } catch (error: unknown) {
+      errorMessage = (error as Error).message;
     } finally {
       loading = false;
     }
