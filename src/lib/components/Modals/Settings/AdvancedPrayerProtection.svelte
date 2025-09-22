@@ -1,7 +1,6 @@
 <!-- AdvancedPrayerProtection.svelte -->
 <script lang="ts">
   import Button from "lib/components/Button.svelte";
-  import Toggle from "lib/components/Toggle.svelte";
   import backChevron from "lib/assets/back-chevron.svg";
   import { e2eeEnabledStore } from "lib/stores/e2eeEnabledStore";
 

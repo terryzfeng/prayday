@@ -3,16 +3,18 @@ import type { FirebaseAccountSettings } from "../utils/account/account";
 
 /**
  * Asynchonously get account settings from server after cache pull to sync account settings
- * @param getAccountSettingsFromServer Promise<Box<firebaseAccountSettings>>
+ * @param getAccountSettingsFromServer Promise<Box<FirebaseAccountSettings>>
  */
 export async function getAccountSettingsAsync(
-  getAccountSettingsFromServer: Promise<any>,
+  getAccountSettingsFromServer: Promise<
+    | { success: boolean; data: FirebaseAccountSettings; fromCache: boolean }
+    | { success: boolean; error: string }
+  >,
 ) {
   try {
     const serverDocResponse = await getAccountSettingsFromServer;
-    if (serverDocResponse.success) {
-      const firebaseAccountSettings =
-        serverDocResponse.data as FirebaseAccountSettings;
+    if (serverDocResponse.success && "data" in serverDocResponse) {
+      const firebaseAccountSettings = serverDocResponse.data;
       account.updateName(firebaseAccountSettings.name);
       account.updateEmail(firebaseAccountSettings.email);
     } else {

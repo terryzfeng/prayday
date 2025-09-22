@@ -233,8 +233,8 @@ export class FirebaseSyncService implements PrayerSyncService {
           case PrayerOperation.DELETE:
             batch.delete(prayerRef);
             break;
-          case PrayerOperation.CREATE:
-            { const prayer = prayerChange.prayerRequest;
+          case PrayerOperation.CREATE: {
+            const prayer = prayerChange.prayerRequest;
             batch.set(prayerRef, {
               prayer: prayer.prayer,
               uuid: prayer.uuid,
@@ -243,7 +243,8 @@ export class FirebaseSyncService implements PrayerSyncService {
               lastPrayed: prayer.lastPrayed.toISOString(),
               answered: prayer.answered,
             });
-            break; }
+            break;
+          }
           case PrayerOperation.UPDATE:
             if (prayerChange.updateType === undefined) continue;
             if (prayerChange.updateType === PrayerUpdateType.PRAY_COUNT) {

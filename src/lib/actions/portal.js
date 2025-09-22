@@ -50,7 +50,6 @@ export const portal = (el, target = "div") => {
     } else if (target instanceof HTMLElement) {
       targetEl = target;
     } else {
-       
       throw new TypeError(
         `Unknown portal target type: ${target === null ? "null" : typeof target}. Allowed types: string (CSS selector) or HTMLElement.`,
       );

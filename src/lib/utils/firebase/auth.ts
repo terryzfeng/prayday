@@ -6,6 +6,7 @@ import {
 } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { auth, db } from "./config";
+import type { FirebaseError } from "firebase/app";
 
 /**
  * Sign up a new user for Prayday.
@@ -53,11 +54,11 @@ export const logIn = async (email: string, password: string) => {
     );
 
     return { success: true, user: userCredential.user };
-  } catch (error: any) {
-    if (error.code === "auth/invalid-credential") {
+  } catch (error: unknown) {
+    if ((error as FirebaseError).code === "auth/invalid-credential") {
       return { success: false, error: "Invalid email or password" };
     }
-    return { success: false, error: error.message };
+    return { success: false, error: (error as FirebaseError).message };
   }
 };
 

@@ -34,7 +34,7 @@
 
       // Success - close the modal or navigate back
       onBack();
-    } catch (error: any) {
+    } catch (error: unknown) {
       errorMessage = error.message;
     } finally {
       loading = false;

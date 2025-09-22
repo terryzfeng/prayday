@@ -78,7 +78,7 @@ export default class Account {
     firebaseAuthUser?: FirebaseAuthUser,
     firebaseAccountSettings?: FirebaseAccountSettings,
     fromCache?: boolean,
-    getAccountSettingsFromServer?: Promise<unknown>
+    getAccountSettingsFromServer?: Promise<unknown>,
   ): Promise<Account | undefined> {
     // No cloud account exists
     let account = null;

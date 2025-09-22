@@ -17,6 +17,7 @@ import {
 import { db } from "./config";
 import { midnight as midnight } from "../date-utils";
 import { USER_HISTORY_SIZE } from "lib/stores/userHistoryStore";
+import type { FirebaseAccountSettings } from "lib/utils/account/account";
 
 export interface PrayHistoryItem {
   timestamp: Timestamp;
@@ -26,15 +27,20 @@ export interface PrayHistoryItem {
 /**
  * Get account settings from server asynchronous
  * @param userDocRef user doc reference
- * @returns Box<firebaseAccountSettings>
+ * @returns Box<FirebaseAccountSettings>
  */
-async function getAccountSettingsFromServer(userDocRef: DocumentReference) {
+async function getAccountSettingsFromServer(
+  userDocRef: DocumentReference,
+): Promise<
+  | { success: boolean; data: FirebaseAccountSettings; fromCache: boolean }
+  | { success: boolean; error: string }
+> {
   try {
     const serverDoc = await getDocFromServer(userDocRef);
     if (serverDoc.exists()) {
       return {
         success: true,
-        data: serverDoc.data(),
+        data: serverDoc.data() as FirebaseAccountSettings,
         fromCache: false,
       };
     }
@@ -65,7 +71,7 @@ export async function getAccountSettings(userId: string) {
       };
     }
     throw new Error();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error: unknown) {
     // If not in cache, fall back to server
     const serverDoc = await getDocFromServer(userDocRef);
@@ -77,9 +83,13 @@ export async function getAccountSettings(userId: string) {
         fromCache: false,
       };
     }
-    // Otherwise we failed to initialize firebase account settings when we had 
+    // Otherwise we failed to initialize firebase account settings when we had
     // a firebase account
-    return { success: false, error: "Failed to load user account settings. Please contact Prayday support." };
+    return {
+      success: false,
+      error:
+        "Failed to load user account settings. Please contact Prayday support.",
+    };
   }
 }
 
@@ -112,7 +122,7 @@ export async function queryPrayerHistory(userId: string) {
     });
     return { success: true, data: results };
   } catch (error: unknown) {
-    return { success: false, error: (error as Error).message};
+    return { success: false, error: (error as Error).message };
   }
 }
 

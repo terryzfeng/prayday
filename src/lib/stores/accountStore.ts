@@ -29,13 +29,13 @@ function createAccountStore() {
           firebaseAuthUser,
           firebaseAccountSettingsPromise.data as FirebaseAccountSettings,
           firebaseAccountSettingsPromise.fromCache,
-          firebaseAccountSettingsPromise.getAccountSettingsFromServer
+          firebaseAccountSettingsPromise.getAccountSettingsFromServer,
         );
         cloudAccountLoggedIn = true;
       } else {
         // Firebase failed to log in, fallback to guest account
-        console.error(firebaseAccountSettingsPromise.error)
-        account = await Account.establishAccount(/*isCloudAccount=*/false);
+        console.error(firebaseAccountSettingsPromise.error);
+        account = await Account.establishAccount(/*isCloudAccount=*/ false);
       }
     } else {
       // Switching from logged in to log out
@@ -46,7 +46,7 @@ function createAccountStore() {
       }
 
       // Establish guest account
-      account = await Account.establishAccount(/*isCloudAccount=*/false);
+      account = await Account.establishAccount(/*isCloudAccount=*/ false);
     }
 
     set(account);

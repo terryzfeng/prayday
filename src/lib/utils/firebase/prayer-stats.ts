@@ -38,7 +38,7 @@ export async function incrementGlobalPrayerCount() {
       globalPrayerCount: increment(1),
     });
   } catch (error: unknown) {
-    console.error("Error incrementing global prayer count:", (error as Error));
+    console.error("Error incrementing global prayer count:", error as Error);
   }
 }
 
@@ -52,7 +52,7 @@ export async function subtractGlobalPrayerCount(amount: number) {
       globalPrayerCount: increment(-amount),
     });
   } catch (error: unknown) {
-    console.error("Error decrementing global prayer count:", (error as Error));
+    console.error("Error decrementing global prayer count:", error as Error);
   }
 }
 
