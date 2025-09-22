@@ -12,7 +12,7 @@ type Filter = (prayer: PrayerRequest) => boolean;
 /*
  * Filters for PrayerStore
  */
-let filterBank: Map<string, Filter> = new Map([
+const filterBank: Map<string, Filter> = new Map([
   ["hideAnswered", (prayer: PrayerRequest) => !prayer.answered],
 ]);
 

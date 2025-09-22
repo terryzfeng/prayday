@@ -31,7 +31,7 @@ export function isE2EE(keys: Keys) {
  * @returns SerializedKeys
  */
 export function serializeKeys(keys: Keys): SerializedKeys {
-  let serializedKeys: SerializedKeys = { user: keys.user };
+  const serializedKeys: SerializedKeys = { user: keys.user };
   if (keys.dek !== undefined) {
     console.log(encodeBase64(keys.dek));
     serializedKeys.dek = encodeBase64(keys.dek);

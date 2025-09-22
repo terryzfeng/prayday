@@ -147,7 +147,7 @@
         onClick={handleSubmit}
       />
       <Button
-        text={"Cancel"}
+        text="Cancel"
         color="orange"
         className="w-full"
         onClick={onBack}

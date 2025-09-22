@@ -34,7 +34,7 @@ export class LocalSyncService implements PrayerSyncService {
     prayerRequest: PrayerRequest,
     updateType: PrayerUpdateType | undefined,
   ): void {
-    let prayers = PrayerStore.getPrayers();
+    const prayers = PrayerStore.getPrayers();
     let updatedPrayers: PrayerRequest[] = [];
     if (prayerOperation === PrayerOperation.CREATE) {
       updatedPrayers = [...prayers, prayerRequest];

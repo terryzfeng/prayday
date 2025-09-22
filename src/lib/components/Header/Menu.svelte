@@ -81,7 +81,7 @@
           callback={() => filterStatesStore.toggleFilterState("hideAnswered")}
           bind:isMenuOpen
         />
-        <MenuItem value={"Settings"} callback={openSettings} bind:isMenuOpen />
+        <MenuItem value="Settings" callback={openSettings} bind:isMenuOpen />
       {:else}
         <!-- Logged out state -->
         <MenuItem
@@ -99,7 +99,7 @@
           callback={openAbout}
           bind:isMenuOpen
         />
-        <MenuItem value={"Settings"} callback={openSettings} bind:isMenuOpen />
+        <MenuItem value="Settings" callback={openSettings} bind:isMenuOpen />
       {/if}
     </div>
   {/if}

@@ -55,14 +55,14 @@
           text="Enable Advanced Prayer Protection"
           onClick={() => onNavigate("create-data-passphrase")}
           color="blue"
-          className={"w-full"}
+          className="w-full"
         />
       {:else}
         <Button
           text="Disable Advanced Prayer Protection"
           onClick={disableE2eeEncryption}
           color="red"
-          className={"w-full"}
+          className="w-full"
         />
       {/if}
     </div>

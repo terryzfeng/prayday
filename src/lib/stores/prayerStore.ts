@@ -64,7 +64,7 @@ function createPrayerStore() {
     },
     deletePrayer: (uuid: string) => {
       update((prayers) => {
-        let updatedPrayers = prayers.filter((p) => {
+        const updatedPrayers = prayers.filter((p) => {
           if (p.uuid === uuid) {
             prayerSync.update(PrayerOperation.DELETE, p);
             return false; // Exclude the matched prayer
