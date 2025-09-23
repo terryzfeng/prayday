@@ -1,10 +1,12 @@
 import { writable } from "svelte/store";
 import { auth } from "lib/utils/firebase/config";
 import { onAuthStateChanged } from "firebase/auth";
-import { getAccountSettings } from "../utils/firebase/users";
-import Account, {
+import {
+  getAccountSettings,
   type FirebaseAccountSettings,
-} from "../utils/account/account";
+} from "../utils/firebase/users";
+import Account from "../utils/account/account";
+import type { Keys, KeySettings } from "../utils/account/keys";
 
 let cloudAccountLoggedIn = false;
 
@@ -27,9 +29,11 @@ function createAccountStore() {
         account = await Account.establishAccount(
           /*isCloudAccount=*/ true,
           firebaseAuthUser,
-          firebaseAccountSettingsPromise.data as FirebaseAccountSettings,
-          firebaseAccountSettingsPromise.fromCache,
-          firebaseAccountSettingsPromise.getAccountSettingsFromServer,
+          firebaseAccountSettingsPromise.data
+            ?.firebaseAccountSettings as FirebaseAccountSettings,
+          firebaseAccountSettingsPromise.data?.keySettings as KeySettings,
+          firebaseAccountSettingsPromise.data?.fromCache,
+          firebaseAccountSettingsPromise.data?.getAccountSettingsFromServer,
         );
         cloudAccountLoggedIn = true;
       } else {
@@ -69,6 +73,27 @@ function createAccountStore() {
         }
         return account;
       });
+    },
+    updateKeys: (newKeys: Keys) => {
+      update((account) => {
+        if (account) {
+          account.setKeysAndPull(newKeys);
+        }
+        return account;
+      });
+    },
+    inputDataPassphrase: async (dataPassphrase: string) => {
+      // Get current account value
+      let currentAccount: Account | undefined;
+      const unsubscribe = subscribe((acc) => {
+        currentAccount = acc;
+      });
+      unsubscribe(); // Immediately unsubscribe after getting the value
+
+      if (currentAccount) {
+        await currentAccount.deriveAndUnwrapAccountKey(dataPassphrase);
+        set(currentAccount); // Update the store with the modified account
+      }
     },
   };
 }

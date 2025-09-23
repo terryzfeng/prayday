@@ -9,6 +9,7 @@ export interface FirebasePrayerData {
   answered: boolean;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function validateFirebasePrayerData(
   data: any,
 ): data is FirebasePrayerData {

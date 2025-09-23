@@ -17,13 +17,47 @@ import {
 import { db } from "./config";
 import { midnight as midnight } from "../date-utils";
 import { USER_HISTORY_SIZE } from "lib/stores/userHistoryStore";
-import type { FirebaseAccountSettings } from "lib/utils/account/account";
+import type { KeySettings } from "../account/keys";
+
+export interface FirebaseAccountSettingsBox {
+  success: boolean;
+  data?: {
+    firebaseAccountSettings: FirebaseAccountSettings;
+    keySettings: KeySettings;
+    fromCache?: boolean;
+    getAccountSettingsFromServer?: Promise<FirebaseAccountSettingsBox>;
+  };
+  error?: string;
+}
+
+// Firebase Firestore User Doc Account Settings
+export interface FirebaseAccountSettings {
+  name: string;
+  email: string;
+}
 
 export interface PrayHistoryItem {
   timestamp: Timestamp;
   prayCount: number;
 }
 
+//------------------------------------------------------------------------------
+// Firebase Key Settings
+//------------------------------------------------------------------------------
+export async function uploadKeySettings(
+  userId: string,
+  keySettings: KeySettings,
+) {
+  // TODO: Serialize keySettings for firebase
+  console.log("uploadKeySettings", keySettings);
+  // return setDoc(doc(db, "users", userId, "keys", "keySettings"), {
+  //   "test": 2
+  // });
+}
+
+//------------------------------------------------------------------------------
+// Firebase Account Settings
+//------------------------------------------------------------------------------
 /**
  * Get account settings from server asynchronous
  * @param userDocRef user doc reference
@@ -31,17 +65,20 @@ export interface PrayHistoryItem {
  */
 async function getAccountSettingsFromServer(
   userDocRef: DocumentReference,
-): Promise<
-  | { success: boolean; data: FirebaseAccountSettings; fromCache: boolean }
-  | { success: boolean; error: string }
-> {
+  keySettingsDocRef: DocumentReference,
+): Promise<FirebaseAccountSettingsBox> {
   try {
-    const serverDoc = await getDocFromServer(userDocRef);
-    if (serverDoc.exists()) {
+    const serverUserDoc = await getDocFromServer(userDocRef);
+    const serverKeySettingsDoc = await getDocFromServer(keySettingsDocRef);
+    if (serverUserDoc.exists()) {
       return {
         success: true,
-        data: serverDoc.data() as FirebaseAccountSettings,
-        fromCache: false,
+        data: {
+          firebaseAccountSettings:
+            serverUserDoc.data() as FirebaseAccountSettings,
+          keySettings: serverKeySettingsDoc.data() as KeySettings,
+          fromCache: false,
+        },
       };
     }
     throw new Error("User account settings not found");
@@ -55,32 +92,49 @@ async function getAccountSettingsFromServer(
  * @param userId userId
  * @returns success and data for user document
  */
-export async function getAccountSettings(userId: string) {
+export async function getAccountSettings(
+  userId: string,
+): Promise<FirebaseAccountSettingsBox> {
   // Try to pull account data settings from Firestore cache
   const userDocRef = doc(db, "users", userId);
+  const keySettingsDocRef = doc(db, "users", userId, "keys", "keySettings");
 
   try {
     // First, try to get from cache only, will throw error if not in cache
-    const cachedDoc = await getDocFromCache(userDocRef);
-    if (cachedDoc.exists()) {
+    const cachedUserDoc = await getDocFromCache(userDocRef);
+    const cachedKeySettingsDoc = await getDocFromCache(keySettingsDocRef);
+
+    if (cachedUserDoc.exists() && cachedKeySettingsDoc.exists()) {
       return {
         success: true,
-        data: cachedDoc.data(),
-        fromCache: true,
-        getAccountSettingsFromServer: getAccountSettingsFromServer(userDocRef),
+        data: {
+          firebaseAccountSettings:
+            cachedUserDoc.data() as FirebaseAccountSettings,
+          keySettings: cachedKeySettingsDoc.data() as KeySettings,
+          fromCache: true,
+          getAccountSettingsFromServer: getAccountSettingsFromServer(
+            userDocRef,
+            keySettingsDocRef,
+          ),
+        },
       };
     }
     throw new Error();
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error: unknown) {
     // If not in cache, fall back to server
-    const serverDoc = await getDocFromServer(userDocRef);
+    const serverUserDoc = await getDocFromServer(userDocRef);
+    const serverKeySettingsDoc = await getDocFromServer(keySettingsDocRef);
 
-    if (serverDoc.exists()) {
+    if (serverUserDoc.exists() && serverKeySettingsDoc.exists()) {
       return {
         success: true,
-        data: serverDoc.data(),
-        fromCache: false,
+        data: {
+          firebaseAccountSettings:
+            serverUserDoc.data() as FirebaseAccountSettings,
+          keySettings: serverKeySettingsDoc.data() as KeySettings,
+          fromCache: false,
+        },
       };
     }
     // Otherwise we failed to initialize firebase account settings when we had
@@ -93,6 +147,23 @@ export async function getAccountSettings(userId: string) {
   }
 }
 
+// Create a firebase user account settings and keys
+export async function createFirebaseAccountSettings(
+  userId: string,
+  name: string,
+  email: string,
+  keySettings: KeySettings,
+): Promise<void> {
+  await setDoc(doc(db, "users", userId), {
+    name: name,
+    email: email,
+  });
+  return uploadKeySettings(userId, keySettings);
+}
+
+//------------------------------------------------------------------------------
+// User Pray History
+//------------------------------------------------------------------------------
 /**
  * Get userId's prayHistory in the last USER_HISTORY_SIZE days, ordered by date.
  * @param userId userId

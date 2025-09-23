@@ -4,9 +4,10 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
-import { auth, db } from "./config";
+import { auth } from "./config";
 import type { FirebaseError } from "firebase/app";
+import { createFirebaseAccountSettings } from "./users";
+import type { KeySettings } from "../account/keys";
 
 /**
  * Sign up a new user for Prayday.
@@ -24,11 +25,14 @@ export const signUp = async (email: string, password: string, name: string) => {
       email,
       password,
     );
-    await setDoc(doc(db, "users", userCredential.user.uid), {
-      name: name,
-      email: email,
-      // dek_base_64: encodeBase64(currentKey),
-    });
+    // TODO: create key settings
+    const keySettings = undefined as unknown as KeySettings;
+    await createFirebaseAccountSettings(
+      userCredential.user.uid,
+      name,
+      email,
+      keySettings,
+    );
     return { success: true, user: userCredential.user };
   } catch (error: unknown) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

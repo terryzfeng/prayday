@@ -1,62 +1,432 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import { webcrypto } from "crypto";
+
+// Ensure we have a window object with crypto
+(global as any).window = (global as any).window || {};
+(global as any).window.crypto = webcrypto;
+(global as any).crypto = webcrypto;
+
+// Import the functions to test
 import {
-  generateDek,
-  encodeBase64,
-  decodeBase64,
-} from "../src/lib/utils/account/encryption";
+  generateAccountKey,
+  generateAccountKeyCheckValue,
+  checkAccountKey,
+  exportAccountKey,
+  importAccountKey,
+  encryptText,
+  decryptText,
+  deriveDataPassphraseDerivedKey,
+  wrapAccountKey,
+  unwrapAccountKey,
+  type EncryptedData,
+  type DataPassphraseDerivedKeyDerivationParams,
+} from "lib/utils/account/encryption"; // Adjust path as needed
 
-const HelloUint8Array = new Uint8Array([72, 101, 108, 108, 111]);
-const HelloBase64 = "SGVsbG8=";
+describe("Account Key Operations", () => {
+  describe("generateAccountKey", () => {
+    it("should generate a valid CryptoKey", async () => {
+      const key = await generateAccountKey();
 
-describe("Encryption", () => {
-  test("GenerateDekLength", () => {
-    const dek = generateDek();
-    expect(dek).toBeInstanceOf(Uint8Array);
-    expect(dek.length).toBe(32);
-  });
-
-  // Encode
-  describe("Encode", () => {
-    test("Encode Uint8Array", () => {
-      const bytes = HelloUint8Array; // "Hello"
-      expect(encodeBase64(bytes)).toBe(HelloBase64);
-    });
-
-    test("EncodeEmpty", () => {
-      const bytes = new Uint8Array([]);
-      expect(encodeBase64(bytes)).toBe("");
-    });
-  });
-
-  // Decode
-  describe("Decode", () => {
-    test("DecodeBase64", () => {
-      const base64String = HelloBase64; // "Hello"
-      expect(decodeBase64(base64String)).toEqual(HelloUint8Array);
-    });
-
-    test("DecodeInvalidString", () => {
-      expect(decodeBase64("invalid base64")).toBeUndefined();
-    });
-
-    test("DecodeEmpty", () => {
-      expect(decodeBase64("")).toEqual(new Uint8Array([]));
+      expect(key).toBeInstanceOf(CryptoKey);
+      expect(key.algorithm.name).toBe("AES-GCM");
+      expect((key.algorithm as AesKeyAlgorithm).length).toBe(256);
+      expect(key.extractable).toBe(true);
+      expect(key.usages).toEqual(["encrypt", "decrypt"]);
     });
   });
 
-  // Encode & Decode
-  describe("Combo Encode & Decode", () => {
-    test("Encode & Decode Empty", () => {
-      const bytes = new Uint8Array([]);
-      const base64String = encodeBase64(bytes);
-      const decodedBytes = decodeBase64(base64String);
-      expect(decodedBytes).toEqual(bytes);
+  describe("generateAccountKeyCheckValue", () => {
+    it("should generate check value for account key", async () => {
+      const key = await generateAccountKey();
+      const checkValue = await generateAccountKeyCheckValue(key);
+
+      expect(checkValue).toHaveProperty("data");
+      expect(checkValue).toHaveProperty("iv");
+      expect(checkValue.data).toBeInstanceOf(ArrayBuffer);
+      expect(checkValue.iv).toBeInstanceOf(ArrayBuffer);
+      expect(checkValue.iv.byteLength).toBe(12); // 96 bits
+    });
+  });
+
+  describe("checkAccountKey", () => {
+    it("should return true for valid key and check value", async () => {
+      const key = await generateAccountKey();
+      const checkValue = await generateAccountKeyCheckValue(key);
+
+      const isValid = await checkAccountKey(key, checkValue);
+      expect(isValid).toBe(true);
     });
 
-    test("Encode & Decode String", () => {
-      const bytes = HelloUint8Array; // "Hello"
-      const base64String = encodeBase64(bytes);
-      const decodedBytes = decodeBase64(base64String);
-      expect(decodedBytes).toEqual(bytes);
+    it("should return false for invalid key", async () => {
+      const key1 = await generateAccountKey();
+      const key2 = await generateAccountKey();
+      const checkValue = await generateAccountKeyCheckValue(key1);
+
+      const isValid = await checkAccountKey(key2, checkValue);
+      expect(isValid).toBe(false);
     });
+
+    it("should return false for corrupted check value", async () => {
+      const key = await generateAccountKey();
+      const checkValue = await generateAccountKeyCheckValue(key);
+
+      // Corrupt the data
+      const corruptedCheckValue: EncryptedData = {
+        ...checkValue,
+        data: new ArrayBuffer(16),
+      };
+
+      const isValid = await checkAccountKey(key, corruptedCheckValue);
+      expect(isValid).toBe(false);
+    });
+  });
+
+  describe("exportAccountKey and importAccountKey", () => {
+    it("should export and import key successfully", async () => {
+      const originalKey = await generateAccountKey();
+      const exported = await exportAccountKey(originalKey);
+      const imported = await importAccountKey(exported);
+
+      expect(exported).toBeInstanceOf(ArrayBuffer);
+      expect(exported.byteLength).toBe(32); // 256 bits
+      expect(imported).toBeInstanceOf(CryptoKey);
+      expect(imported.algorithm.name).toBe("AES-GCM");
+    });
+
+    it("should maintain key functionality after export/import", async () => {
+      const originalKey = await generateAccountKey();
+      const exported = await exportAccountKey(originalKey);
+      const imported = await importAccountKey(exported);
+
+      const testData = "test encryption data";
+      const encrypted = await encryptText(originalKey, testData);
+      const decrypted = await decryptText(imported, encrypted);
+
+      expect(decrypted).toBe(testData);
+    });
+  });
+});
+
+describe("Text Encryption/Decryption", () => {
+  let testKey: CryptoKey;
+
+  beforeEach(async () => {
+    testKey = await generateAccountKey();
+  });
+
+  describe("encryptText", () => {
+    it("should encrypt text successfully", async () => {
+      const plaintext = "Hello, World!";
+      const encrypted = await encryptText(testKey, plaintext);
+
+      expect(encrypted).toHaveProperty("data");
+      expect(encrypted).toHaveProperty("iv");
+      expect(encrypted.data).toBeInstanceOf(ArrayBuffer);
+      expect(encrypted.iv).toBeInstanceOf(ArrayBuffer);
+      expect(encrypted.iv.byteLength).toBe(12);
+      expect(encrypted.data.byteLength).toBeGreaterThan(0);
+    });
+
+    it("should generate different ciphertexts for same plaintext", async () => {
+      const plaintext = "Hello, World!";
+      const encrypted1 = await encryptText(testKey, plaintext);
+      const encrypted2 = await encryptText(testKey, plaintext);
+
+      const dataBuffer1 = new Uint8Array(encrypted1.data);
+      const ivBuffer1 = new Uint8Array(encrypted1.iv);
+      const dataBuffer2 = new Uint8Array(encrypted2.data);
+      const ivBuffer2 = new Uint8Array(encrypted2.iv);
+
+      expect(dataBuffer1).not.toEqual(dataBuffer2);
+      expect(ivBuffer1).not.toEqual(ivBuffer2);
+    });
+
+    it("should handle empty string", async () => {
+      const plaintext = "";
+      const encrypted = await encryptText(testKey, plaintext);
+
+      expect(encrypted).toHaveProperty("data");
+      expect(encrypted).toHaveProperty("iv");
+    });
+
+    it("should handle unicode characters", async () => {
+      const plaintext = "🔐 Test with émojis and ñ characters";
+      const encrypted = await encryptText(testKey, plaintext);
+      const decrypted = await decryptText(testKey, encrypted);
+
+      expect(decrypted).toBe(plaintext);
+    });
+  });
+
+  describe("decryptText", () => {
+    it("should decrypt text successfully", async () => {
+      const plaintext = "Hello, World!";
+      const encrypted = await encryptText(testKey, plaintext);
+      const decrypted = await decryptText(testKey, encrypted);
+
+      expect(decrypted).toBe(plaintext);
+    });
+
+    it("should return empty string for invalid key", async () => {
+      const plaintext = "Hello, World!";
+      const wrongKey = await generateAccountKey();
+      const encrypted = await encryptText(testKey, plaintext);
+
+      const consoleSpy = jest.spyOn(console, "error").mockImplementation();
+      const decrypted = await decryptText(wrongKey, encrypted);
+
+      expect(decrypted).toBe("");
+      expect(consoleSpy).toHaveBeenCalled();
+      consoleSpy.mockRestore();
+    });
+
+    it("should return empty string for corrupted data", async () => {
+      const plaintext = "Hello, World!";
+      const encrypted = await encryptText(testKey, plaintext);
+
+      // Corrupt the encrypted data
+      const corruptedData: EncryptedData = {
+        ...encrypted,
+        data: new ArrayBuffer(16),
+      };
+
+      const consoleSpy = jest.spyOn(console, "error").mockImplementation();
+      const decrypted = await decryptText(testKey, corruptedData);
+
+      expect(decrypted).toBe("");
+      expect(consoleSpy).toHaveBeenCalled();
+      consoleSpy.mockRestore();
+    });
+
+    it("should handle large text", async () => {
+      const plaintext = "A".repeat(10000);
+      const encrypted = await encryptText(testKey, plaintext);
+      const decrypted = await decryptText(testKey, encrypted);
+
+      expect(decrypted).toBe(plaintext);
+    });
+  });
+});
+
+describe("End-to-End Encryption (E2EE)", () => {
+  const testPassphrase = "MySecurePassphrase123!";
+  let salt: ArrayBuffer;
+  let derivationParams: DataPassphraseDerivedKeyDerivationParams;
+
+  beforeEach(() => {
+    salt = crypto.getRandomValues(new Uint8Array(32)).buffer;
+    derivationParams = { salt };
+  });
+
+  describe("deriveDataPassphraseDerivedKey", () => {
+    it("should derive key from passphrase and salt", async () => {
+      const derivedKey = await deriveDataPassphraseDerivedKey(
+        testPassphrase,
+        derivationParams,
+      );
+
+      expect(derivedKey).toBeInstanceOf(CryptoKey);
+      expect(derivedKey.algorithm.name).toBe("AES-GCM");
+      expect((derivedKey.algorithm as AesKeyAlgorithm).length).toBe(256);
+      expect(derivedKey.extractable).toBe(false);
+      expect(derivedKey.usages).toEqual(["wrapKey", "unwrapKey"]);
+    });
+
+    it("should generate same key for same passphrase and salt", async () => {
+      const derivedKey1 = await deriveDataPassphraseDerivedKey(
+        testPassphrase,
+        derivationParams,
+      );
+      const derivedKey2 = await deriveDataPassphraseDerivedKey(
+        testPassphrase,
+        derivationParams,
+      );
+
+      // We can't compare keys directly, so test by wrapping/unwrapping
+      const accountKey = await generateAccountKey();
+      const wrapped1 = await wrapAccountKey(accountKey, derivedKey1);
+      const unwrapped2 = await unwrapAccountKey(wrapped1, derivedKey2);
+
+      expect(unwrapped2).toBeInstanceOf(CryptoKey);
+    });
+
+    it("should generate different keys for different salts", async () => {
+      const salt2 = crypto.getRandomValues(new Uint8Array(32)).buffer;
+      const derivationParams2 = { salt: salt2 };
+
+      const derivedKey1 = await deriveDataPassphraseDerivedKey(
+        testPassphrase,
+        derivationParams,
+      );
+      const derivedKey2 = await deriveDataPassphraseDerivedKey(
+        testPassphrase,
+        derivationParams2,
+      );
+
+      const accountKey = await generateAccountKey();
+      const wrapped1 = await wrapAccountKey(accountKey, derivedKey1);
+
+      // Should fail to unwrap with different derived key
+      await expect(unwrapAccountKey(wrapped1, derivedKey2)).rejects.toThrow();
+    });
+  });
+
+  describe("wrapAccountKey and unwrapAccountKey", () => {
+    let accountKey: CryptoKey;
+    let derivedKey: CryptoKey;
+
+    beforeEach(async () => {
+      accountKey = await generateAccountKey();
+      derivedKey = await deriveDataPassphraseDerivedKey(
+        testPassphrase,
+        derivationParams,
+      );
+    });
+
+    it("should wrap and unwrap account key successfully", async () => {
+      const wrapped = await wrapAccountKey(accountKey, derivedKey);
+      const unwrapped = await unwrapAccountKey(wrapped, derivedKey);
+
+      expect(wrapped).toHaveProperty("data");
+      expect(wrapped).toHaveProperty("iv");
+      expect(wrapped.iv.byteLength).toBe(12);
+      expect(unwrapped).toBeInstanceOf(CryptoKey);
+    });
+
+    it("should maintain key functionality after wrap/unwrap", async () => {
+      const wrapped = await wrapAccountKey(accountKey, derivedKey);
+      const unwrapped = await unwrapAccountKey(wrapped, derivedKey);
+
+      const testData = "test data for wrapped key";
+      const encrypted = await encryptText(accountKey, testData);
+      const decrypted = await decryptText(unwrapped, encrypted);
+
+      expect(decrypted).toBe(testData);
+    });
+
+    it("should fail to unwrap with wrong derived key", async () => {
+      const wrongSalt = crypto.getRandomValues(new Uint8Array(32)).buffer;
+      const wrongDerivedKey = await deriveDataPassphraseDerivedKey(
+        testPassphrase,
+        { salt: wrongSalt },
+      );
+
+      const wrapped = await wrapAccountKey(accountKey, derivedKey);
+
+      await expect(
+        unwrapAccountKey(wrapped, wrongDerivedKey),
+      ).rejects.toThrow();
+    });
+
+    it("should generate different wrapped data each time", async () => {
+      const wrapped1 = await wrapAccountKey(accountKey, derivedKey);
+      const wrapped2 = await wrapAccountKey(accountKey, derivedKey);
+
+      const dataBuffer = new Uint8Array(wrapped1.data);
+      const ivBuffer = new Uint8Array(wrapped1.iv);
+      const dataBuffer2 = new Uint8Array(wrapped2.data);
+      const ivBuffer2 = new Uint8Array(wrapped2.iv);
+
+      expect(dataBuffer).not.toEqual(dataBuffer2);
+      expect(ivBuffer).not.toEqual(ivBuffer2);
+    });
+  });
+});
+
+describe("Integration Tests", () => {
+  it("should complete full E2EE workflow", async () => {
+    // 1. Generate account key
+    const accountKey = await generateAccountKey();
+
+    // 2. Create check value
+    const checkValue = await generateAccountKeyCheckValue(accountKey);
+    expect(await checkAccountKey(accountKey, checkValue)).toBe(true);
+
+    // 3. Encrypt some data
+    const originalText = "Secret message for E2EE test";
+    const encryptedText = await encryptText(accountKey, originalText);
+
+    // 4. Derive key from passphrase
+    const passphrase = "MySecurePassphrase123!";
+    const salt = crypto.getRandomValues(new Uint8Array(32)).buffer;
+    const derivedKey = await deriveDataPassphraseDerivedKey(passphrase, {
+      salt,
+    });
+
+    // 5. Wrap account key
+    const wrappedKey = await wrapAccountKey(accountKey, derivedKey);
+
+    // 6. Simulate key recovery: derive key again and unwrap
+    const recoveredDerivedKey = await deriveDataPassphraseDerivedKey(
+      passphrase,
+      { salt },
+    );
+    const recoveredAccountKey = await unwrapAccountKey(
+      wrappedKey,
+      recoveredDerivedKey,
+    );
+
+    // 7. Decrypt data with recovered key
+    const decryptedText = await decryptText(recoveredAccountKey, encryptedText);
+
+    expect(decryptedText).toBe(originalText);
+  });
+
+  it("should handle export/import in E2EE workflow", async () => {
+    // Generate and export account key
+    const accountKey = await generateAccountKey();
+    const exportedKey = await exportAccountKey(accountKey);
+    const importedKey = await importAccountKey(exportedKey);
+
+    // Use imported key in E2EE workflow
+    const passphrase = "TestPassphrase456!";
+    const salt = crypto.getRandomValues(new Uint8Array(32)).buffer;
+    const derivedKey = await deriveDataPassphraseDerivedKey(passphrase, {
+      salt,
+    });
+
+    const wrappedKey = await wrapAccountKey(importedKey, derivedKey);
+    const recoveredKey = await unwrapAccountKey(wrappedKey, derivedKey);
+
+    // Test encryption/decryption with recovered key
+    const testMessage = "Test message with exported key";
+    const encrypted = await encryptText(importedKey, testMessage);
+    const decrypted = await decryptText(recoveredKey, encrypted);
+
+    expect(decrypted).toBe(testMessage);
+  });
+});
+
+describe("Edge Cases and Error Handling", () => {
+  it("should handle very long passphrases", async () => {
+    const longPassphrase = "A".repeat(1000);
+    const salt = crypto.getRandomValues(new Uint8Array(32)).buffer;
+
+    const derivedKey = await deriveDataPassphraseDerivedKey(longPassphrase, {
+      salt,
+    });
+    expect(derivedKey).toBeInstanceOf(CryptoKey);
+  });
+
+  it("should handle special characters in passphrase", async () => {
+    const specialPassphrase = "!@#$%^&*()_+-=[]{}|;:,.<>?`~\"'\\";
+    const salt = crypto.getRandomValues(new Uint8Array(32)).buffer;
+
+    const derivedKey = await deriveDataPassphraseDerivedKey(specialPassphrase, {
+      salt,
+    });
+    expect(derivedKey).toBeInstanceOf(CryptoKey);
+  });
+
+  it("should handle zero-length salt gracefully", async () => {
+    const passphrase = "TestPassphrase";
+    const emptySalt = new ArrayBuffer(0);
+
+    // This should still work as PBKDF2 can handle empty salt
+    const derivedKey = await deriveDataPassphraseDerivedKey(passphrase, {
+      salt: emptySalt,
+    });
+    expect(derivedKey).toBeInstanceOf(CryptoKey);
   });
 });

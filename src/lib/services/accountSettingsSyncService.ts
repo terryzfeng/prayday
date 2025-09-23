@@ -1,22 +1,32 @@
 import { account } from "../stores/accountStore";
-import type { FirebaseAccountSettings } from "../utils/account/account";
+import { establishKeys } from "../utils/account/keys";
+import type { FirebaseAccountSettingsBox } from "../utils/firebase/users";
 
 /**
  * Asynchonously get account settings from server after cache pull to sync account settings
  * @param getAccountSettingsFromServer Promise<Box<FirebaseAccountSettings>>
  */
 export async function getAccountSettingsAsync(
-  getAccountSettingsFromServer: Promise<
-    | { success: boolean; data: FirebaseAccountSettings; fromCache: boolean }
-    | { success: boolean; error: string }
-  >,
+  getAccountSettingsFromServer: Promise<FirebaseAccountSettingsBox>,
 ) {
   try {
-    const serverDocResponse = await getAccountSettingsFromServer;
-    if (serverDocResponse.success && "data" in serverDocResponse) {
-      const firebaseAccountSettings = serverDocResponse.data;
+    const firebaseAccountSettingsBox = await getAccountSettingsFromServer;
+    console.log("Account settings sync");
+    if (
+      firebaseAccountSettingsBox.success &&
+      firebaseAccountSettingsBox.data !== undefined
+    ) {
+      const firebaseAccountSettings =
+        firebaseAccountSettingsBox.data.firebaseAccountSettings;
       account.updateName(firebaseAccountSettings.name);
       account.updateEmail(firebaseAccountSettings.email);
+      const { keys, isNew } = await establishKeys(
+        firebaseAccountSettingsBox.data.keySettings,
+      );
+      if (isNew) {
+        // TODO: Write to local storage
+      }
+      account.updateKeys(keys);
     } else {
       throw new Error();
     }
