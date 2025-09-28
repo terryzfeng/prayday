@@ -70,7 +70,7 @@ function createAccountStore() {
       // Switching from logged in to log out
       if (cloudAccountLoggedIn) {
         console.log("Log out");
-        Account.clearAccount();
+        Account.uninitializePrayers();
         cloudAccountLoggedIn = false;
       }
 

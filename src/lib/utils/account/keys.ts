@@ -42,7 +42,7 @@ export interface EstablishKeysBox {
  * Generate new keys for an account.
  * @returns Keys
  */
-async function generateNewKeys(): Promise<Keys> {
+export async function generateNewKeys(): Promise<Keys> {
   const key = await generateAccountKey();
   return {
     key,
@@ -58,62 +58,114 @@ async function generateNewKeys(): Promise<Keys> {
  * @param keySettings KeySettings
  * @returns keys Keys
  */
-function createKeysFromKeySettings(
+export function createKeysFromKeySettings(
   keySettings: KeySettings,
   key?: CryptoKey,
 ): Keys {
   return { key, keySettings };
 }
 
-/**
- * Establish keys from keySettings if they are valid. Can be called at any time.
- * @param keySettings KeySettings
- * @returns Keys
- */
-export async function establishKeys(
-  keySettings?: KeySettings,
-  dataPassphrase?: string,
-): Promise<EstablishKeysBox> {
-  if (keySettings !== undefined && Object.keys(keySettings).length !== 0) {
-    let key: CryptoKey | undefined = undefined;
-    if (keySettings.unprotectedAccountKey) {
-      // If we have unprotected account key
-      const importKey = await importAccountKey(
-        keySettings.unprotectedAccountKey,
-      );
-      if (await checkAccountKey(importKey, keySettings.accountKeyCheckValue)) {
-        key = importKey;
-      } else {
-        // Key is invalid, this should never happen
-        console.error(
-          "Account keys are invalid. Please contact Prayday support.",
-        );
-      }
-    } else if (loadKeysFromLocal()) {
-      // TODO: Load keys from local storage
-    } else if (
-      dataPassphrase &&
-      keySettings.protectedAccountKey &&
-      keySettings.dataPassphraseDerivedKeyDerivationParams
-    ) {
-      // E2EE is on, unwrap protected account key with data passphrase derived key
-      const dataPassphraseDerivedKey = await deriveDataPassphraseDerivedKey(
-        dataPassphrase,
-        keySettings.dataPassphraseDerivedKeyDerivationParams,
-      );
-      key = await unwrapAccountKey(
-        keySettings.protectedAccountKey,
-        dataPassphraseDerivedKey,
+export async function importUnprotectedAccountKey(
+  keySettings: KeySettings,
+): Promise<Keys> {
+  if (keySettings.unprotectedAccountKey) {
+    const importedKey = await importAccountKey(
+      keySettings.unprotectedAccountKey,
+    );
+    if (await checkAccountKey(importedKey, keySettings.accountKeyCheckValue)) {
+      return createKeysFromKeySettings(keySettings, importedKey);
+    } else {
+      // Key is invalid, this should never happen
+      console.error(
+        "Account keys are invalid. Please contact Prayday support.",
       );
     }
-    return { keys: createKeysFromKeySettings(keySettings, key) };
-  } else {
-    // We have no key settings, generate new Keys
-    return { keys: await generateNewKeys(), isNew: true };
   }
+  return createKeysFromKeySettings(keySettings);
 }
 
+export async function extractKeysWithDataPassphrase(
+  keySettings: KeySettings,
+  dataPassphrase: string,
+) {
+  // E2EE is on, unwrap protected account key with data passphrase derived key
+  if (
+    dataPassphrase &&
+    keySettings.protectedAccountKey &&
+    keySettings.dataPassphraseDerivedKeyDerivationParams
+  ) {
+    const dataPassphraseDerivedKey = await deriveDataPassphraseDerivedKey(
+      dataPassphrase,
+      keySettings.dataPassphraseDerivedKeyDerivationParams,
+    );
+    const unwrappedKey = await unwrapAccountKey(
+      keySettings.protectedAccountKey,
+      dataPassphraseDerivedKey,
+    );
+    if (await checkAccountKey(unwrappedKey, keySettings.accountKeyCheckValue)) {
+      return createKeysFromKeySettings(keySettings, unwrappedKey);
+    } else {
+      // Key is invalid, this should never happen
+      console.error(
+        "Account keys are invalid. Please contact Prayday support.",
+      );
+    }
+  }
+  return createKeysFromKeySettings(keySettings);
+}
+
+// /**
+//  * Establish keys from keySettings if they are valid. Can be called at any time.
+//  * @param keySettings KeySettings
+//  * @returns Keys
+//  */
+// export async function establishKeys(
+//   keySettings?: KeySettings,
+//   dataPassphrase?: string,
+// ): Promise<EstablishKeysBox> {
+//   if (keySettings !== undefined && Object.keys(keySettings).length !== 0) {
+//     let key: CryptoKey | undefined = undefined;
+//     if (keySettings.unprotectedAccountKey) {
+//       // If we have unprotected account key
+//       const importKey = await importAccountKey(
+//         keySettings.unprotectedAccountKey,
+//       );
+//       if (await checkAccountKey(importKey, keySettings.accountKeyCheckValue)) {
+//         key = importKey;
+//       } else {
+//         // Key is invalid, this should never happen
+//         console.error(
+//           "Account keys are invalid. Please contact Prayday support.",
+//         );
+//       }
+//     } else if (loadKeysFromLocal()) {
+//       // TODO: Load keys from local storage
+//     } else if (
+//       dataPassphrase &&
+//       keySettings.protectedAccountKey &&
+//       keySettings.dataPassphraseDerivedKeyDerivationParams
+//     ) {
+//       // E2EE is on, unwrap protected account key with data passphrase derived key
+//       const dataPassphraseDerivedKey = await deriveDataPassphraseDerivedKey(
+//         dataPassphrase,
+//         keySettings.dataPassphraseDerivedKeyDerivationParams,
+//       );
+//       key = await unwrapAccountKey(
+//         keySettings.protectedAccountKey,
+//         dataPassphraseDerivedKey,
+//       );
+//     }
+//     return { keys: createKeysFromKeySettings(keySettings, key) };
+//   } else {
+//     // We have no key settings, generate new Keys
+//     return { keys: await generateNewKeys(), isNew: true };
+//   }
+// }
+
 // TODO
-function loadKeysFromLocal(): boolean {
-  return false;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function loadAccountKeyFromLocal(
+  id: string,
+): Promise<CryptoKey | undefined> {
+  return Promise.resolve(undefined);
 }

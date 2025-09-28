@@ -10,7 +10,7 @@ import {
   createFirebaseAccountSettings,
   type FirebaseAccountSettings,
 } from "./users";
-import { establishKeys } from "../account/keys";
+import { generateNewKeys } from "../account/keys";
 import {
   account as accountStore,
   establishCloudAccount,
@@ -36,18 +36,19 @@ export const signUp = async (email: string, password: string, name: string) => {
       name,
       email,
     };
-    const keySettings = (await establishKeys()).keys.keySettings;
+    const keys = await generateNewKeys();
     await createFirebaseAccountSettings(
       userCredential.user.uid,
       firebaseAccountSettings,
-      keySettings,
+      keys.keySettings,
     );
     // Manually establish and log in the user
     const newCloudAccount = await establishCloudAccount(
       userCredential.user,
       firebaseAccountSettings,
-      keySettings,
+      keys.keySettings,
     );
+    // TODO: Write keys.key to localStorage
     if (newCloudAccount) {
       accountStore.setAccount(newCloudAccount);
     } else {

@@ -1,5 +1,5 @@
 import { account } from "../stores/accountStore";
-import { establishKeys } from "../utils/account/keys";
+import { importUnprotectedAccountKey } from "../utils/account/keys";
 import type { FirebaseAccountSettingsBox } from "../utils/firebase/users";
 
 /**
@@ -20,12 +20,9 @@ export async function getAccountSettingsAsync(
         firebaseAccountSettingsBox.data.firebaseAccountSettings;
       account.updateName(firebaseAccountSettings.name);
       account.updateEmail(firebaseAccountSettings.email);
-      const { keys, isNew } = await establishKeys(
+      const keys = await importUnprotectedAccountKey(
         firebaseAccountSettingsBox.data.keySettings,
       );
-      if (isNew) {
-        // TODO: Write to local storage
-      }
       account.updateKeys(keys);
     } else {
       throw new Error();
