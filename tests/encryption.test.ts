@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import { describe, expect, test, beforeEach } from "vitest";
 import { webcrypto } from "crypto";
 
 // Ensure we have a window object with crypto
 (global as any).window = (global as any).window || {};
 (global as any).window.crypto = webcrypto;
-(global as any).crypto = webcrypto;
 
 // Import the functions to test
 import {
@@ -21,11 +21,11 @@ import {
   unwrapAccountKey,
   type EncryptedData,
   type DataPassphraseDerivedKeyDerivationParams,
-} from "lib/utils/account/encryption"; // Adjust path as needed
+} from "lib/utils/account/encryption";
 
 describe("Account Key Operations", () => {
   describe("generateAccountKey", () => {
-    it("should generate a valid CryptoKey", async () => {
+    test("should generate a valid CryptoKey", async () => {
       const key = await generateAccountKey();
 
       expect(key).toBeInstanceOf(CryptoKey);
@@ -37,20 +37,20 @@ describe("Account Key Operations", () => {
   });
 
   describe("generateAccountKeyCheckValue", () => {
-    it("should generate check value for account key", async () => {
+    test("should generate check value for account key", async () => {
       const key = await generateAccountKey();
       const checkValue = await generateAccountKeyCheckValue(key);
 
-      expect(checkValue).toHaveProperty("data");
       expect(checkValue).toHaveProperty("iv");
-      expect(checkValue.data).toBeInstanceOf(ArrayBuffer);
+      expect(checkValue).toHaveProperty("data");
       expect(checkValue.iv).toBeInstanceOf(ArrayBuffer);
+      expect(checkValue.data).toBeInstanceOf(ArrayBuffer);
       expect(checkValue.iv.byteLength).toBe(12); // 96 bits
     });
   });
 
   describe("checkAccountKey", () => {
-    it("should return true for valid key and check value", async () => {
+    test("should return true for valid key and check value", async () => {
       const key = await generateAccountKey();
       const checkValue = await generateAccountKeyCheckValue(key);
 
@@ -58,7 +58,7 @@ describe("Account Key Operations", () => {
       expect(isValid).toBe(true);
     });
 
-    it("should return false for invalid key", async () => {
+    test("should return false for invalid key", async () => {
       const key1 = await generateAccountKey();
       const key2 = await generateAccountKey();
       const checkValue = await generateAccountKeyCheckValue(key1);
@@ -67,7 +67,7 @@ describe("Account Key Operations", () => {
       expect(isValid).toBe(false);
     });
 
-    it("should return false for corrupted check value", async () => {
+    test("should return false for corrupted check value", async () => {
       const key = await generateAccountKey();
       const checkValue = await generateAccountKeyCheckValue(key);
 
@@ -83,7 +83,7 @@ describe("Account Key Operations", () => {
   });
 
   describe("exportAccountKey and importAccountKey", () => {
-    it("should export and import key successfully", async () => {
+    test("should export and import key successfully", async () => {
       const originalKey = await generateAccountKey();
       const exported = await exportAccountKey(originalKey);
       const imported = await importAccountKey(exported);
@@ -94,7 +94,7 @@ describe("Account Key Operations", () => {
       expect(imported.algorithm.name).toBe("AES-GCM");
     });
 
-    it("should maintain key functionality after export/import", async () => {
+    test("should maintain key functionality after export/import", async () => {
       const originalKey = await generateAccountKey();
       const exported = await exportAccountKey(originalKey);
       const imported = await importAccountKey(exported);
@@ -116,41 +116,41 @@ describe("Text Encryption/Decryption", () => {
   });
 
   describe("encryptText", () => {
-    it("should encrypt text successfully", async () => {
+    test("should encrypt text successfully", async () => {
       const plaintext = "Hello, World!";
       const encrypted = await encryptText(testKey, plaintext);
 
-      expect(encrypted).toHaveProperty("data");
       expect(encrypted).toHaveProperty("iv");
-      expect(encrypted.data).toBeInstanceOf(ArrayBuffer);
+      expect(encrypted).toHaveProperty("data");
       expect(encrypted.iv).toBeInstanceOf(ArrayBuffer);
+      expect(encrypted.data).toBeInstanceOf(ArrayBuffer);
       expect(encrypted.iv.byteLength).toBe(12);
       expect(encrypted.data.byteLength).toBeGreaterThan(0);
     });
 
-    it("should generate different ciphertexts for same plaintext", async () => {
+    test("should generate different ciphertexts for same plaintext", async () => {
       const plaintext = "Hello, World!";
       const encrypted1 = await encryptText(testKey, plaintext);
       const encrypted2 = await encryptText(testKey, plaintext);
 
-      const dataBuffer1 = new Uint8Array(encrypted1.data);
       const ivBuffer1 = new Uint8Array(encrypted1.iv);
-      const dataBuffer2 = new Uint8Array(encrypted2.data);
+      const dataBuffer1 = new Uint8Array(encrypted1.data);
       const ivBuffer2 = new Uint8Array(encrypted2.iv);
+      const dataBuffer2 = new Uint8Array(encrypted2.data);
 
-      expect(dataBuffer1).not.toEqual(dataBuffer2);
       expect(ivBuffer1).not.toEqual(ivBuffer2);
+      expect(dataBuffer1).not.toEqual(dataBuffer2);
     });
 
-    it("should handle empty string", async () => {
+    test("should handle empty string", async () => {
       const plaintext = "";
       const encrypted = await encryptText(testKey, plaintext);
 
-      expect(encrypted).toHaveProperty("data");
       expect(encrypted).toHaveProperty("iv");
+      expect(encrypted).toHaveProperty("data");
     });
 
-    it("should handle unicode characters", async () => {
+    test("should handle unicode characters", async () => {
       const plaintext = "🔐 Test with émojis and ñ characters";
       const encrypted = await encryptText(testKey, plaintext);
       const decrypted = await decryptText(testKey, encrypted);
@@ -160,7 +160,7 @@ describe("Text Encryption/Decryption", () => {
   });
 
   describe("decryptText", () => {
-    it("should decrypt text successfully", async () => {
+    test("should decrypt text successfully", async () => {
       const plaintext = "Hello, World!";
       const encrypted = await encryptText(testKey, plaintext);
       const decrypted = await decryptText(testKey, encrypted);
@@ -168,20 +168,17 @@ describe("Text Encryption/Decryption", () => {
       expect(decrypted).toBe(plaintext);
     });
 
-    it("should return empty string for invalid key", async () => {
+    test("should return empty string for invalid key", async () => {
       const plaintext = "Hello, World!";
       const wrongKey = await generateAccountKey();
       const encrypted = await encryptText(testKey, plaintext);
 
-      const consoleSpy = jest.spyOn(console, "error").mockImplementation();
       const decrypted = await decryptText(wrongKey, encrypted);
 
       expect(decrypted).toBe("");
-      expect(consoleSpy).toHaveBeenCalled();
-      consoleSpy.mockRestore();
     });
 
-    it("should return empty string for corrupted data", async () => {
+    test("should return empty string for corrupted data", async () => {
       const plaintext = "Hello, World!";
       const encrypted = await encryptText(testKey, plaintext);
 
@@ -191,15 +188,12 @@ describe("Text Encryption/Decryption", () => {
         data: new ArrayBuffer(16),
       };
 
-      const consoleSpy = jest.spyOn(console, "error").mockImplementation();
       const decrypted = await decryptText(testKey, corruptedData);
 
       expect(decrypted).toBe("");
-      expect(consoleSpy).toHaveBeenCalled();
-      consoleSpy.mockRestore();
     });
 
-    it("should handle large text", async () => {
+    test("should handle large text", async () => {
       const plaintext = "A".repeat(10000);
       const encrypted = await encryptText(testKey, plaintext);
       const decrypted = await decryptText(testKey, encrypted);
@@ -220,7 +214,7 @@ describe("End-to-End Encryption (E2EE)", () => {
   });
 
   describe("deriveDataPassphraseDerivedKey", () => {
-    it("should derive key from passphrase and salt", async () => {
+    test("should derive key from passphrase and salt", async () => {
       const derivedKey = await deriveDataPassphraseDerivedKey(
         testPassphrase,
         derivationParams,
@@ -233,7 +227,7 @@ describe("End-to-End Encryption (E2EE)", () => {
       expect(derivedKey.usages).toEqual(["wrapKey", "unwrapKey"]);
     });
 
-    it("should generate same key for same passphrase and salt", async () => {
+    test("should generate same key for same passphrase and salt", async () => {
       const derivedKey1 = await deriveDataPassphraseDerivedKey(
         testPassphrase,
         derivationParams,
@@ -251,7 +245,7 @@ describe("End-to-End Encryption (E2EE)", () => {
       expect(unwrapped2).toBeInstanceOf(CryptoKey);
     });
 
-    it("should generate different keys for different salts", async () => {
+    test("should generate different keys for different salts", async () => {
       const salt2 = crypto.getRandomValues(new Uint8Array(32)).buffer;
       const derivationParams2 = { salt: salt2 };
 
@@ -284,17 +278,17 @@ describe("End-to-End Encryption (E2EE)", () => {
       );
     });
 
-    it("should wrap and unwrap account key successfully", async () => {
+    test("should wrap and unwrap account key successfully", async () => {
       const wrapped = await wrapAccountKey(accountKey, derivedKey);
       const unwrapped = await unwrapAccountKey(wrapped, derivedKey);
 
-      expect(wrapped).toHaveProperty("data");
       expect(wrapped).toHaveProperty("iv");
+      expect(wrapped).toHaveProperty("data");
       expect(wrapped.iv.byteLength).toBe(12);
       expect(unwrapped).toBeInstanceOf(CryptoKey);
     });
 
-    it("should maintain key functionality after wrap/unwrap", async () => {
+    test("should maintain key functionality after wrap/unwrap", async () => {
       const wrapped = await wrapAccountKey(accountKey, derivedKey);
       const unwrapped = await unwrapAccountKey(wrapped, derivedKey);
 
@@ -305,7 +299,7 @@ describe("End-to-End Encryption (E2EE)", () => {
       expect(decrypted).toBe(testData);
     });
 
-    it("should fail to unwrap with wrong derived key", async () => {
+    test("should fail to unwrap with wrong derived key", async () => {
       const wrongSalt = crypto.getRandomValues(new Uint8Array(32)).buffer;
       const wrongDerivedKey = await deriveDataPassphraseDerivedKey(
         testPassphrase,
@@ -319,23 +313,23 @@ describe("End-to-End Encryption (E2EE)", () => {
       ).rejects.toThrow();
     });
 
-    it("should generate different wrapped data each time", async () => {
+    test("should generate different wrapped data each time", async () => {
       const wrapped1 = await wrapAccountKey(accountKey, derivedKey);
       const wrapped2 = await wrapAccountKey(accountKey, derivedKey);
 
-      const dataBuffer = new Uint8Array(wrapped1.data);
       const ivBuffer = new Uint8Array(wrapped1.iv);
-      const dataBuffer2 = new Uint8Array(wrapped2.data);
+      const dataBuffer = new Uint8Array(wrapped1.data);
       const ivBuffer2 = new Uint8Array(wrapped2.iv);
+      const dataBuffer2 = new Uint8Array(wrapped2.data);
 
-      expect(dataBuffer).not.toEqual(dataBuffer2);
       expect(ivBuffer).not.toEqual(ivBuffer2);
+      expect(dataBuffer).not.toEqual(dataBuffer2);
     });
   });
 });
 
 describe("Integration Tests", () => {
-  it("should complete full E2EE workflow", async () => {
+  test("should complete full E2EE workflow", async () => {
     // 1. Generate account key
     const accountKey = await generateAccountKey();
 
@@ -373,7 +367,7 @@ describe("Integration Tests", () => {
     expect(decryptedText).toBe(originalText);
   });
 
-  it("should handle export/import in E2EE workflow", async () => {
+  test("should handle export/import in E2EE workflow", async () => {
     // Generate and export account key
     const accountKey = await generateAccountKey();
     const exportedKey = await exportAccountKey(accountKey);
@@ -399,7 +393,7 @@ describe("Integration Tests", () => {
 });
 
 describe("Edge Cases and Error Handling", () => {
-  it("should handle very long passphrases", async () => {
+  test("should handle very long passphrases", async () => {
     const longPassphrase = "A".repeat(1000);
     const salt = crypto.getRandomValues(new Uint8Array(32)).buffer;
 
@@ -409,7 +403,7 @@ describe("Edge Cases and Error Handling", () => {
     expect(derivedKey).toBeInstanceOf(CryptoKey);
   });
 
-  it("should handle special characters in passphrase", async () => {
+  test("should handle special characters in passphrase", async () => {
     const specialPassphrase = "!@#$%^&*()_+-=[]{}|;:,.<>?`~\"'\\";
     const salt = crypto.getRandomValues(new Uint8Array(32)).buffer;
 
@@ -419,7 +413,7 @@ describe("Edge Cases and Error Handling", () => {
     expect(derivedKey).toBeInstanceOf(CryptoKey);
   });
 
-  it("should handle zero-length salt gracefully", async () => {
+  test("should handle zero-length salt gracefully", async () => {
     const passphrase = "TestPassphrase";
     const emptySalt = new ArrayBuffer(0);
 

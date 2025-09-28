@@ -9,8 +9,8 @@
  * - iv: initialization vector for ciphertext
  */
 export interface EncryptedData {
-  data: ArrayBuffer;
   iv: ArrayBuffer;
+  data: ArrayBuffer;
 }
 
 /**
@@ -214,8 +214,8 @@ async function encrypt(
     data,
   );
   return {
-    data: ciphertext,
     iv,
+    data: ciphertext,
   };
 }
 
@@ -288,8 +288,8 @@ export async function wrapAccountKey(
     },
   );
   return {
-    data: wrappedKey,
     iv,
+    data: wrappedKey,
   };
 }
 

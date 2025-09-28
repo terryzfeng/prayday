@@ -6,11 +6,11 @@ import type {
 } from "../account/encryption";
 
 export interface FirebaseKeySettings {
-  accountKeyCheckValueData: Bytes;
   accountKeyCheckValueIV: Bytes;
+  accountKeyCheckValueData: Bytes;
   unprotectedAccountKey?: Bytes;
-  protectedAccountKeyData?: Bytes;
   protectedAccountKeyIV?: Bytes;
+  protectedAccountKeyData?: Bytes;
   dataPassphraseDerivedKeyDerivationParamsSalt?: Bytes;
 }
 
@@ -26,11 +26,11 @@ export function serializeKeySettings(
 ): FirebaseKeySettings {
   // Start with the required properties that are always present.
   const firebaseSettings: FirebaseKeySettings = {
-    accountKeyCheckValueData: arrayBufferToBytes(
-      keySettings.accountKeyCheckValue.data,
-    ),
     accountKeyCheckValueIV: arrayBufferToBytes(
       keySettings.accountKeyCheckValue.iv,
+    ),
+    accountKeyCheckValueData: arrayBufferToBytes(
+      keySettings.accountKeyCheckValue.data,
     ),
   };
 
@@ -41,11 +41,11 @@ export function serializeKeySettings(
     );
   }
   if (keySettings.protectedAccountKey) {
-    firebaseSettings.protectedAccountKeyData = arrayBufferToBytes(
-      keySettings.protectedAccountKey.data,
-    );
     firebaseSettings.protectedAccountKeyIV = arrayBufferToBytes(
       keySettings.protectedAccountKey.iv,
+    );
+    firebaseSettings.protectedAccountKeyData = arrayBufferToBytes(
+      keySettings.protectedAccountKey.data,
     );
   }
   if (keySettings.dataPassphraseDerivedKeyDerivationParams) {
@@ -68,8 +68,8 @@ export function deserializeFirebaseKeySettings(
 ): KeySettings {
   const keySettings: KeySettings = {
     accountKeyCheckValue: bytesToEncryptedData(
-      firebaseKeySettings.accountKeyCheckValueData,
       firebaseKeySettings.accountKeyCheckValueIV,
+      firebaseKeySettings.accountKeyCheckValueData,
     ),
   };
   if (firebaseKeySettings.unprotectedAccountKey) {
@@ -79,8 +79,8 @@ export function deserializeFirebaseKeySettings(
   }
   if (firebaseKeySettings.protectedAccountKeyData) {
     keySettings.protectedAccountKey = bytesToEncryptedData(
-      firebaseKeySettings.protectedAccountKeyData!,
       firebaseKeySettings.protectedAccountKeyIV!,
+      firebaseKeySettings.protectedAccountKeyData!,
     );
   }
   if (firebaseKeySettings.dataPassphraseDerivedKeyDerivationParamsSalt) {
@@ -98,27 +98,27 @@ export function deserializeFirebaseKeySettings(
 /**
  * Convert an EncryptedData object to a tuple of Bytes objects.
  * @param encryptedData - The EncryptedData object to convert.
- * @returns A tuple of Bytes objects representing the data and IV.
+ * @returns A tuple of Bytes (iv, data)
  */
 export function encryptedDataToBytes(
   encryptedData: EncryptedData,
 ): [Bytes, Bytes] {
   return [
-    arrayBufferToBytes(encryptedData.data),
     arrayBufferToBytes(encryptedData.iv),
+    arrayBufferToBytes(encryptedData.data),
   ];
 }
 
 /**
  * Convert a tuple of Bytes objects to an EncryptedData object.
- * @param data - The Bytes object representing the data.
  * @param iv - The Bytes object representing the IV.
+ * @param data - The Bytes object representing the data.
  * @returns An EncryptedData object.
  */
-export function bytesToEncryptedData(data: Bytes, iv: Bytes): EncryptedData {
+export function bytesToEncryptedData(iv: Bytes, data: Bytes): EncryptedData {
   return {
-    data: bytesToArrayBuffer(data),
     iv: bytesToArrayBuffer(iv),
+    data: bytesToArrayBuffer(data),
   };
 }
 

@@ -28,7 +28,6 @@
         "src/lib/utils/*"
       ]
     },
-
   },
   "include": ["src/**/*.ts", "src/**/*.js", "src/**/*.svelte", "tests/**/*.ts", "tests/**/*.js"],
   "references": [{ "path": "./tsconfig.node.json" }]
