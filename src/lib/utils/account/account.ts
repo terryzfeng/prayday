@@ -12,13 +12,18 @@ import { establishKeys, type Keys, type KeySettings } from "./keys";
 const LOCAL_ACCOUNT_KEY = "account";
 
 export default class Account {
-  id: string; // Firebase UID or Local ID
+  // Firebase UID or Guest Local ID
+  id: string;
+  // If account is cloud account
   isCloudAccount: boolean;
+  // Account User first name
   name: string;
+  // Account Keys for encryption/decryption
   private keys: Keys;
   // If the account is synced with server and keys.key is set.
   isReady: boolean;
 
+  // Firebase Auth fields
   private firebaseAuthUser: FirebaseAuthUser | undefined;
   private email: string | undefined;
 
@@ -55,11 +60,12 @@ export default class Account {
     this.isReady = this.keys.key !== undefined;
   }
 
-  setKeysAndPull(keys: Keys) {
+  async setKeysAndSyncPrayers(keys: Keys) {
     this.setKeys(keys);
     if (this.isReady) {
       // Decrypt prayers here
-      PrayerStore.setPrayers(prayerSync.pull());
+      await prayerSync.initialize(this);
+      PrayerStore.mergePrayers(prayerSync.pull());
     }
   }
 
@@ -71,21 +77,20 @@ export default class Account {
     if (isNew) {
       // TODO: Write to local storage
     }
-    this.setKeysAndPull(keys);
+    this.setKeysAndSyncPrayers(keys);
   }
 
   static createCloudAccount(
     firebaseAuthUser: FirebaseAuthUser,
     firebaseAccountSettings: FirebaseAccountSettings,
     keys: Keys,
-    fromCache: boolean = false,
   ) {
     return new Account(
       firebaseAuthUser.uid,
       /*isCloudAccount=*/ true,
       firebaseAccountSettings.name,
       keys,
-      !fromCache,
+      /*isReady*/ keys.key !== undefined,
       firebaseAuthUser,
       firebaseAccountSettings.email,
     );
@@ -134,9 +139,7 @@ export default class Account {
         firebaseAuthUser,
         firebaseAccountSettings,
         keys,
-        fromCache,
       );
-      console.log("account keys", account.keys);
       // If we loaded from cache, will need to sync account from server later
       if (fromCache && getAccountSettingsFromServer) {
         getAccountSettingsAsync(getAccountSettingsFromServer);
@@ -151,9 +154,9 @@ export default class Account {
     if (prayerSync.isInitialized()) {
       prayerSync.uninitialize();
     }
-    await prayerSync.initialize(account);
     if (account.isReady) {
-      PrayerStore.setPrayers(prayerSync.pull());
+      await prayerSync.initialize(account);
+      PrayerStore.mergePrayers(prayerSync.pull());
     }
     return account;
   }

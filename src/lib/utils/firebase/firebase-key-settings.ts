@@ -1,0 +1,134 @@
+import { Bytes } from "firebase/firestore";
+import type { KeySettings } from "../account/keys";
+import type {
+  DataPassphraseDerivedKeyDerivationParams,
+  EncryptedData,
+} from "../account/encryption";
+
+export interface FirebaseKeySettings {
+  accountKeyCheckValueData: Bytes;
+  accountKeyCheckValueIV: Bytes;
+  unprotectedAccountKey?: Bytes;
+  protectedAccountKeyData?: Bytes;
+  protectedAccountKeyIV?: Bytes;
+  dataPassphraseDerivedKeyDerivationParamsSalt?: Bytes;
+}
+
+/**
+ * Safely serializes a KeySettings object to a FirebaseKeySettings object,
+ * handling optional properties with undefined checks.
+ *
+ * @param keySettings - The source key settings object.
+ * @returns A new FirebaseKeySettings object ready for Firestore.
+ */
+export function serializeKeySettings(
+  keySettings: KeySettings,
+): FirebaseKeySettings {
+  // Start with the required properties that are always present.
+  const firebaseSettings: FirebaseKeySettings = {
+    accountKeyCheckValueData: arrayBufferToBytes(
+      keySettings.accountKeyCheckValue.data,
+    ),
+    accountKeyCheckValueIV: arrayBufferToBytes(
+      keySettings.accountKeyCheckValue.iv,
+    ),
+  };
+
+  // Conditionally add optional properties if they exist.
+  if (keySettings.unprotectedAccountKey) {
+    firebaseSettings.unprotectedAccountKey = arrayBufferToBytes(
+      keySettings.unprotectedAccountKey,
+    );
+  }
+  if (keySettings.protectedAccountKey) {
+    firebaseSettings.protectedAccountKeyData = arrayBufferToBytes(
+      keySettings.protectedAccountKey.data,
+    );
+    firebaseSettings.protectedAccountKeyIV = arrayBufferToBytes(
+      keySettings.protectedAccountKey.iv,
+    );
+  }
+  if (keySettings.dataPassphraseDerivedKeyDerivationParams) {
+    firebaseSettings.dataPassphraseDerivedKeyDerivationParamsSalt =
+      arrayBufferToBytes(
+        keySettings.dataPassphraseDerivedKeyDerivationParams.salt,
+      );
+  }
+
+  return firebaseSettings;
+}
+
+/**
+ * Deserialize FirebaseKeySettings to KeySettings
+ * @param firebaseKeySettings firebaseKeySettings from Firestore
+ * @returns KeySettings for user account
+ */
+export function deserializeFirebaseKeySettings(
+  firebaseKeySettings: FirebaseKeySettings,
+): KeySettings {
+  const keySettings: KeySettings = {
+    accountKeyCheckValue: bytesToEncryptedData(
+      firebaseKeySettings.accountKeyCheckValueData,
+      firebaseKeySettings.accountKeyCheckValueIV,
+    ),
+  };
+  if (firebaseKeySettings.unprotectedAccountKey) {
+    keySettings.unprotectedAccountKey = bytesToArrayBuffer(
+      firebaseKeySettings.unprotectedAccountKey!,
+    );
+  }
+  if (firebaseKeySettings.protectedAccountKeyData) {
+    keySettings.protectedAccountKey = bytesToEncryptedData(
+      firebaseKeySettings.protectedAccountKeyData!,
+      firebaseKeySettings.protectedAccountKeyIV!,
+    );
+  }
+  if (firebaseKeySettings.dataPassphraseDerivedKeyDerivationParamsSalt) {
+    const dataPassphraseDerivedKeyDerivationParams = {
+      salt: bytesToArrayBuffer(
+        firebaseKeySettings.dataPassphraseDerivedKeyDerivationParamsSalt!,
+      ),
+    } as DataPassphraseDerivedKeyDerivationParams;
+    keySettings.dataPassphraseDerivedKeyDerivationParams =
+      dataPassphraseDerivedKeyDerivationParams;
+  }
+  return keySettings;
+}
+
+/**
+ * Convert an EncryptedData object to a tuple of Bytes objects.
+ * @param encryptedData - The EncryptedData object to convert.
+ * @returns A tuple of Bytes objects representing the data and IV.
+ */
+export function encryptedDataToBytes(
+  encryptedData: EncryptedData,
+): [Bytes, Bytes] {
+  return [
+    arrayBufferToBytes(encryptedData.data),
+    arrayBufferToBytes(encryptedData.iv),
+  ];
+}
+
+/**
+ * Convert a tuple of Bytes objects to an EncryptedData object.
+ * @param data - The Bytes object representing the data.
+ * @param iv - The Bytes object representing the IV.
+ * @returns An EncryptedData object.
+ */
+export function bytesToEncryptedData(data: Bytes, iv: Bytes): EncryptedData {
+  return {
+    data: bytesToArrayBuffer(data),
+    iv: bytesToArrayBuffer(iv),
+  };
+}
+
+// Helper Functions
+function arrayBufferToBytes(arrayBuffer: ArrayBuffer): Bytes {
+  const uint8Array = new Uint8Array(arrayBuffer);
+  return Bytes.fromUint8Array(uint8Array);
+}
+
+function bytesToArrayBuffer(bytes: Bytes): ArrayBuffer {
+  const uint8Array = bytes.toUint8Array();
+  return uint8Array.buffer as ArrayBuffer;
+}

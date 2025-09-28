@@ -17,7 +17,12 @@ import {
 import { db } from "./config";
 import { midnight as midnight } from "../date-utils";
 import { USER_HISTORY_SIZE } from "lib/stores/userHistoryStore";
-import type { KeySettings } from "../account/keys";
+import { type KeySettings } from "../account/keys";
+import {
+  deserializeFirebaseKeySettings,
+  serializeKeySettings,
+  type FirebaseKeySettings,
+} from "./firebase-key-settings";
 
 export interface FirebaseAccountSettingsBox {
   success: boolean;
@@ -48,11 +53,10 @@ export async function uploadKeySettings(
   userId: string,
   keySettings: KeySettings,
 ) {
-  // TODO: Serialize keySettings for firebase
-  console.log("uploadKeySettings", keySettings);
-  // return setDoc(doc(db, "users", userId, "keys", "keySettings"), {
-  //   "test": 2
-  // });
+  return setDoc(
+    doc(db, "users", userId, "keys", "keySettings"),
+    serializeKeySettings(keySettings),
+  );
 }
 
 //------------------------------------------------------------------------------
@@ -76,7 +80,9 @@ async function getAccountSettingsFromServer(
         data: {
           firebaseAccountSettings:
             serverUserDoc.data() as FirebaseAccountSettings,
-          keySettings: serverKeySettingsDoc.data() as KeySettings,
+          keySettings: deserializeFirebaseKeySettings(
+            serverKeySettingsDoc.data() as FirebaseKeySettings,
+          ),
           fromCache: false,
         },
       };
@@ -110,7 +116,9 @@ export async function getAccountSettings(
         data: {
           firebaseAccountSettings:
             cachedUserDoc.data() as FirebaseAccountSettings,
-          keySettings: cachedKeySettingsDoc.data() as KeySettings,
+          keySettings: deserializeFirebaseKeySettings(
+            cachedKeySettingsDoc.data() as FirebaseKeySettings,
+          ),
           fromCache: true,
           getAccountSettingsFromServer: getAccountSettingsFromServer(
             userDocRef,
@@ -132,7 +140,9 @@ export async function getAccountSettings(
         data: {
           firebaseAccountSettings:
             serverUserDoc.data() as FirebaseAccountSettings,
-          keySettings: serverKeySettingsDoc.data() as KeySettings,
+          keySettings: deserializeFirebaseKeySettings(
+            serverKeySettingsDoc.data() as FirebaseKeySettings,
+          ),
           fromCache: false,
         },
       };
@@ -150,14 +160,10 @@ export async function getAccountSettings(
 // Create a firebase user account settings and keys
 export async function createFirebaseAccountSettings(
   userId: string,
-  name: string,
-  email: string,
+  firebaseAccountSettings: FirebaseAccountSettings,
   keySettings: KeySettings,
 ): Promise<void> {
-  await setDoc(doc(db, "users", userId), {
-    name: name,
-    email: email,
-  });
+  await setDoc(doc(db, "users", userId), firebaseAccountSettings);
   return uploadKeySettings(userId, keySettings);
 }
 

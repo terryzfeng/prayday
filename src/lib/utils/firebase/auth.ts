@@ -6,8 +6,15 @@ import {
 } from "firebase/auth";
 import { auth } from "./config";
 import type { FirebaseError } from "firebase/app";
-import { createFirebaseAccountSettings } from "./users";
-import type { KeySettings } from "../account/keys";
+import {
+  createFirebaseAccountSettings,
+  type FirebaseAccountSettings,
+} from "./users";
+import { establishKeys } from "../account/keys";
+import {
+  account as accountStore,
+  establishCloudAccount,
+} from "lib/stores/accountStore";
 
 /**
  * Sign up a new user for Prayday.
@@ -18,21 +25,36 @@ import type { KeySettings } from "../account/keys";
  */
 export const signUp = async (email: string, password: string, name: string) => {
   try {
-    // Get current guest key
-    // const currentKey = getKeys().dek!;
+    // Create FirebaseAuthUser
     const userCredential = await createUserWithEmailAndPassword(
       auth,
       email,
       password,
     );
-    // TODO: create key settings
-    const keySettings = undefined as unknown as KeySettings;
-    await createFirebaseAccountSettings(
-      userCredential.user.uid,
+    // Create new user account & key settings and upload to Firestore
+    const firebaseAccountSettings: FirebaseAccountSettings = {
       name,
       email,
+    };
+    const keySettings = (await establishKeys()).keys.keySettings;
+    await createFirebaseAccountSettings(
+      userCredential.user.uid,
+      firebaseAccountSettings,
       keySettings,
     );
+    // Manually establish and log in the user
+    const newCloudAccount = await establishCloudAccount(
+      userCredential.user,
+      firebaseAccountSettings,
+      keySettings,
+    );
+    if (newCloudAccount) {
+      accountStore.setAccount(newCloudAccount);
+    } else {
+      throw new Error(
+        "Failed to create account. Please contact Prayday support.",
+      );
+    }
     return { success: true, user: userCredential.user };
   } catch (error: unknown) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -75,8 +97,8 @@ export const logOut = async () => {
     await signOut(auth);
     // clear store
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: (error as Error).message };
   }
 };
 

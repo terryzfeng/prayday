@@ -1,14 +1,40 @@
 import { writable } from "svelte/store";
 import { auth } from "lib/utils/firebase/config";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, type User } from "firebase/auth";
 import {
   getAccountSettings,
   type FirebaseAccountSettings,
+  type FirebaseAccountSettingsBox,
 } from "../utils/firebase/users";
 import Account from "../utils/account/account";
 import type { Keys, KeySettings } from "../utils/account/keys";
 
 let cloudAccountLoggedIn = false;
+
+/**
+ * Estblish a cloud account. This is used in onAuthStateChanged for log-in,
+ * or manually called after sign up.
+ */
+export async function establishCloudAccount(
+  firebaseAuthUser: User,
+  firebaseAccountSettings: FirebaseAccountSettings,
+  keySettings: KeySettings,
+  fromCache: boolean = false,
+  getAccountSettingsFromServer:
+    | Promise<FirebaseAccountSettingsBox>
+    | undefined = undefined,
+) {
+  const account = await Account.establishAccount(
+    /*isCloudAccount=*/ true,
+    firebaseAuthUser,
+    firebaseAccountSettings as FirebaseAccountSettings,
+    keySettings as KeySettings,
+    fromCache,
+    getAccountSettingsFromServer,
+  );
+  cloudAccountLoggedIn = true;
+  return account;
+}
 
 /**
  * Create store for storing user credentials and handling log in/out
@@ -26,8 +52,7 @@ function createAccountStore() {
         firebaseAuthUser.uid,
       );
       if (firebaseAccountSettingsPromise.success) {
-        account = await Account.establishAccount(
-          /*isCloudAccount=*/ true,
+        account = await establishCloudAccount(
           firebaseAuthUser,
           firebaseAccountSettingsPromise.data
             ?.firebaseAccountSettings as FirebaseAccountSettings,
@@ -37,7 +62,7 @@ function createAccountStore() {
         );
         cloudAccountLoggedIn = true;
       } else {
-        // Firebase failed to log in, fallback to guest account
+        // Failed to load user account settings. Please contact Prayday support.
         console.error(firebaseAccountSettingsPromise.error);
         account = await Account.establishAccount(/*isCloudAccount=*/ false);
       }
@@ -58,6 +83,9 @@ function createAccountStore() {
 
   return {
     subscribe,
+    setAccount: (account: Account) => {
+      set(account);
+    },
     updateName: (newName: string) => {
       update((account) => {
         if (account) {
@@ -77,7 +105,7 @@ function createAccountStore() {
     updateKeys: (newKeys: Keys) => {
       update((account) => {
         if (account) {
-          account.setKeysAndPull(newKeys);
+          account.setKeysAndSyncPrayers(newKeys);
         }
         return account;
       });
