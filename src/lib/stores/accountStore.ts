@@ -70,7 +70,7 @@ function createAccountStore() {
       // Switching from logged in to log out
       if (cloudAccountLoggedIn) {
         console.log("Log out");
-        Account.uninitializePrayers();
+        Account.uninitializeServices();
         cloudAccountLoggedIn = false;
       }
 
@@ -86,27 +86,12 @@ function createAccountStore() {
     setAccount: (account: Account) => {
       set(account);
     },
-    updateName: (newName: string) => {
+    updateAccount: (name: string, email:string, newKeys: Keys) => {
       update((account) => {
-        if (account) {
-          account.setName(newName);
-        }
-        return account;
-      });
-    },
-    updateEmail: (newEmail: string) => {
-      update((account) => {
-        if (account) {
-          account.setEmail(newEmail);
-        }
-        return account;
-      });
-    },
-    updateKeys: (newKeys: Keys) => {
-      update((account) => {
-        if (account) {
-          account.setKeysAndSyncPrayers(newKeys);
-        }
+        if (account === undefined) return;
+        account.setName(name);
+        account.setEmail(email);
+        account.asyncInitializeServices(newKeys);
         return account;
       });
     },

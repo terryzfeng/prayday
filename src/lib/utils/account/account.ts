@@ -11,19 +11,24 @@ import {
   generateNewKeys,
   type Keys,
   type KeySettings,
-  importUnprotectedAccountKey,
+  importAccountKeys,
   loadAccountKeyFromLocal,
+  writeAccountKeyToLocal,
+  quickCompareKeySettings,
 } from "./keys";
+import { e2eeEnabledStore, showPassphraseModalStore } from "lib/stores/e2eeEnabledStore";
 
 const LOCAL_ACCOUNT_KEY = "account";
 
 export default class Account {
   // Firebase UID or Guest Local ID
   id: string;
-  // If account is cloud account
+  // If account is a cloud account
   isCloudAccount: boolean;
-  // Account User first name
+  // Account first name
   name: string;
+  // Are account services initialized
+  initialized: boolean;
   // Account Keys for encryption/decryption
   private keys: Keys;
 
@@ -42,6 +47,7 @@ export default class Account {
     this.id = id;
     this.isCloudAccount = isCloudAccount;
     this.name = name;
+    this.initialized = false;
     this.keys = keys;
 
     // Optional
@@ -57,21 +63,28 @@ export default class Account {
     this.email = email;
   }
 
-  setKeys(keys: Keys) {
-    this.keys = keys;
-  }
-
   getFullId(): string {
     return this.id + (this.isCloudAccount ? "@cloud" : "@local");
   }
 
-  async setKeysAndSyncPrayers(keys: Keys) {
-    this.setKeys(keys);
-    if (keys.key) {
-      // Decrypt prayers here
-      await prayerSync.initialize(this);
-      PrayerStore.mergePrayers(prayerSync.pull());
+  /**
+   * Asynchronously initialize services after the initial call has been made
+   * Will address any failures if there are new keys.
+   * @param keys new keys pulled from server
+   * @returns boolean if account is initialized
+   */
+  async asyncInitializeServices(keys: Keys) {
+    const isSameKeysSettings = quickCompareKeySettings(this.keys.keySettings, keys.keySettings);
+    if (!isSameKeysSettings) {
+      this.keys = keys;
+      this.saveKeys();
+      return await Account.initializeServices(this);
     }
+  }
+
+  requestDataPassphrase() {
+    // If account can't find keys.key, this means e2ee is turned on
+    showPassphraseModalStore.set(true);
   }
 
   // async deriveAndUnwrapAccountKey(dataPassphrase: string) {
@@ -89,27 +102,29 @@ export default class Account {
    * Write the account keys to firebase if cloud account
    * Write Account.keys to localStorage
    */
-  async saveKeys() {
+  saveKeys() {
     if (this.isCloudAccount) {
-      await uploadKeySettings(this.id, this.keys.keySettings);
+      uploadKeySettings(this.id, this.keys.keySettings);
     }
     // TODO: Persist Account.keys to localStorage
-    return;
-  }
-
-  async loadPrayers() {
-    await prayerSync.initialize(this);
-    PrayerStore.setPrayers(prayerSync.pull());
+    writeAccountKeyToLocal(this.getFullId(), this.keys);
   }
 
   //----------------------------------------------------------------------------
   // Static functions
   //----------------------------------------------------------------------------
-  static initializeCloudAccount(
+  /**
+   * Construct a new firebase cloud account.
+   * @param firebaseAuthUser 
+   * @param firebaseAccountSettings
+   * @param keys
+   * @returns Account
+   */
+  static setUpCloudAccount(
     firebaseAuthUser: FirebaseAuthUser,
     firebaseAccountSettings: FirebaseAccountSettings,
     keys: Keys,
-  ) {
+  ): Account {
     return new Account(
       firebaseAuthUser.uid,
       /*isCloudAccount=*/ true,
@@ -120,26 +135,76 @@ export default class Account {
     );
   }
 
-  static async createNewLocalAccount(id: string) {
+
+  /**
+   * Create and return a new local guest account
+   * @param id 
+   * @returns Promise<Account>
+   */
+  static async setUpNewLocalAccount(id: string): Promise<Account> {
     const keys = await generateNewKeys();
-    const guestAccount = new Account(
+    return new Account(
       id,
       /*isCloudAccount=*/ false,
       "Guest",
       keys,
     );
-    guestAccount.saveKeys();
-    return guestAccount;
-  }
-
-  static uninitializePrayers() {
-    prayerSync.uninitialize();
-    PrayerStore.clearStorage();
   }
 
   /**
-   * Handles log-in behavior and establishes an account for Prayday.
-   * Handles both cloud accounts and local account (load or create).
+   * Connect an account to prayer sync services and do an initial load.
+   * Load pulled prayers into view.
+   * @param account 
+   */
+  static async initializePrayers(account: Account) {
+    if (!account.initialized) {
+      await prayerSync.initialize(account);
+      // TODO: Check if it is safe to do this here post encryption
+      PrayerStore.setPrayers(prayerSync.pull());
+    } else {
+      PrayerStore.mergePrayers(prayerSync.pull());
+    }
+  }
+
+  /**
+   * Disconnect account from services like prayer sync
+   */
+  static uninitializeServices() {
+    if (prayerSync.isInitialized()) {
+      prayerSync.uninitialize();
+      PrayerStore.clearStorage();
+    }
+  }
+
+  /**
+   * Check and initialize services for account based on keys. 
+   */
+  static async initializeServices(account: Account): Promise<boolean> {
+    // Account is ready to be initialized, start up services
+    if (account.keys.key) {
+      e2eeEnabledStore.set(false);
+      Account.initializePrayers(account);
+      account.initialized = true;
+    } else {
+      // Don't have keys.key, this means e2ee is turned on
+      e2eeEnabledStore.set(true);
+      const loadedLocalKey = await loadAccountKeyFromLocal(account.getFullId());
+      if (loadedLocalKey) {
+        account.keys.key = loadedLocalKey;
+        Account.initializePrayers(account);
+        account.initialized = true;
+      } else {
+        // Will need to request for data passphrase
+        account.requestDataPassphrase();
+        account.initialized = false;
+      }
+    }
+    return account.initialized;
+  }
+
+  /**
+   * Handle log-in behavior and establish an account for Prayday application.
+   * Handles both cloud accounts and local accounts (load or create).
    * @param isCloudAccount
    * @param firebaseAuthUser
    * @param firebaseAccountSettings
@@ -159,46 +224,35 @@ export default class Account {
     let account = null;
     if (isCloudAccount) {
       if (
-        firebaseAuthUser === undefined ||
+        firebaseAuthUser === undefined || 
         firebaseAccountSettings === undefined ||
         keySettings === undefined
       ) {
         console.error("No cloud account exists");
         return undefined;
       }
-      const key = await importUnprotectedAccountKey(keySettings);
-      account = Account.initializeCloudAccount(
+      const keys = await importAccountKeys(keySettings);
+      account = Account.setUpCloudAccount(
         firebaseAuthUser,
         firebaseAccountSettings,
-        key,
+        keys,
       );
-      // If we loaded from cache, will need to sync account from server later
+      // If cloud account comes from cache, we also need a server pull
       if (fromCache && getAccountSettingsFromServer) {
         getAccountSettingsAsync(getAccountSettingsFromServer);
       }
     } else {
       account = await loadLocalAccount();
       if (account === null) {
-        account = await Account.createNewLocalAccount(crypto.randomUUID());
+        account = await Account.setUpNewLocalAccount(crypto.randomUUID());
+        account.saveKeys();
       }
-    }
-    // Establish Services and Keys
-    if (prayerSync.isInitialized()) {
-      Account.uninitializePrayers();
     }
 
-    if (account.keys.key) {
-      account.loadPrayers();
-    } else {
-      // Don't have keys.key, this means e2ee is turned on
-      const loadedLocalKey = await loadAccountKeyFromLocal(account.getFullId());
-      if (loadedLocalKey) {
-        account.keys.key = loadedLocalKey;
-        account.loadPrayers();
-      } else {
-        // account.requestDataPassphrase();
-      }
-    }
+    // Uninitialize services if they exist, initialize new services
+    Account.uninitializeServices();
+    await Account.initializeServices(account);
+
     return account;
   }
 }
@@ -213,5 +267,5 @@ async function loadLocalAccount(): Promise<Account | null> {
   if (localAccountId === null) {
     return null;
   }
-  return await Account.createNewLocalAccount(localAccountId);
+  return await Account.setUpNewLocalAccount(localAccountId);
 }

@@ -3,40 +3,32 @@
   import Modal from "lib/components/Modals/Modal.svelte";
   import Button from "lib/components/Button.svelte";
   import { account } from "lib/stores/accountStore";
-  import { e2eeEnabledStore } from "lib/stores/e2eeEnabledStore";
-
+  import { e2eeEnabledStore, showPassphraseModalStore } from "lib/stores/e2eeEnabledStore";
   export let showInputPassphrase: (state: boolean) => void;
-
   let password = "";
   let errorMessage = "";
   let loading = false;
+  let isVisible = false;
 
   async function handleSubmit() {
     loading = true;
     errorMessage = "";
-
     try {
       if (!password) {
         throw new Error("Please enter your passphrase.");
       }
-
       // TODO: Add your decryption/verification logic here
       // const result = await verifyPassphrase(password);
-
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
-
       // For demo purposes, simulate a failed attempt occasionally
       if (password === "wrong") {
         throw new Error("Incorrect passphrase. Please try again.");
       }
-
-      // TODO: Fix Account Keys
-      // setDek("0", null);
-
       // Success - reset form and close modal
       password = "";
       showInputPassphrase(false);
+      showPassphraseModalStore.set(false);
     } catch (error: unknown) {
       errorMessage = (error as Error).message;
     } finally {
@@ -44,19 +36,23 @@
     }
   }
 
-  // Note: Dummy close function so that when user clicks outside Modal,
-  // the modal won't close or clear
-  function dummyClose() {}
+  function closeInputDataPassphrase() {
+    showInputPassphrase(false);
+    showPassphraseModalStore.set(false);
+    isVisible = false;
+  }
 
   $: {
-    // Once user logs in and if e2ee is enabled
-    if ($account?.isCloudAccount === true && $e2eeEnabledStore) {
-      // If we don't have a dek, show input passphrase to decrypt e_dek
-      // TODO: Fix Account Keys
-      // if (!getDek()) {
-      //   showInputPassphrase(true);
-      //   console.log("show input passphrase");
-      // }
+    // Once user logs in and if e2ee is enabled for this account
+    if ($account?.isCloudAccount && $showPassphraseModalStore && $e2eeEnabledStore) {
+      if (!isVisible) {
+        console.log("show input passphrase");
+        console.log("is cloud account", $account?.isCloudAccount);
+        console.log("show passphrase modal", $showPassphraseModalStore);
+        console.log("e2ee enabled", $e2eeEnabledStore)
+        showInputPassphrase(true);
+        isVisible = true;
+      }
     }
   }
 </script>
@@ -64,7 +60,7 @@
 <Modal
   bind:showModal={showInputPassphrase}
   showClosePrompt={false}
-  onClose={dummyClose}
+  onClose={closeInputDataPassphrase}
 >
   <div class="flex flex-col items-center space-y-8 px-4 py-6">
     <h1

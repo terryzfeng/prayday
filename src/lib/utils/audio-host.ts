@@ -45,13 +45,7 @@ async function loadMultipleAudioFiles(
   const buffers: { [key: string]: AudioBuffer } = {};
   const promises = Object.entries(files).map(async ([key, filename]) => {
     const url = audioUrl + filename;
-    // TODO: Figure out why we needed this redundant throw
-    // eslint-disable-next-line no-useless-catch
-    try {
-      buffers[key] = await getAudioBufferFromUrl(audioContext, url);
-    } catch (error) {
-      throw error;
-    }
+    buffers[key] = await getAudioBufferFromUrl(audioContext, url);
   });
 
   await Promise.all(promises);

@@ -48,9 +48,9 @@ export const signUp = async (email: string, password: string, name: string) => {
       firebaseAccountSettings,
       keys.keySettings,
     );
-    // TODO: Write keys.key to localStorage
     if (newCloudAccount) {
       accountStore.setAccount(newCloudAccount);
+      newCloudAccount.saveKeys();
     } else {
       throw new Error(
         "Failed to create account. Please contact Prayday support.",

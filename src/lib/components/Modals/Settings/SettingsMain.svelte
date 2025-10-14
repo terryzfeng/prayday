@@ -3,6 +3,8 @@
   import Button from "lib/components/Button.svelte";
   import SettingsItem from "./SettingsItem.svelte";
   import { logOut } from "lib/utils/firebase/auth";
+  import { e2eeEnabledStore, showPassphraseModalStore } from "lib/stores/e2eeEnabledStore";
+  import { account } from "lib/stores/accountStore";
 
   export let onNavigate: (page: string) => void;
   export let onClose: () => void;
@@ -33,9 +35,21 @@
       <h2 class="h2">
         <span>Manage Your Account</span>
       </h2>
+      {#if !$account?.initialized}
+      <SettingsItem
+        headline="Unlock Prayers"
+        description="Prayers are currently encrypted"
+        onClick={() => {
+          showPassphraseModalStore.set(true);
+          onClose();
+        }}
+      />
+      {/if}
       <SettingsItem
         headline="Advanced Prayer Protection"
-        description="Encrypt your prayers to keep them secure"
+        description={$e2eeEnabledStore === true 
+          ? "Manage settings" 
+          : "Encrypt your prayers to keep them secure"}
         onClick={() => onNavigate("advanced-prayer-protection")}
       />
     </div>

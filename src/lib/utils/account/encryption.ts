@@ -317,6 +317,21 @@ export function unwrapAccountKey(
   );
 }
 
+/**
+ * Deep compare if two EncryptedData objects are equal.
+ * @param a EncryptedData
+ * @param b EncryptedData
+ * @returns boolean
+ */
+export function assertEqualEncryptedData(
+  a: EncryptedData,
+  b: EncryptedData,
+): boolean {
+  return (
+    assertEqual(a.iv, b.iv) && assertEqual(a.data, b.data)
+  )
+}
+
 //------------------------------------------------------------------------------
 // Helper Utility Functions
 //------------------------------------------------------------------------------

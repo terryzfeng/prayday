@@ -8,6 +8,7 @@ import {
   importAccountKey,
   deriveDataPassphraseDerivedKey,
   unwrapAccountKey,
+  assertEqualEncryptedData,
 } from "./encryption";
 
 /**
@@ -54,6 +55,21 @@ export async function generateNewKeys(): Promise<Keys> {
 }
 
 /**
+ * Quick compare if keySettings are equal. Checks for field presence.
+ * @param KeySettings
+ */
+export function quickCompareKeySettings(a: KeySettings, b: KeySettings): boolean {
+  // Check e2ee states are the same, if both have unprotected account key 
+  const aHasUnprotected = a.unprotectedAccountKey !== undefined;
+  const bHasUnprotected = b.unprotectedAccountKey !== undefined;
+  if (aHasUnprotected !== bHasUnprotected) {
+    return false;
+  }
+  // Quick compare and return if accountKeyCheckValue is the same
+  return assertEqualEncryptedData(a.accountKeyCheckValue, b.accountKeyCheckValue);
+}
+
+/**
  * Structure keySettings to Keys
  * @param keySettings KeySettings
  * @returns keys Keys
@@ -65,7 +81,12 @@ export function createKeysFromKeySettings(
   return { key, keySettings };
 }
 
-export async function importUnprotectedAccountKey(
+/**
+ * Import keySettings to Keys, importing unprotected key to keys.key if possible
+ * @param keySettings KeySettings
+ * @returns Keys with keys.key if unprotected present
+ */
+export async function importAccountKeys(
   keySettings: KeySettings,
 ): Promise<Keys> {
   if (keySettings.unprotectedAccountKey) {
@@ -84,10 +105,16 @@ export async function importUnprotectedAccountKey(
   return createKeysFromKeySettings(keySettings);
 }
 
+/**
+ * Unwrap protected account key with data passphrase to get Keys
+ * @param keySettings account KeySettings
+ * @param dataPassphrase user data passphrase
+ * @returns Keys
+ */
 export async function extractKeysWithDataPassphrase(
   keySettings: KeySettings,
   dataPassphrase: string,
-) {
+): Promise<Keys> {
   // E2EE is on, unwrap protected account key with data passphrase derived key
   if (
     dataPassphrase &&
@@ -162,10 +189,27 @@ export async function extractKeysWithDataPassphrase(
 //   }
 // }
 
-// TODO
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// TODO: Write keys to local
+/**
+ * Load an account key from local storage 
+ * @param accountFullId Account id ending in @cloud or @local
+ * @returns 
+ */
 export function loadAccountKeyFromLocal(
-  id: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  accountFullId: string,
 ): Promise<CryptoKey | undefined> {
   return Promise.resolve(undefined);
+}
+
+// TODO: Implement write keys to local
+/**
+ * Write account keys to local storage
+ * @param accountFullId Full account id to write to local Storage
+ * @param Keys 
+ * @returns 
+ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function writeAccountKeyToLocal(accountFullId: string, Keys: Keys) {
+  return;
 }

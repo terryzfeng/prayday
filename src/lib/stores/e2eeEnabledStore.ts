@@ -5,8 +5,23 @@ function createE2eeEnabledStore() {
 
   return {
     subscribe,
-    set: (enabled: boolean) => set(enabled),
+    set: (enabled: boolean) => { set(enabled) },
+  };
+}
+
+function createShowPassphraseModalStore() {
+  const { subscribe, set } = writable(false);
+  let currentValue = false;
+  return {
+    subscribe,
+    set: (show: boolean) => { 
+      if (currentValue !== show) {
+        currentValue = show;
+        set(show) 
+      }
+    },
   };
 }
 
 export const e2eeEnabledStore = createE2eeEnabledStore();
+export const showPassphraseModalStore = createShowPassphraseModalStore();
