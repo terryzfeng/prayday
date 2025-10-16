@@ -115,4 +115,4 @@
 <SignUpModal bind:showSignUp bind:showLogIn />
 
 <!-- Other Modals -->
-<InputDataPassphrase bind:showInputPassphrase />
+<InputDataPassphrase bind:showInputDataPassphrase={showInputPassphrase} />

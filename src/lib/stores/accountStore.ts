@@ -102,7 +102,18 @@ function createAccountStore() {
       }
       const success = await account.changeDataPassphrase(dataPassphrase);
       if (success) {
-        set(account); // Trigger reactivity
+        set(account);
+      }
+      return success;
+    },
+    async inputDataPassphrase(dataPassphrase: string): Promise<boolean> {
+      const account = get(this);
+      if (account === undefined) {
+        return false;
+      }
+      const success = await account.deriveAndUnwrapAccountKey(dataPassphrase);
+      if (success) {
+        set(account);
       }
       return success;
     },

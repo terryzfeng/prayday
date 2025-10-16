@@ -5,7 +5,7 @@
   import { logOut } from "lib/utils/firebase/auth";
   import {
     e2eeEnabledStore,
-    showPassphraseModalStore,
+    showDataPassphraseModalStore,
   } from "lib/stores/e2eeEnabledStore";
   import { account } from "lib/stores/accountStore";
 

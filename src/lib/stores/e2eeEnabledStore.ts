@@ -11,7 +11,7 @@ function createE2eeEnabledStore() {
   };
 }
 
-function createShowPassphraseModalStore() {
+function createshowDataPassphraseModalStore() {
   const { subscribe, set } = writable(false);
   let currentValue = false;
   return {
@@ -26,4 +26,4 @@ function createShowPassphraseModalStore() {
 }
 
 export const e2eeEnabledStore = createE2eeEnabledStore();
-export const showPassphraseModalStore = createShowPassphraseModalStore();
+export const showDataPassphraseModalStore = createshowDataPassphraseModalStore();

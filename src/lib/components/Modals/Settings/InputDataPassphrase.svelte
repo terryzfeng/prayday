@@ -5,9 +5,9 @@
   import { account } from "lib/stores/accountStore";
   import {
     e2eeEnabledStore,
-    showPassphraseModalStore,
+    showDataPassphraseModalStore,
   } from "lib/stores/e2eeEnabledStore";
-  export let showInputPassphrase: (state: boolean) => void;
+  export let showInputDataPassphrase: (state: boolean) => void;
   let dataPassphrase = "";
   let errorMessage = "";
   let loading = false;
@@ -21,17 +21,13 @@
         throw new Error("Please enter your passphrase.");
       }
       // TODO: Add your decryption/verification logic here
-      // const result = await verifyPassphrase(dataPassphrase);
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      // For demo purposes, simulate a failed attempt occasionally
-      if (dataPassphrase === "wrong") {
-        throw new Error("Incorrect passphrase. Please try again.");
+      const result = await account.inputDataPassphrase(dataPassphrase);
+      if (!result) {
+        throw new Error("Data passphrase is incorrect.");
       }
+
       // Success - reset form and close modal
-      dataPassphrase = "";
-      showInputPassphrase(false);
-      showPassphraseModalStore.set(false);
+      closeInputDataPassphrase();
     } catch (error: unknown) {
       errorMessage = (error as Error).message;
     } finally {
@@ -40,24 +36,23 @@
   }
 
   function closeInputDataPassphrase() {
-    showInputPassphrase(false);
-    showPassphraseModalStore.set(false);
+    showInputDataPassphrase(false);
+    showDataPassphraseModalStore.set(false);
     isVisible = false;
+    dataPassphrase = "";
+    errorMessage = "";
   }
 
   $: {
     // Once user logs in and if e2ee is enabled for this account
     if (
       $account?.isCloudAccount &&
-      $showPassphraseModalStore &&
+      $showDataPassphraseModalStore &&
       $e2eeEnabledStore
     ) {
       if (!isVisible) {
         console.log("show input passphrase");
-        console.log("is cloud account", $account?.isCloudAccount);
-        console.log("show passphrase modal", $showPassphraseModalStore);
-        console.log("e2ee enabled", $e2eeEnabledStore);
-        showInputPassphrase(true);
+        showInputDataPassphrase(true);
         isVisible = true;
       }
     }
@@ -65,7 +60,7 @@
 </script>
 
 <Modal
-  bind:showModal={showInputPassphrase}
+  bind:showModal={showInputDataPassphrase}
   showClosePrompt={false}
   onClose={closeInputDataPassphrase}
 >
@@ -80,7 +75,7 @@
       <div class="space-y-2 flex flex-col justify-center text-center">
         <h2 class="text-xl font-semibold text-center">Enter Data Passphrase</h2>
         <div class="pb-2 text-sm text-gray-500">
-          Enter your passphrase to decrypt and access your protected prayers.
+          Enter your data passphrase to access your protected prayers.
         </div>
       </div>
 

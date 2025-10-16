@@ -15,10 +15,11 @@ import {
   loadAccountKeyFromLocal,
   writeAccountKeyToLocal,
   quickCompareKeySettings,
+  extractKeysWithDataPassphrase,
 } from "./keys";
 import {
   e2eeEnabledStore,
-  showPassphraseModalStore,
+  showDataPassphraseModalStore,
 } from "lib/stores/e2eeEnabledStore";
 import {
   deriveDataPassphraseDerivedKey,
@@ -79,7 +80,7 @@ export default class Account {
    * Request the data passphrase (UI)
    */
   requestDataPassphrase() {
-    showPassphraseModalStore.set(true);
+    showDataPassphraseModalStore.set(true);
   }
 
   /**
@@ -122,23 +123,37 @@ export default class Account {
     return saveSuccess;
   }
 
-  // async deriveAndUnwrapAccountKey(dataPassphrase: string) {
-  //   const { keys, isNew } = await establishKeys(
-  //     this.keys.keySettings,
-  //     dataPassphrase,
-  //   );
-  //   if (isNew) {
-  //     // TODO: Write to local storage
-  //   }
-  //   this.setKeysAndSyncPrayers(keys);
-  // }
+  /**
+   * Derived and unwrap account key with data passphrase.
+   * If successful, will also set account.keys.key and initialize prayers
+   * @param dataPassphrase
+   */
+  async deriveAndUnwrapAccountKey(dataPassphrase: string) {
+    const newKeys = await extractKeysWithDataPassphrase(
+      this.keys.keySettings,
+      dataPassphrase,
+    );
+    this.keys = newKeys;
+
+    // If we successfully extracted account key, save new keys to local,
+    // and initialize prayers for decryption
+    if (this.keys.key) {
+      this.saveKeysToLocal();
+      // We directly initialize services to load prayers now that we have keys.key
+      await Account.initializeServices(this);
+      return true;
+    }
+    return false;
+  }
 
   /**
    * Save all of keys to local storage
    */
   saveKeysToLocal(): boolean {
+    // TODO: no op for now
+    return true;
     // TODO: If no keys.key, don't save the keys
-    // writeAccountKeyToLocal(this.getFullId(), this.keys);
+    writeAccountKeyToLocal(this.getFullId(), this.keys);
     return true;
   }
 
@@ -198,6 +213,8 @@ export default class Account {
   /**
    * Connect an account to prayer sync services and do an initial load.
    * Load pulled prayers into view.
+   * TODO: Check if we need to await on this (await initializePrayers),
+   *       might be able to spin off on a new thread
    * @param account
    */
   static async initializePrayers(account: Account) {
@@ -233,7 +250,6 @@ export default class Account {
     );
     if (!isSameKeysSettings) {
       account.keys = keys;
-      writeAccountKeyToLocal(account.getFullId(), account.keys);
       account.saveKeysToLocal();
       return await Account.initializeServices(account);
     }
@@ -245,12 +261,10 @@ export default class Account {
   static async initializeServices(account: Account): Promise<boolean> {
     // Account is ready to be initialized, start up services
     if (account.keys.key) {
-      e2eeEnabledStore.set(false);
       Account.initializePrayers(account);
       account.initialized = true;
     } else {
       // Don't have keys.key, this means e2ee is turned on
-      e2eeEnabledStore.set(true);
       const loadedLocalKey = await loadAccountKeyFromLocal(account.getFullId());
       if (loadedLocalKey) {
         account.keys.key = loadedLocalKey;
@@ -262,6 +276,10 @@ export default class Account {
         account.initialized = false;
       }
     }
+    // Mark if this account is E2EE encrypted (if they don't have unprotected account key)
+    e2eeEnabledStore.set(
+      account.keys.keySettings.unprotectedAccountKey === undefined,
+    );
     return account.initialized;
   }
 

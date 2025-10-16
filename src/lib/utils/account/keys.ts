@@ -127,21 +127,27 @@ export async function extractKeysWithDataPassphrase(
     keySettings.protectedAccountKey &&
     keySettings.dataPassphraseDerivedKeyDerivationParams
   ) {
-    const dataPassphraseDerivedKey = await deriveDataPassphraseDerivedKey(
-      dataPassphrase,
-      keySettings.dataPassphraseDerivedKeyDerivationParams,
-    );
-    const unwrappedKey = await unwrapAccountKey(
-      keySettings.protectedAccountKey,
-      dataPassphraseDerivedKey,
-    );
-    if (await checkAccountKey(unwrappedKey, keySettings.accountKeyCheckValue)) {
-      return createKeysFromKeySettings(keySettings, unwrappedKey);
-    } else {
-      // Key is invalid, this should never happen
-      console.error(
-        "Account keys are invalid. Please contact Prayday support.",
+    try {
+      const dataPassphraseDerivedKey = await deriveDataPassphraseDerivedKey(
+        dataPassphrase,
+        keySettings.dataPassphraseDerivedKeyDerivationParams,
       );
+      const unwrappedKey = await unwrapAccountKey(
+        keySettings.protectedAccountKey,
+        dataPassphraseDerivedKey,
+      );
+      if (
+        await checkAccountKey(unwrappedKey, keySettings.accountKeyCheckValue)
+      ) {
+        return createKeysFromKeySettings(keySettings, unwrappedKey);
+      } else {
+        // Key is invalid, this should never happen
+        console.error(
+          "Account keys are invalid. Please contact Prayday support.",
+        );
+      }
+    } catch (_: unknown) {
+      // Failed to unwrap, wrong data passphrase, gracefully do nothing.
     }
   }
   return createKeysFromKeySettings(keySettings);
