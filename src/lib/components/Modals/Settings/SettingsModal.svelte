@@ -4,6 +4,7 @@
   import SettingsMain from "./SettingsMain.svelte";
   import AdvancedPrayerProtection from "./AdvancedPrayerProtection.svelte";
   import CreateDataPassphrase from "./CreateDataPassphrase.svelte";
+  import RemoveDataPassphrase from "./RemoveDataPassphrase.svelte";
 
   let modalRef: NavigableModal;
   let currentPage = "main";
@@ -13,10 +14,13 @@
     main: SettingsMain,
     "advanced-prayer-protection": AdvancedPrayerProtection,
     "create-data-passphrase": CreateDataPassphrase,
+    "remove-data-passphrase": RemoveDataPassphrase,
   };
 
   // Conditionally set showClosePrompt based on current page
-  $: showClosePrompt = currentPage !== "create-data-passphrase";
+  $: showClosePrompt =
+    currentPage !== "create-data-passphrase" &&
+    currentPage !== "remove-data-passphrase";
 
   // Open Settings Navigable Modal
   export const openSettings = () => {
@@ -46,6 +50,8 @@
       />
     {:else if currentPage === "create-data-passphrase"}
       <CreateDataPassphrase onBack={navigateBack} />
+    {:else if currentPage === "remove-data-passphrase"}
+      <RemoveDataPassphrase onBack={navigateBack} />
     {/if}
   </svelte:fragment>
 </NavigableModal>

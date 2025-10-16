@@ -26,4 +26,5 @@ function createshowDataPassphraseModalStore() {
 }
 
 export const e2eeEnabledStore = createE2eeEnabledStore();
-export const showDataPassphraseModalStore = createshowDataPassphraseModalStore();
+export const showDataPassphraseModalStore =
+  createshowDataPassphraseModalStore();

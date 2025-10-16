@@ -43,7 +43,7 @@
           headline="Unlock Prayers"
           description="Prayers are currently encrypted"
           onClick={() => {
-            showPassphraseModalStore.set(true);
+            showDataPassphraseModalStore.set(true);
             onClose();
           }}
         />

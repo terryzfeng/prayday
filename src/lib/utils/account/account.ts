@@ -23,6 +23,7 @@ import {
 } from "lib/stores/e2eeEnabledStore";
 import {
   deriveDataPassphraseDerivedKey,
+  exportAccountKey,
   generateDataPassphraseDerivedKeyDerivationParams,
   wrapAccountKey,
 } from "./encryption";
@@ -105,7 +106,7 @@ export default class Account {
     );
 
     // Create temporary updated keySettings, removing unprotectAccountKey
-    const updatedKeySettings: KeySettings = {
+    const newKeySettings: KeySettings = {
       accountKeyCheckValue: this.keys.keySettings.accountKeyCheckValue,
       protectedAccountKey,
       dataPassphraseDerivedKeyDerivationParams,
@@ -113,11 +114,47 @@ export default class Account {
 
     const saveSuccess = await this.saveAndSetKeys({
       key: this.keys.key,
-      keySettings: updatedKeySettings,
+      keySettings: newKeySettings,
     });
 
     if (saveSuccess) {
       e2eeEnabledStore.set(true);
+    }
+
+    return saveSuccess;
+  }
+
+  /**
+   *
+   */
+  async removeDataPassphrase(dataPassphrase: string) {
+    if (
+      this.keys.keySettings.protectedAccountKey === undefined ||
+      this.keys.keySettings.dataPassphraseDerivedKeyDerivationParams ===
+        undefined
+    ) {
+      return false;
+    }
+    const extractedKeys = await extractKeysWithDataPassphrase(
+      this.keys.keySettings,
+      dataPassphrase,
+    );
+    if (extractedKeys.key === undefined) {
+      return false;
+    }
+    // The data passphrase was correct, update key state
+    const newKeySettings: KeySettings = {
+      accountKeyCheckValue: extractedKeys.keySettings.accountKeyCheckValue,
+      unprotectedAccountKey: await exportAccountKey(extractedKeys.key),
+    };
+
+    const saveSuccess = await this.saveAndSetKeys({
+      key: extractedKeys.key,
+      keySettings: newKeySettings,
+    });
+
+    if (saveSuccess) {
+      e2eeEnabledStore.set(false);
     }
 
     return saveSuccess;

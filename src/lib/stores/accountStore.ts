@@ -106,6 +106,17 @@ function createAccountStore() {
       }
       return success;
     },
+    async disableE2EE(dataPassphrase: string): Promise<boolean> {
+      const account = get(this);
+      if (account === undefined) {
+        return false;
+      }
+      const success = await account.removeDataPassphrase(dataPassphrase);
+      if (success) {
+        set(account);
+      }
+      return success;
+    },
     async inputDataPassphrase(dataPassphrase: string): Promise<boolean> {
       const account = get(this);
       if (account === undefined) {

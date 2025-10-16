@@ -1,4 +1,4 @@
-<!-- AdvancedPrayerProtection.svelte -->
+<!-- RemoveDataPassphrase.svelte -->
 <script lang="ts">
   import Button from "lib/components/Button.svelte";
   import backChevron from "lib/assets/back-chevron.svg";
@@ -7,7 +7,6 @@
   export let onBack: () => void;
 
   let dataPassphrase = "";
-  let dataPassphrase2 = "";
   let errorMessage = "";
   let loading = false;
 
@@ -16,19 +15,14 @@
     errorMessage = "";
 
     try {
-      if (dataPassphrase !== dataPassphrase2) {
-        throw new Error("Passphrases do not match. Please try again.");
+      if (!dataPassphrase) {
+        throw new Error("Please enter your current data passphrase.");
       }
 
-      if (dataPassphrase.length < 8) {
-        throw new Error("Passphrase must be at least 8 characters long.");
-      }
-
-      // TODO: Add your encryption setup logic here
-      const result = await account.enableE2EE(dataPassphrase);
+      const result = await account.disableE2EE(dataPassphrase);
       if (!result) {
         throw new Error(
-          "Failed to enable Advanced Prayer Protection. Please try again later.",
+          "Failed to disable Advanced Prayer Protection. Please try again.",
         );
       }
 
@@ -60,15 +54,15 @@
     <!-- Description -->
     <div class="space-y-3">
       <p class="text-gray-600 text-sm">
-        Create a secure data passphrase. This data passphrase will be required
-        to view your prayers.
+        Are you sure you want to disable Advanced Prayer Protection? Your data
+        passphrase will no longer be required to view your prayers.
       </p>
-      <div
-        class="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg text-sm"
+      <!-- <div
+        class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg text-sm"
       >
-        <strong>Important:</strong> If you forget this data passphrase, your prayers
-        cannot be recovered. Please store your data passphrase in a safe place.
-      </div>
+        <strong>Warning:</strong> After removing protection, your prayers will be
+        stored without the additional encryption layer. This action cannot be undone.
+      </div> -->
     </div>
 
     <!-- Error Message -->
@@ -100,34 +94,15 @@
             for="passphrase"
             class="block text-sm font-medium text-gray-700"
           >
-            Enter Data Passphrase
+            Enter Current Data Passphrase
           </label>
           <input
             id="passphrase"
             type="password"
-            placeholder="Enter data passphrase"
+            placeholder="Enter current data passphrase"
             bind:value={dataPassphrase}
             required
-            autocomplete="new-password"
-            class="text-sm w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-300"
-            disabled={loading}
-          />
-        </div>
-
-        <div class="space-y-2">
-          <label
-            for="confirm-passphrase"
-            class="block text-sm font-medium text-gray-700"
-          >
-            Confirm Data Passphrase
-          </label>
-          <input
-            id="confirm-passphrase"
-            type="password"
-            placeholder="Confirm data passphrase"
-            bind:value={dataPassphrase2}
-            required
-            autocomplete="new-password"
+            autocomplete="current-password"
             class="text-sm w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-300"
             disabled={loading}
           />
@@ -138,10 +113,10 @@
     <!-- Action Buttons -->
     <div class="flex flex-col items-center space-y-3 pt-4 mx-auto">
       <Button
-        text={loading ? "Enabling..." : "Enable Advanced Prayer Protection"}
-        color="blue"
+        text={loading ? "Disabling..." : "Disable Advanced Prayer Protection"}
+        color="red"
         className="w-full"
-        disabled={loading || !dataPassphrase || !dataPassphrase2}
+        disabled={loading || !dataPassphrase}
         onClick={handleSubmit}
       />
       <Button

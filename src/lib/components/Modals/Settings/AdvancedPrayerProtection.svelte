@@ -6,10 +6,6 @@
 
   export let onNavigate: (page: string) => void;
   export let onBack: () => void;
-
-  function disableE2eeEncryption() {
-    e2eeEnabledStore.set(false);
-  }
 </script>
 
 <div class="modal-page">
@@ -27,17 +23,18 @@
     </div>
 
     <!-- APP Content -->
-    <div class="space-y-4">
+    <div class="space-y-4 text-gray-600 leading-relaxed">
+      <p>
+        Prayday always encrypts your data to keep it secure. Advanced Prayer
+        Protection is an optional feature that enables end-to-end encryption to
+        ensure that your prayers can only be decrypted on your trusted devices,
+        protecting your information even in the case of a data breach.
+      </p>
       {#if !$e2eeEnabledStore}
-        <p class="text-gray-600 leading-relaxed">
-          Prayday always encrypts your data to keep it secure. Advanced Prayer
-          Protection is an optional feature that enables end-to-end encryption
-          to ensure that your prayers can only be decrypted on your trusted
-          devices, protecting your information even in the case of a data
-          breach.<br />
-          <br />
-          Create a data passphrase to enable Advanced Prayer Protection. If you ever
-          lose your device, you will need to enter this data passphrase again.
+        <p>
+          Create a data passphrase to enable Advanced Prayer Protection. If you
+          ever lose your device, you will need to enter this data passphrase
+          again.
         </p>
       {:else}
         <p class="text-gray-600 leading-relaxed">
@@ -59,7 +56,7 @@
       {:else}
         <Button
           text="Disable Advanced Prayer Protection"
-          onClick={disableE2eeEncryption}
+          onClick={() => onNavigate("remove-data-passphrase")}
           color="red"
           className="w-full"
         />

@@ -23,7 +23,7 @@
       // TODO: Add your decryption/verification logic here
       const result = await account.inputDataPassphrase(dataPassphrase);
       if (!result) {
-        throw new Error("Data passphrase is incorrect.");
+        throw new Error("Incorrect data passphrase.");
       }
 
       // Success - reset form and close modal
