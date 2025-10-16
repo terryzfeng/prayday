@@ -49,14 +49,27 @@ export interface PrayHistoryItem {
 //------------------------------------------------------------------------------
 // Firebase Key Settings
 //------------------------------------------------------------------------------
+/**
+ * Write key settings to firebase. Will return true or false once successfully
+ * written. Note that this will not work if device is offline.
+ * @param userId
+ * @param keySettings
+ * @returns
+ */
 export async function uploadKeySettings(
   userId: string,
   keySettings: KeySettings,
-) {
-  return setDoc(
-    doc(db, "users", userId, "keys", "keySettings"),
-    serializeKeySettings(keySettings),
-  );
+): Promise<boolean> {
+  try {
+    await setDoc(
+      doc(db, "users", userId, "keys", "keySettings"),
+      serializeKeySettings(keySettings),
+    );
+    return true;
+  } catch (error) {
+    console.error("Failed to upload key settings:", error);
+    return false;
+  }
 }
 
 //------------------------------------------------------------------------------
@@ -162,7 +175,7 @@ export async function createFirebaseAccountSettings(
   userId: string,
   firebaseAccountSettings: FirebaseAccountSettings,
   keySettings: KeySettings,
-): Promise<void> {
+): Promise<boolean> {
   await setDoc(doc(db, "users", userId), firebaseAccountSettings);
   return uploadKeySettings(userId, keySettings);
 }

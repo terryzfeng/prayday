@@ -5,7 +5,9 @@ function createE2eeEnabledStore() {
 
   return {
     subscribe,
-    set: (enabled: boolean) => { set(enabled) },
+    set: (enabled: boolean) => {
+      set(enabled);
+    },
   };
 }
 
@@ -14,10 +16,10 @@ function createShowPassphraseModalStore() {
   let currentValue = false;
   return {
     subscribe,
-    set: (show: boolean) => { 
+    set: (show: boolean) => {
       if (currentValue !== show) {
         currentValue = show;
-        set(show) 
+        set(show);
       }
     },
   };

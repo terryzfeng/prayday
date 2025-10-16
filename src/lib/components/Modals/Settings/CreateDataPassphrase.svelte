@@ -2,12 +2,12 @@
 <script lang="ts">
   import Button from "lib/components/Button.svelte";
   import backChevron from "lib/assets/back-chevron.svg";
-  import { e2eeEnabledStore } from "lib/stores/e2eeEnabledStore";
+  import { account } from "lib/stores/accountStore";
 
   export let onBack: () => void;
 
-  let password = "";
-  let password2 = "";
+  let dataPassphrase = "";
+  let dataPassphrase2 = "";
   let errorMessage = "";
   let loading = false;
 
@@ -16,21 +16,21 @@
     errorMessage = "";
 
     try {
-      if (password !== password2) {
+      if (dataPassphrase !== dataPassphrase2) {
         throw new Error("Passphrases do not match. Please try again.");
       }
 
-      if (password.length < 8) {
+      if (dataPassphrase.length < 8) {
         throw new Error("Passphrase must be at least 8 characters long.");
       }
 
       // TODO: Add your encryption setup logic here
-      // const result = await setupAdvancedProtection(password);
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      e2eeEnabledStore.set(true);
+      const result = await account.enableE2EE(dataPassphrase);
+      if (!result) {
+        throw new Error(
+          "Failed to Enable Advanced Prayer Protection. Please try again later.",
+        );
+      }
 
       // Success - close the modal or navigate back
       onBack();
@@ -106,7 +106,7 @@
             id="passphrase"
             type="password"
             placeholder="Enter data passphrase"
-            bind:value={password}
+            bind:value={dataPassphrase}
             required
             autocomplete="new-password"
             class="text-sm w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-300"
@@ -125,7 +125,7 @@
             id="confirm-passphrase"
             type="password"
             placeholder="Confirm data passphrase"
-            bind:value={password2}
+            bind:value={dataPassphrase2}
             required
             autocomplete="new-password"
             class="text-sm w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-300"
@@ -143,7 +143,7 @@
           : "Enable Advanced Prayer Protection"}
         color="blue"
         className="w-full"
-        disabled={loading || !password || !password2}
+        disabled={loading || !dataPassphrase || !dataPassphrase2}
         onClick={handleSubmit}
       />
       <Button

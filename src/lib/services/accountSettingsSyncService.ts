@@ -21,7 +21,11 @@ export async function getAccountSettingsAsync(
       const keys = await importAccountKeys(
         firebaseAccountSettingsBox.data.keySettings,
       );
-      account.updateAccount(firebaseAccountSettings.name, firebaseAccountSettings.email, keys);
+      account.updateAccount(
+        firebaseAccountSettings.name,
+        firebaseAccountSettings.email,
+        keys,
+      );
     } else {
       throw new Error();
     }

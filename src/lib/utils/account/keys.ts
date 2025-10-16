@@ -58,15 +58,21 @@ export async function generateNewKeys(): Promise<Keys> {
  * Quick compare if keySettings are equal. Checks for field presence.
  * @param KeySettings
  */
-export function quickCompareKeySettings(a: KeySettings, b: KeySettings): boolean {
-  // Check e2ee states are the same, if both have unprotected account key 
+export function quickCompareKeySettings(
+  a: KeySettings,
+  b: KeySettings,
+): boolean {
+  // Check e2ee states are the same, if both have unprotected account key
   const aHasUnprotected = a.unprotectedAccountKey !== undefined;
   const bHasUnprotected = b.unprotectedAccountKey !== undefined;
   if (aHasUnprotected !== bHasUnprotected) {
     return false;
   }
   // Quick compare and return if accountKeyCheckValue is the same
-  return assertEqualEncryptedData(a.accountKeyCheckValue, b.accountKeyCheckValue);
+  return assertEqualEncryptedData(
+    a.accountKeyCheckValue,
+    b.accountKeyCheckValue,
+  );
 }
 
 /**
@@ -191,9 +197,9 @@ export async function extractKeysWithDataPassphrase(
 
 // TODO: Write keys to local
 /**
- * Load an account key from local storage 
+ * Load an account key from local storage
  * @param accountFullId Account id ending in @cloud or @local
- * @returns 
+ * @returns
  */
 export function loadAccountKeyFromLocal(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -206,8 +212,8 @@ export function loadAccountKeyFromLocal(
 /**
  * Write account keys to local storage
  * @param accountFullId Full account id to write to local Storage
- * @param Keys 
- * @returns 
+ * @param Keys
+ * @returns
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function writeAccountKeyToLocal(accountFullId: string, Keys: Keys) {

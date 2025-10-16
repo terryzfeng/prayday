@@ -37,11 +37,14 @@ export const signUp = async (email: string, password: string, name: string) => {
       email,
     };
     const keys = await generateNewKeys();
-    await createFirebaseAccountSettings(
+    const createSuccess = await createFirebaseAccountSettings(
       userCredential.user.uid,
       firebaseAccountSettings,
       keys.keySettings,
     );
+    if (!createSuccess) {
+      throw new Error("Failed to create account. Please try again later.");
+    }
     // Manually establish and log in the user
     const newCloudAccount = await establishCloudAccount(
       userCredential.user,
@@ -50,7 +53,7 @@ export const signUp = async (email: string, password: string, name: string) => {
     );
     if (newCloudAccount) {
       accountStore.setAccount(newCloudAccount);
-      newCloudAccount.saveKeys();
+      newCloudAccount.saveKeysToLocal();
     } else {
       throw new Error(
         "Failed to create account. Please contact Prayday support.",

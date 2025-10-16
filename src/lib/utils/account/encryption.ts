@@ -73,6 +73,7 @@ const DATA_PASSPHRASE_DERIVED_KEY_DERIVATION_PARAMS_CONFIG = {
     hash: "SHA-256",
     iterations: 600000, // OWASP 2023
   },
+  saltLength: 16,
 };
 
 /**
@@ -243,6 +244,20 @@ function decrypt(
 // End-to-End Encryption (E2EE) Utility Functions
 //------------------------------------------------------------------------------
 /**
+ * Generate a new data passphrase derived key derivation params for an e2ee
+ * account.
+ * @returns DataPassphraseDerivedKeyDerivationParamts
+ */
+export function generateDataPassphraseDerivedKeyDerivationParams(): DataPassphraseDerivedKeyDerivationParams {
+  return {
+    salt: window.crypto.getRandomValues(
+      new Uint8Array(
+        DATA_PASSPHRASE_DERIVED_KEY_DERIVATION_PARAMS_CONFIG.saltLength,
+      ),
+    ).buffer,
+  };
+}
+/**
  * Derive the data passphrase derived key from data passphrase and derivation parameters.
  * @param dataPassphrase The data passphrase string
  * @param dataPassphraseDerivedKeyDerivationParams The derivation parameters
@@ -327,9 +342,7 @@ export function assertEqualEncryptedData(
   a: EncryptedData,
   b: EncryptedData,
 ): boolean {
-  return (
-    assertEqual(a.iv, b.iv) && assertEqual(a.data, b.data)
-  )
+  return assertEqual(a.iv, b.iv) && assertEqual(a.data, b.data);
 }
 
 //------------------------------------------------------------------------------

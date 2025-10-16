@@ -1,4 +1,4 @@
-import { writable } from "svelte/store";
+import { get, writable } from "svelte/store";
 import { auth } from "lib/utils/firebase/config";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import {
@@ -86,27 +86,25 @@ function createAccountStore() {
     setAccount: (account: Account) => {
       set(account);
     },
-    updateAccount: (name: string, email:string, newKeys: Keys) => {
+    updateAccount: (name: string, email: string, newKeys: Keys) => {
       update((account) => {
         if (account === undefined) return;
         account.setName(name);
         account.setEmail(email);
-        account.asyncInitializeServices(newKeys);
+        Account.asyncInitializeServices(account, newKeys);
         return account;
       });
     },
-    inputDataPassphrase: async (dataPassphrase: string) => {
-      // Get current account value
-      let currentAccount: Account | undefined;
-      const unsubscribe = subscribe((acc) => {
-        currentAccount = acc;
-      });
-      unsubscribe(); // Immediately unsubscribe after getting the value
-
-      if (currentAccount) {
-        await currentAccount.deriveAndUnwrapAccountKey(dataPassphrase);
-        set(currentAccount); // Update the store with the modified account
+    async enableE2EE(dataPassphrase: string): Promise<boolean> {
+      const account = get(this);
+      if (account === undefined) {
+        return false;
       }
+      const success = await account.changeDataPassphrase(dataPassphrase);
+      if (success) {
+        set(account); // Trigger reactivity
+      }
+      return success;
     },
   };
 }
