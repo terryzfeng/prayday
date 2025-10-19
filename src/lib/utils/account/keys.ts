@@ -222,6 +222,6 @@ export function loadAccountKeyFromLocal(
  * @returns
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function writeAccountKeyToLocal(accountFullId: string, Keys: Keys) {
+export function writeAccountKeysToLocal(accountFullId: string, Keys: Keys) {
   return;
 }

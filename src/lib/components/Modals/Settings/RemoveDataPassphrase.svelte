@@ -54,8 +54,8 @@
     <!-- Description -->
     <div class="space-y-3">
       <p class="text-gray-600 text-sm">
-        Are you sure you want to disable Advanced Prayer Protection? Your data
-        passphrase will no longer be required to view your prayers.
+        Are you sure you want to disable Advanced Prayer Protection? Your prayers
+        will no longer be end-to-end encrypted.
       </p>
       <!-- <div
         class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg text-sm"

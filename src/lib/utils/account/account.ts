@@ -13,14 +13,10 @@ import {
   type KeySettings,
   importAccountKeys,
   loadAccountKeyFromLocal,
-  writeAccountKeyToLocal,
+  writeAccountKeysToLocal,
   quickCompareKeySettings,
   extractKeysWithDataPassphrase,
 } from "./keys";
-import {
-  e2eeEnabledStore,
-  showDataPassphraseModalStore,
-} from "lib/stores/e2eeEnabledStore";
 import {
   deriveDataPassphraseDerivedKey,
   exportAccountKey,
@@ -65,6 +61,9 @@ export default class Account {
     this.email = email;
   }
 
+  //----------------------------------------------------------------------------
+  // Setters
+  //----------------------------------------------------------------------------
   setName(name: string) {
     this.name = name;
   }
@@ -73,27 +72,35 @@ export default class Account {
     this.email = email;
   }
 
+  //----------------------------------------------------------------------------
+  // Getters
+  //----------------------------------------------------------------------------
   getFullId(): string {
     return this.id + (this.isCloudAccount ? "@cloud" : "@local");
   }
 
-  /**
-   * Request the data passphrase (UI)
-   */
-  requestDataPassphrase() {
-    showDataPassphraseModalStore.set(true);
+  isE2EEEnabled(): boolean {
+    return this.keys.keySettings.unprotectedAccountKey === undefined;
   }
 
+  requiresDataPassphrase(): boolean {
+    return this.keys.key === undefined && this.isE2EEEnabled();
+  }
+
+  //----------------------------------------------------------------------------
+  // Member Functions
+  //----------------------------------------------------------------------------
   /**
    * Change the data passphrase for an account. Can be used to set a new data
    * passphrase or change an existing one. Will enable E2EE.
-   * @param dataPassphrase
+   * @param dataPassphrase new data passphrase to wrap account key
    */
   async changeDataPassphrase(dataPassphrase: string): Promise<boolean> {
     if (this.keys.key === undefined) {
       return false;
     }
-    // Create Data Passphrase Derived Key to wrap account key
+
+    // Create Data Passphrase Derived Key to wrap account key for E2EE
     const dataPassphraseDerivedKeyDerivationParams =
       generateDataPassphraseDerivedKeyDerivationParams();
     const dataPassphraseDerivedKey = await deriveDataPassphraseDerivedKey(
@@ -112,22 +119,17 @@ export default class Account {
       dataPassphraseDerivedKeyDerivationParams,
     };
 
-    const saveSuccess = await this.saveAndSetKeys({
+    return this.saveAndSetKeys({ 
       key: this.keys.key,
       keySettings: newKeySettings,
     });
-
-    if (saveSuccess) {
-      e2eeEnabledStore.set(true);
-    }
-
-    return saveSuccess;
   }
 
   /**
-   *
+   * Remove the data passphrase for an account. Will disable E2EE.
+   * @param dataPassphrase Use data passphrase to unwrap protected key.
    */
-  async removeDataPassphrase(dataPassphrase: string) {
+  async removeDataPassphrase(dataPassphrase: string): Promise<boolean> {
     if (
       this.keys.keySettings.protectedAccountKey === undefined ||
       this.keys.keySettings.dataPassphraseDerivedKeyDerivationParams ===
@@ -142,79 +144,84 @@ export default class Account {
     if (extractedKeys.key === undefined) {
       return false;
     }
-    // The data passphrase was correct, update key state
+
+    // The data passphrase was correct, update key state disabling E2EE
     const newKeySettings: KeySettings = {
       accountKeyCheckValue: extractedKeys.keySettings.accountKeyCheckValue,
       unprotectedAccountKey: await exportAccountKey(extractedKeys.key),
     };
-
     const saveSuccess = await this.saveAndSetKeys({
       key: extractedKeys.key,
       keySettings: newKeySettings,
     });
-
-    if (saveSuccess) {
-      e2eeEnabledStore.set(false);
+    if (!saveSuccess) {
+      return false;
     }
 
-    return saveSuccess;
+    // If account wasn't initialized yet, initialize services
+    if (!this.initialized) {
+      this.initialized = await Account.initializeServices(this);
+      return this.initialized;
+    }
+
+    return true;
   }
 
   /**
-   * Derived and unwrap account key with data passphrase.
-   * If successful, will also set account.keys.key and initialize prayers
-   * @param dataPassphrase
+   * Derive an account keys.key using data passphrase to unlock prayers
+   * If successfull, initialize account services. Otherwise do nothing.
+   * @param dataPassphrase To unlock account key
+   * @returns if unwrap account key was successful and services were initialized
    */
-  async deriveAndUnwrapAccountKey(dataPassphrase: string) {
+  async deriveAndUnwrapAccountKey(dataPassphrase: string): Promise<boolean> {
+    // Use data passphrase to unwrap account key, setting newKeys.key if successful
+    // If data passphrase is incorrect, newKeys.key remains undefined.
     const newKeys = await extractKeysWithDataPassphrase(
       this.keys.keySettings,
       dataPassphrase,
     );
-    this.keys = newKeys;
+    if (newKeys.key === undefined) {
+      return false;
+    }
 
-    // If we successfully extracted account key, save new keys to local,
-    // and initialize prayers for decryption
-    if (this.keys.key) {
-      this.saveKeysToLocal();
-      // We directly initialize services to load prayers now that we have keys.key
-      await Account.initializeServices(this);
+    this.keys = newKeys;
+    Account.saveKeysToLocal(this);
+    this.initialized = await Account.initializeServices(this);
+    return this.initialized;
+  }
+
+  /**
+   * Save keys to external firebase (if cloud account) and local storage always
+   * If successful external save, set in memory
+   */
+  async saveAndSetKeys(keys: Keys): Promise<boolean> {
+    try {
+      if (this.isCloudAccount) {
+        await uploadKeySettings(this.id, keys.keySettings);
+      }
+      Account.saveKeysToLocal(this);
+      this.keys = keys;
       return true;
+    } catch (error: unknown) {
+      console.error("Failed to sync keys with server", error);
     }
     return false;
   }
 
+  //----------------------------------------------------------------------------
+  // Static Functions
+  //----------------------------------------------------------------------------
   /**
    * Save all of keys to local storage
    */
-  saveKeysToLocal(): boolean {
+  static saveKeysToLocal(account: Account): boolean {
     // TODO: no op for now
     return true;
     // TODO: If no keys.key, don't save the keys
-    writeAccountKeyToLocal(this.getFullId(), this.keys);
+    writeAccountKeysToLocal(account.getFullId(), account.keys);
     return true;
   }
 
-  /**
-   * Write the account keys to firebase if cloud account
-   * Write Account.keys to localStorage
-   */
-  async saveAndSetKeys(keys: Keys): Promise<boolean> {
-    let saveSuccess = true;
-    if (this.isCloudAccount) {
-      saveSuccess &&= await uploadKeySettings(this.id, keys.keySettings);
-    }
-
-    if (saveSuccess) {
-      // TODO: Persist Account.keys to localStorage
-      this.saveKeysToLocal();
-      this.keys = keys;
-    }
-    return saveSuccess;
-  }
-
-  //----------------------------------------------------------------------------
-  // Static functions
-  //----------------------------------------------------------------------------
   /**
    * Construct a new firebase cloud account.
    * @param firebaseAuthUser
@@ -242,7 +249,8 @@ export default class Account {
    * @param id
    * @returns Promise<Account>
    */
-  static async setUpNewLocalAccount(id: string): Promise<Account> {
+  static async createNewLocalAccount(): Promise<Account> {
+    const id = crypto.randomUUID();
     const keys = await generateNewKeys();
     return new Account(id, /*isCloudAccount=*/ false, "Guest", keys);
   }
@@ -275,10 +283,12 @@ export default class Account {
   }
 
   /**
-   * Asynchronously initialize services after the initial call has been made
-   * Will address any failures if there are new keys.
-   * @param keys new keys pulled from server
-   * @returns boolean if account is initialized
+   * Use Firebase account pulled from server to initialize services that weren't
+   * able to be initialized on intical cache load.
+   * Don't do anything if keys are the same.
+   * @param account account pulled from server
+   * @param keys keys pulled from server, potentially new
+   * @returns a boolean if account was initialized
    */
   static async asyncInitializeServices(account: Account, keys: Keys) {
     const isSameKeysSettings = quickCompareKeySettings(
@@ -287,37 +297,34 @@ export default class Account {
     );
     if (!isSameKeysSettings) {
       account.keys = keys;
-      account.saveKeysToLocal();
-      return await Account.initializeServices(account);
+      Account.saveKeysToLocal(account);
+      account.initialized = await Account.initializeServices(account);
+      return account.initialized;
     }
   }
 
   /**
-   * Check and initialize services for account based on keys.
+   * Take in a new account and initialize relevant services with keys
+   * If no keys, load from localStorage or request. 
    */
   static async initializeServices(account: Account): Promise<boolean> {
+    let initialized = false;
     // Account is ready to be initialized, start up services
+    // If we have an account key, we're good to initialize services
     if (account.keys.key) {
-      Account.initializePrayers(account);
-      account.initialized = true;
+      await Account.initializePrayers(account);
+      initialized = true;
     } else {
-      // Don't have keys.key, this means e2ee is turned on
+      // Don't have an account key, e2ee is on, try to pull key from local
       const loadedLocalKey = await loadAccountKeyFromLocal(account.getFullId());
       if (loadedLocalKey) {
         account.keys.key = loadedLocalKey;
         Account.initializePrayers(account);
-        account.initialized = true;
-      } else {
-        // Will need to request for data passphrase
-        account.requestDataPassphrase();
-        account.initialized = false;
+        initialized = true;
       }
+      // Otherwise we don't have keys.key thus need to request data passphrase
     }
-    // Mark if this account is E2EE encrypted (if they don't have unprotected account key)
-    e2eeEnabledStore.set(
-      account.keys.keySettings.unprotectedAccountKey === undefined,
-    );
-    return account.initialized;
+    return initialized;
   }
 
   /**
@@ -340,6 +347,8 @@ export default class Account {
     getAccountSettingsFromServer?: Promise<FirebaseAccountSettingsBox>,
   ): Promise<Account | undefined> {
     let account = null;
+
+    // ESTABLISH CLOUD ACCOUNT
     if (isCloudAccount) {
       if (
         firebaseAuthUser === undefined ||
@@ -355,36 +364,52 @@ export default class Account {
         firebaseAccountSettings,
         keys,
       );
-      // If cloud account comes from cache, we also need a server pull
+      // If cloud account was loaded from cache, we also start a server pull
       if (fromCache && getAccountSettingsFromServer) {
         getAccountSettingsAsync(getAccountSettingsFromServer);
       }
     } else {
-      account = await loadLocalAccount();
+      // ESTABLISH GUEST (local) ACCOUNT
+      account = await loadAccountFromLocal();
       if (account === null) {
-        // We need to generate a new account
-        account = await Account.setUpNewLocalAccount(crypto.randomUUID());
-        account.saveKeysToLocal();
+        // Create a new local account
+        account = await Account.createNewLocalAccount();
+        Account.saveKeysToLocal(account);
       }
     }
 
-    // Uninitialize services if they exist, initialize new services
+    // Uninitialize past services, initialize new services with new keys
     Account.uninitializeServices();
-    await Account.initializeServices(account);
-
+    account.initialized = await Account.initializeServices(account);
     return account;
   }
+}
+
+/**
+ * Take a full id and extract the id and location of the account
+ * @param fullId full id of account
+ */
+function parseIdFromFull(fullId: string): { id: string; isCloudAccount: boolean } {
+  const fullIdVector = fullId.split('@');
+  return {
+    id: fullIdVector[0],
+    isCloudAccount: fullIdVector[1] === 'cloud',
+  };
 }
 
 /**
  * Load guest account from localStorage
  * @returns local guest account
  */
-async function loadLocalAccount(): Promise<Account | null> {
-  // TODO: Load actual keys
-  const localAccountId = localStorage.getItem(LOCAL_ACCOUNT_KEY);
-  if (localAccountId === null) {
+async function loadAccountFromLocal(): Promise<Account | null> {
+  const fullId = localStorage.getItem(LOCAL_ACCOUNT_KEY);
+  if (fullId === null) {
     return null;
   }
-  return await Account.setUpNewLocalAccount(localAccountId);
+
+  // TODO: Load actual keys
+  const keys = await generateNewKeys();
+
+  const id = parseIdFromFull(fullId).id;
+  return new Account(id, /*isCloudAccount=*/ false, "Guest", keys);
 }

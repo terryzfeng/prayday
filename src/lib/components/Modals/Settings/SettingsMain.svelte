@@ -8,9 +8,12 @@
     showDataPassphraseModalStore,
   } from "lib/stores/e2eeEnabledStore";
   import { account } from "lib/stores/accountStore";
-
+  
   export let onNavigate: (page: string) => void;
   export let onClose: () => void;
+
+  // Reactive statement to ensure we're tracking changes
+  $: requiresDataPassphrase = $account?.requiresDataPassphrase() ?? false;
 
   /**
    * Handle log out
@@ -32,13 +35,12 @@
 <div class="modal-page">
   <div class="w-full space-y-6">
     <h1 class="h1 line-section">Settings</h1>
-
     <!-- Account Section -->
     <div class="space-y-3">
       <h2 class="h2">
         <span>Manage Your Account</span>
       </h2>
-      {#if !$account?.initialized}
+      {#if requiresDataPassphrase}
         <SettingsItem
           headline="Unlock Prayers"
           description="Prayers are currently encrypted"
@@ -56,7 +58,6 @@
         onClick={() => onNavigate("advanced-prayer-protection")}
       />
     </div>
-
     <!-- Log Out Section -->
     <div class="flex space-x-3 pt-4 border-t border-gray-200">
       <Button

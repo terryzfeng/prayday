@@ -8,8 +8,9 @@ import {
 } from "../utils/firebase/users";
 import Account from "../utils/account/account";
 import type { Keys, KeySettings } from "../utils/account/keys";
+import { e2eeEnabledStore, showDataPassphraseModalStore } from "./e2eeEnabledStore";
 
-let cloudAccountLoggedIn = false;
+let loggedIntoCloudAccount = false;
 
 /**
  * Estblish a cloud account. This is used in onAuthStateChanged for log-in,
@@ -32,7 +33,10 @@ export async function establishCloudAccount(
     fromCache,
     getAccountSettingsFromServer,
   );
-  cloudAccountLoggedIn = true;
+  loggedIntoCloudAccount = true;
+  if (account && account.requiresDataPassphrase()) {
+    showDataPassphraseModalStore.set(true);
+  }
   return account;
 }
 
@@ -60,18 +64,18 @@ function createAccountStore() {
           firebaseAccountSettingsPromise.data?.fromCache,
           firebaseAccountSettingsPromise.data?.getAccountSettingsFromServer,
         );
-        cloudAccountLoggedIn = true;
       } else {
         // Failed to load user account settings. Please contact Prayday support.
         console.error(firebaseAccountSettingsPromise.error);
+        // Fallback to guest account
         account = await Account.establishAccount(/*isCloudAccount=*/ false);
       }
     } else {
       // Switching from logged in to log out
-      if (cloudAccountLoggedIn) {
+      if (loggedIntoCloudAccount) {
         console.log("Log out");
         Account.uninitializeServices();
-        cloudAccountLoggedIn = false;
+        loggedIntoCloudAccount = false;
       }
 
       // Establish guest account
@@ -92,6 +96,7 @@ function createAccountStore() {
         account.setName(name);
         account.setEmail(email);
         Account.asyncInitializeServices(account, newKeys);
+        e2eeEnabledStore.set(account.isE2EEEnabled());
         return account;
       });
     },
@@ -102,7 +107,8 @@ function createAccountStore() {
       }
       const success = await account.changeDataPassphrase(dataPassphrase);
       if (success) {
-        set(account);
+        e2eeEnabledStore.set(account.isE2EEEnabled());
+        // set(account)
       }
       return success;
     },
@@ -113,7 +119,8 @@ function createAccountStore() {
       }
       const success = await account.removeDataPassphrase(dataPassphrase);
       if (success) {
-        set(account);
+        e2eeEnabledStore.set(account.isE2EEEnabled());
+        // set(account)
       }
       return success;
     },

@@ -59,17 +59,10 @@ export interface PrayHistoryItem {
 export async function uploadKeySettings(
   userId: string,
   keySettings: KeySettings,
-): Promise<boolean> {
-  try {
-    await setDoc(
-      doc(db, "users", userId, "keys", "keySettings"),
-      serializeKeySettings(keySettings),
-    );
-    return true;
-  } catch (error) {
-    console.error("Failed to upload key settings:", error);
-    return false;
-  }
+): Promise<void> {
+  // offline
+  return setDoc(doc(db, "users", userId, "keys", "keySettings"),
+                serializeKeySettings(keySettings));
 }
 
 //------------------------------------------------------------------------------
@@ -176,8 +169,14 @@ export async function createFirebaseAccountSettings(
   firebaseAccountSettings: FirebaseAccountSettings,
   keySettings: KeySettings,
 ): Promise<boolean> {
-  await setDoc(doc(db, "users", userId), firebaseAccountSettings);
-  return uploadKeySettings(userId, keySettings);
+  try {
+    await setDoc(doc(db, "users", userId), firebaseAccountSettings);
+    await uploadKeySettings(userId, keySettings);
+    return true;
+  } catch (error: unknown) {
+    console.log("Unable to contact server:", (error as Error).message);
+    return false;
+  }
 }
 
 //------------------------------------------------------------------------------

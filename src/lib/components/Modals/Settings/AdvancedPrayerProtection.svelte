@@ -37,9 +37,8 @@
           again.
         </p>
       {:else}
-        <p class="text-gray-600 leading-relaxed">
-          Advanced Prayer Protection is currently enabled. Your prayers can only
-          be decrypted on your trusted devices.
+        <p class="font-semibold">
+          Advanced Prayer Protection is currently enabled.
         </p>
       {/if}
     </div>
