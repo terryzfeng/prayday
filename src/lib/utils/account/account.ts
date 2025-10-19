@@ -126,7 +126,7 @@ export default class Account {
       dataPassphraseDerivedKeyDerivationParams,
     };
 
-    return this.saveAndSetKeys({ 
+    return this.saveAndSetKeys({
       key: this.keys.key,
       keySettings: newKeySettings,
     });
@@ -312,7 +312,7 @@ export default class Account {
 
   /**
    * Take in a new account and initialize relevant services with keys
-   * If no keys, load from localStorage or request. 
+   * If no keys, load from localStorage or request.
    */
   static async initializeServices(account: Account): Promise<boolean> {
     let initialized = false;
@@ -396,11 +396,14 @@ export default class Account {
  * Take a full id and extract the id and location of the account
  * @param fullId full id of account
  */
-function parseIdFromFull(fullId: string): { id: string; isCloudAccount: boolean } {
-  const fullIdVector = fullId.split('@');
+function parseIdFromFull(fullId: string): {
+  id: string;
+  isCloudAccount: boolean;
+} {
+  const fullIdVector = fullId.split("@");
   return {
     id: fullIdVector[0],
-    isCloudAccount: fullIdVector[1] === 'cloud',
+    isCloudAccount: fullIdVector[1] === "cloud",
   };
 }
 

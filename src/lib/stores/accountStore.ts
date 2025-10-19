@@ -8,7 +8,10 @@ import {
 } from "../utils/firebase/users";
 import Account from "../utils/account/account";
 import type { Keys, KeySettings } from "../utils/account/keys";
-import { e2eeEnabledStore, showDataPassphraseModalStore } from "./e2eeEnabledStore";
+import {
+  e2eeEnabledStore,
+  showDataPassphraseModalStore,
+} from "./e2eeEnabledStore";
 
 let loggedIntoCloudAccount = false;
 

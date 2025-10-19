@@ -61,8 +61,10 @@ export async function uploadKeySettings(
   keySettings: KeySettings,
 ): Promise<void> {
   // offline
-  return setDoc(doc(db, "users", userId, "keys", "keySettings"),
-                serializeKeySettings(keySettings));
+  return setDoc(
+    doc(db, "users", userId, "keys", "keySettings"),
+    serializeKeySettings(keySettings),
+  );
 }
 
 //------------------------------------------------------------------------------

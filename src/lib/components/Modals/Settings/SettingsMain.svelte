@@ -8,7 +8,7 @@
     showDataPassphraseModalStore,
   } from "lib/stores/e2eeEnabledStore";
   import { account } from "lib/stores/accountStore";
-  
+
   export let onNavigate: (page: string) => void;
   export let onClose: () => void;
 
