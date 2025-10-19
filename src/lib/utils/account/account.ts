@@ -20,6 +20,7 @@ import {
 import {
   deriveDataPassphraseDerivedKey,
   exportAccountKey,
+  generateAccountKeyCheckValue,
   generateDataPassphraseDerivedKeyDerivationParams,
   wrapAccountKey,
 } from "./encryption";
@@ -112,9 +113,15 @@ export default class Account {
       dataPassphraseDerivedKey,
     );
 
-    // Create temporary updated keySettings, removing unprotectAccountKey
+    // Generate new Account Key Check Value for Account Key
+    // Prevent observers without Account Key from confirming Account Key changes
+    const accountKeyCheckValue = await generateAccountKeyCheckValue(
+      this.keys.key,
+    );
+
+    // Create temporary updated keySettings, removing unprotectedAccountKey
     const newKeySettings: KeySettings = {
-      accountKeyCheckValue: this.keys.keySettings.accountKeyCheckValue,
+      accountKeyCheckValue,
       protectedAccountKey,
       dataPassphraseDerivedKeyDerivationParams,
     };

@@ -106,7 +106,7 @@ export function generateAccountKey(): Promise<CryptoKey> {
 /**
  * Generate a key check value for the given crypto key.
  * @param cryptoKey The crypto key to compute check value for
- * @returns string The key check value
+ * @returns Promise<EncryptedData> The key check value
  */
 export function generateAccountKeyCheckValue(
   accountKey: CryptoKey,
