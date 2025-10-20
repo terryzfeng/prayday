@@ -2,7 +2,7 @@
   import Menu from "./Menu.svelte";
   import AboutModal from "../Modals/About/AboutModal.svelte";
 
-  let openAbout: () => {};
+  let openAbout: () => void;
 </script>
 
 <div

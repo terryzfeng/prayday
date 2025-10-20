@@ -48,8 +48,9 @@
    * Auto-resize the textarea for long prayer input
    * @param event oninput event
    */
-  function autoResize(event: { target: any }) {
-    const textarea = event.target;
+  // @eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function autoResize(event: Event) {
+    const textarea = event.currentTarget as HTMLTextAreaElement;
     textarea.style.height = "auto"; // Reset height to recalculate
     textarea.style.height = `${textarea.scrollHeight}px`; // Set height to match content
   }
@@ -58,8 +59,9 @@
    * Reset textarea size if empty and not focused
    * @param event
    */
-  function resetSize(event: { target: any }) {
-    const textarea = event.target;
+  // @eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function resetSize(event: Event) {
+    const textarea = event.currentTarget as HTMLTextAreaElement;
     if (prayerInput.trim().length === 0) {
       textarea.style.height = "4rem";
     }

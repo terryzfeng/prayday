@@ -3,6 +3,7 @@ import {
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut,
+  type User,
 } from "firebase/auth";
 import { auth } from "./config";
 import type { FirebaseError } from "firebase/app";
@@ -11,10 +12,8 @@ import {
   type FirebaseAccountSettings,
 } from "./users";
 import { generateNewKeys } from "../account/keys";
-import {
-  account as accountStore,
-  establishCloudAccount,
-} from "lib/stores/accountStore";
+import { account, establishCloudAccount } from "lib/stores/accountStore";
+import { type Result } from "lib/utils/result";
 
 /**
  * Sign up a new user for Prayday.
@@ -52,8 +51,7 @@ export const signUp = async (email: string, password: string, name: string) => {
       keys.keySettings,
     );
     if (newCloudAccount) {
-      accountStore.setAccount(newCloudAccount);
-      newCloudAccount.saveKeysToLocal();
+      account.setAccount(newCloudAccount);
     } else {
       throw new Error(
         "Failed to create account. Please contact Prayday support.",
@@ -75,7 +73,10 @@ export const signUp = async (email: string, password: string, name: string) => {
  * @param password
  * @returns succes/fail
  */
-export const logIn = async (email: string, password: string) => {
+export const logIn = async (
+  email: string,
+  password: string,
+): Promise<Result<User>> => {
   try {
     const userCredential = await signInWithEmailAndPassword(
       auth,
@@ -83,7 +84,7 @@ export const logIn = async (email: string, password: string) => {
       password,
     );
 
-    return { success: true, user: userCredential.user };
+    return { success: true, data: userCredential.user };
   } catch (error: unknown) {
     if ((error as FirebaseError).code === "auth/invalid-credential") {
       return { success: false, error: "Invalid email or password" };

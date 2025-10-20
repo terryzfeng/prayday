@@ -22,8 +22,8 @@
       } else {
         throw new Error("Error sending password reset email.");
       }
-    } catch (error: any) {
-      errorMessage = error.message;
+    } catch (error: unknown) {
+      errorMessage = (error as Error).message;
     } finally {
       loading = false;
     }
@@ -53,7 +53,7 @@
 
       {#if errorMessage}
         <div
-          class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative text-sm"
+          class="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-2 rounded relative text-sm"
           role="alert"
         >
           {errorMessage}
@@ -76,7 +76,12 @@
             class="text-sm w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-300"
           />
         </div>
-        <Button color="blue" className="w-full" text="Reset Password" />
+        <Button
+          color="blue"
+          className="w-full"
+          text="Reset Password"
+          disabled={loading}
+        />
       </form>
 
       <div class="pt-4 flex flex-col justify-between items-center text-sm">

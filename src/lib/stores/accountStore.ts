@@ -4,7 +4,7 @@ import { onAuthStateChanged, type User } from "firebase/auth";
 import {
   getAccountSettings,
   type FirebaseAccountSettings,
-  type FirebaseAccountSettingsBox,
+  type FirebaseAccountSettingsResult,
 } from "../utils/firebase/users";
 import Account from "../utils/account/account";
 import type { Keys, KeySettings } from "../utils/account/keys";
@@ -25,7 +25,7 @@ export async function establishCloudAccount(
   keySettings: KeySettings,
   fromCache: boolean = false,
   getAccountSettingsFromServer:
-    | Promise<FirebaseAccountSettingsBox>
+    | Promise<FirebaseAccountSettingsResult>
     | undefined = undefined,
 ) {
   const account = await Account.establishAccount(

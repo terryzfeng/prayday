@@ -5,7 +5,7 @@ import { getAccountSettingsAsync } from "lib/services/accountSettingsSyncService
 import {
   uploadKeySettings,
   type FirebaseAccountSettings,
-  type FirebaseAccountSettingsBox,
+  type FirebaseAccountSettingsResult,
 } from "../firebase/users";
 import {
   generateNewKeys,
@@ -357,7 +357,7 @@ export default class Account {
     firebaseAccountSettings?: FirebaseAccountSettings,
     keySettings?: KeySettings,
     fromCache?: boolean,
-    getAccountSettingsFromServer?: Promise<FirebaseAccountSettingsBox>,
+    getAccountSettingsFromServer?: Promise<FirebaseAccountSettingsResult>,
   ): Promise<Account | undefined> {
     let account = null;
 

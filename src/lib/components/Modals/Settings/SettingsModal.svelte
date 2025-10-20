@@ -18,6 +18,7 @@
   };
 
   // Conditionally set showClosePrompt based on current page
+  let showClosePrompt: boolean;
   $: showClosePrompt =
     currentPage !== "create-data-passphrase" &&
     currentPage !== "remove-data-passphrase";
@@ -28,12 +29,7 @@
   };
 </script>
 
-<NavigableModal
-  bind:this={modalRef}
-  bind:currentPage
-  {pages}
-  bind:showClosePrompt
->
+<NavigableModal bind:this={modalRef} bind:currentPage {pages} {showClosePrompt}>
   <svelte:fragment
     slot="default"
     let:currentPage

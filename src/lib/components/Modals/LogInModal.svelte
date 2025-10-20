@@ -95,7 +95,12 @@
             class="text-sm w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-300"
           />
         </div>
-        <Button color="blue" className="w-full" text="Log In" />
+        <Button
+          color="blue"
+          className="w-full"
+          text="Log In"
+          disabled={loading}
+        />
       </form>
 
       <div class="pt-4 flex flex-col justify-between items-center text-sm">

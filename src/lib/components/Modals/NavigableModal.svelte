@@ -3,12 +3,11 @@
   import { onMount, onDestroy } from "svelte";
   import Modal from "./Modal.svelte";
 
-  let showModal = (state: boolean) => {};
   export let showClosePrompt = true;
   let modalRef: Modal;
 
   export let currentPage: string = "main"; // Default page
-  export let pages: Record<string, any> = {};
+  export let pages: Record<string, unknown> = {};
 
   // Track if we're managing history
   let historyEntries = 0;
@@ -77,7 +76,7 @@
     );
     historyEntries = 1; // Reset and set to 1
 
-    showModal(true);
+    modalRef.showModal(true);
   }
 
   export function closeModal() {
@@ -92,7 +91,7 @@
       historyEntries = 0;
     }
 
-    showModal(false);
+    modalRef.showModal(false);
   }
 
   function cleanupHistory() {
@@ -104,12 +103,7 @@
   }
 </script>
 
-<Modal
-  bind:this={modalRef}
-  bind:showModal
-  onClose={closeModal}
-  bind:showClosePrompt
->
+<Modal bind:this={modalRef} onClose={closeModal} bind:showClosePrompt>
   <div class="max-w-2xl mx-auto">
     <slot {currentPage} {navigateToPage} {navigateBack} {closeModal} {pages} />
   </div>

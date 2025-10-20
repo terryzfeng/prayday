@@ -51,7 +51,7 @@
    * Hide the modal if click outside
    * @param event
    */
-  function handleClick(event: any) {
+  function handleClick(event: Event) {
     if (event.target === modalDialog) {
       console.log("close outside");
       // Call the onClose callback instead of directly calling showModal

@@ -21,8 +21,8 @@
   let showProfile: (state: boolean) => void;
   let showInputPassphrase: (state: boolean) => void;
 
-  let openAbout: () => {};
-  let openSettings: () => {};
+  let openAbout: () => void;
+  let openSettings: () => void;
 
   // Filter defaults
   let hideAnsweredText = "Hide Answered";

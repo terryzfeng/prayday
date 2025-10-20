@@ -31,11 +31,6 @@ export interface KeySettings {
   dataPassphraseDerivedKeyDerivationParams?: DataPassphraseDerivedKeyDerivationParams;
 }
 
-export interface EstablishKeysBox {
-  keys: Keys;
-  isNew?: boolean;
-}
-
 //------------------------------------------------------------------------------
 // Keys API
 //------------------------------------------------------------------------------

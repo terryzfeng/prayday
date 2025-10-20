@@ -71,7 +71,7 @@
     <!-- Legend -->
     <div class="flex items-center space-x-1 self-start py-1">
       <span class="text-xs text-gray-500">Less</span>
-      {#each [0, 2, 4, 6, 8] as level}
+      {#each [0, 2, 4, 6, 8] as level (level)}
         <div class="w-3 h-3 rounded-sm {getColor(level)}"></div>
       {/each}
       <span class="text-xs text-gray-500">More</span>
@@ -80,16 +80,16 @@
 
   <!-- Weekday headers -->
   <div class="grid grid-cols-7 gap-1 mb-1">
-    {#each weekdays as day}
+    {#each weekdays as day (day)}
       <div class="text-xs text-gray-400 text-center">{day}</div>
     {/each}
   </div>
 
   <!-- Calendar grid -->
   <div class="grid gap-1">
-    {#each weeks as week, indexWeek}
+    {#each weeks as week, indexWeek (indexWeek)}
       <div class="grid grid-cols-7 gap-1">
-        {#each week as dayCount, indexDay}
+        {#each week as dayCount, indexDay (`${indexWeek}-${indexDay}`)}
           <ContributionCell
             {dayCount}
             dateName={dayLabels[indexWeek][indexDay]}

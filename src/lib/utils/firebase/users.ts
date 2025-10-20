@@ -23,17 +23,14 @@ import {
   serializeKeySettings,
   type FirebaseKeySettings,
 } from "./firebase-key-settings";
+import { type Result } from "lib/utils/result";
 
-export interface FirebaseAccountSettingsBox {
-  success: boolean;
-  data?: {
-    firebaseAccountSettings: FirebaseAccountSettings;
-    keySettings: KeySettings;
-    fromCache?: boolean;
-    getAccountSettingsFromServer?: Promise<FirebaseAccountSettingsBox>;
-  };
-  error?: string;
-}
+export type FirebaseAccountSettingsResult = Result<{
+  firebaseAccountSettings: FirebaseAccountSettings;
+  keySettings: KeySettings;
+  fromCache?: boolean;
+  getAccountSettingsFromServer?: Promise<FirebaseAccountSettingsResult>;
+}>;
 
 // Firebase Firestore User Doc Account Settings
 export interface FirebaseAccountSettings {
@@ -78,7 +75,7 @@ export async function uploadKeySettings(
 async function getAccountSettingsFromServer(
   userDocRef: DocumentReference,
   keySettingsDocRef: DocumentReference,
-): Promise<FirebaseAccountSettingsBox> {
+): Promise<FirebaseAccountSettingsResult> {
   try {
     const serverUserDoc = await getDocFromServer(userDocRef);
     const serverKeySettingsDoc = await getDocFromServer(keySettingsDocRef);
@@ -108,7 +105,7 @@ async function getAccountSettingsFromServer(
  */
 export async function getAccountSettings(
   userId: string,
-): Promise<FirebaseAccountSettingsBox> {
+): Promise<FirebaseAccountSettingsResult> {
   // Try to pull account data settings from Firestore cache
   const userDocRef = doc(db, "users", userId);
   const keySettingsDocRef = doc(db, "users", userId, "keys", "keySettings");
