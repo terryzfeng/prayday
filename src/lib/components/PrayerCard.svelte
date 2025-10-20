@@ -35,7 +35,7 @@
   function deletePrayer(event: Event) {
     // TODO: remove when publish
     const confirmDelete =
-      true || confirm("Are you sure you want to delete this prayer request?");
+      confirm("Are you sure you want to delete this prayer request?");
     if (confirmDelete) {
       event.stopPropagation();
       playFx("ERROR");

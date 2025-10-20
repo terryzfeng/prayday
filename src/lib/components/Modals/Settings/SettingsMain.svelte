@@ -62,6 +62,7 @@
     <div class="flex space-x-3 pt-4 border-t border-gray-200">
       <Button
         color="red"
+        backgroundColor="neutral"
         text="Log Out"
         title="Log Out"
         onClick={handleLogout}

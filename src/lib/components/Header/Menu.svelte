@@ -99,7 +99,6 @@
           callback={openAbout}
           bind:isMenuOpen
         />
-        <MenuItem value="Settings" callback={openSettings} bind:isMenuOpen />
       {/if}
     </div>
   {/if}
