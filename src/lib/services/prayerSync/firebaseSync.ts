@@ -10,7 +10,10 @@ import { db } from "lib/utils/firebase/config";
 import { PrayerStore } from "lib/stores/prayerStore";
 import PrayerRequest from "lib/utils/prayer-request";
 import { userHistoryService } from "../userHistoryService";
-import { createPrayerFromFirebaseData } from "../../utils/firebase/firebase-prayer-request";
+import {
+  createPrayerFromSerializedPrayer,
+  serializePrayer,
+} from "../../utils/serialized-prayer-request";
 import {
   PrayerOperation,
   PrayerUpdateType,
@@ -104,7 +107,7 @@ export class FirebaseSyncService implements PrayerSyncService {
 
       const firebasePrayers = snapshot.docs.map((doc) => {
         const data = doc.data();
-        const prayer = createPrayerFromFirebaseData(data)!;
+        const prayer = createPrayerFromSerializedPrayer(data)!;
         return prayer;
       });
       this.incomingPrayers.push(...firebasePrayers);
@@ -123,7 +126,7 @@ export class FirebaseSyncService implements PrayerSyncService {
           this.removeIncomingPrayer(data.uuid);
           PrayerStore.deletePrayer(data.uuid);
         } else {
-          const incomingPrayer = createPrayerFromFirebaseData(data)!;
+          const incomingPrayer = createPrayerFromSerializedPrayer(data)!;
           this.incomingPrayers.push(incomingPrayer);
           this.mergeFirebaseToPrayerStore();
         }
@@ -235,14 +238,7 @@ export class FirebaseSyncService implements PrayerSyncService {
             break;
           case PrayerOperation.CREATE: {
             const prayer = prayerChange.prayerRequest;
-            batch.set(prayerRef, {
-              prayer: prayer.prayer,
-              uuid: prayer.uuid,
-              prayCount: prayer.prayCount,
-              date: prayer.date.toISOString(),
-              lastPrayed: prayer.lastPrayed.toISOString(),
-              answered: prayer.answered,
-            });
+            batch.set(prayerRef, serializePrayer(prayer));
             break;
           }
           case PrayerOperation.UPDATE:
@@ -268,7 +264,7 @@ export class FirebaseSyncService implements PrayerSyncService {
             break;
 
           default:
-            console.warn("Invalid prayer change");
+            console.warn("Invalid prayer change.");
         }
       }
 

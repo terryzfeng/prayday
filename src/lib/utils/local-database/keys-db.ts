@@ -4,7 +4,7 @@ import { type Keys } from "lib/utils/account/keys";
 /**
  * IndexedDB Database Configuration
  */
-const STORE_NAME = DB_STORES.KEYS;
+const STORE_NAME = DB_STORES.KEYS.name;
 
 /**
  * Save Keys object to IndexedDB. Includes account key and key settings.

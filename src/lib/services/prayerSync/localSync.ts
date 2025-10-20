@@ -1,20 +1,29 @@
-import { PrayerStore } from "../../stores/prayerStore";
+/**
+ * Sync and save prayers for a local account (guest) to Local (indexedDB)
+ */
 import PrayerRequest from "../../utils/prayer-request";
 import {
   PrayerOperation,
   type PrayerSyncService,
   type PrayerUpdateType,
 } from "./prayerSyncService";
-
-const LOCAL_ACCOUNT_KEY = "account";
-const LOCAL_PRAYERS_KEY = "prayers";
+import {
+  deletePrayerRequestFromLocal,
+  getAllPrayerRequestsFromLocal,
+  writePrayerRequestToLocal,
+} from "lib/utils/local-database/prayer-db";
 
 export class LocalSyncService implements PrayerSyncService {
   private userId: string | null = null;
+  private incomingPrayers: PrayerRequest[] = [];
 
   async initialize(userId: string): Promise<void> {
     this.userId = userId;
-    localStorage.setItem(LOCAL_ACCOUNT_KEY, this.userId);
+    try {
+      this.incomingPrayers = await getAllPrayerRequestsFromLocal(userId);
+    } catch {
+      this.incomingPrayers = [];
+    }
     return Promise.resolve();
   }
 
@@ -34,49 +43,21 @@ export class LocalSyncService implements PrayerSyncService {
     prayerRequest: PrayerRequest,
     _updateType: PrayerUpdateType | undefined,
   ): void {
-    const prayers = PrayerStore.getPrayers();
-    let updatedPrayers: PrayerRequest[] = [];
-    if (prayerOperation === PrayerOperation.CREATE) {
-      updatedPrayers = [...prayers, prayerRequest];
-    } else if (prayerOperation === PrayerOperation.UPDATE) {
-      updatedPrayers = prayers.map((p) => {
-        if (p.uuid === prayerRequest.uuid) {
-          return prayerRequest;
-        }
-        return p;
-      });
-    } else if (prayerOperation === PrayerOperation.DELETE) {
-      updatedPrayers = prayers.filter((p) => p.uuid !== prayerRequest.uuid);
-    }
-    try {
-      localStorage.setItem(LOCAL_PRAYERS_KEY, JSON.stringify(updatedPrayers));
-    } catch (error) {
-      console.error("Error saving to localStorage:", error);
+    if (this.userId === null) return;
+    switch (prayerOperation) {
+      case PrayerOperation.CREATE:
+      case PrayerOperation.UPDATE:
+        writePrayerRequestToLocal(this.userId, prayerRequest);
+        break;
+      case PrayerOperation.DELETE:
+        deletePrayerRequestFromLocal(this.userId, prayerRequest.uuid);
+        break;
+      default:
+        console.warn("Invalid prayer change.");
     }
   }
 
   pull(): PrayerRequest[] {
-    try {
-      const storedData = localStorage.getItem(LOCAL_PRAYERS_KEY);
-      if (!storedData) return [];
-
-      const parsedData = JSON.parse(storedData);
-      // Convert array of plain objects to array of PrayerRequest
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return parsedData.map((p: any) => {
-        const prayer = new PrayerRequest(
-          p.prayer,
-          p.uuid,
-          p.prayCount,
-          new Date(p.date),
-          new Date(p.lastPrayed),
-          p.answered,
-        );
-        return prayer;
-      });
-    } catch (error) {
-      console.error("Error loading prayers from localStorage:", error);
-      return [];
-    }
+    return this.incomingPrayers;
   }
 }

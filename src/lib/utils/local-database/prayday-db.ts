@@ -6,10 +6,15 @@
  */
 
 const DB_NAME = "praydayDB";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 export const DB_STORES = {
-  KEYS: "keys",
-  PRAYERS: "prayers",
+  KEYS: {
+    name: "keys",
+  },
+  PRAYERS: {
+    name: "prayers",
+    keyPath: ["accountId", "uuid"],
+  },
 };
 
 /**
@@ -32,11 +37,20 @@ function initializeDB(): Promise<IDBDatabase> {
     request.onupgradeneeded = (event) => {
       const db = (event.target as IDBOpenDBRequest).result;
 
-      // Create all object stores if they don't exist
-      for (const storeName of Object.values(DB_STORES)) {
-        if (!db.objectStoreNames.contains(storeName)) {
-          db.createObjectStore(storeName);
-        }
+      // Create KEYS store
+      if (!db.objectStoreNames.contains(DB_STORES.KEYS.name)) {
+        db.createObjectStore(DB_STORES.KEYS.name);
+      }
+
+      // Create PRAYERS store with indexes
+      if (!db.objectStoreNames.contains(DB_STORES.PRAYERS.name)) {
+        const prayersStore = db.createObjectStore(DB_STORES.PRAYERS.name, {
+          keyPath: DB_STORES.PRAYERS.keyPath,
+        });
+
+        // Add indexes for efficient querying
+        prayersStore.createIndex("accountId", "accountId", { unique: false });
+        // prayersStore.createIndex('answered', ['accountId', 'answered'], { unique: false });
       }
     };
   });
