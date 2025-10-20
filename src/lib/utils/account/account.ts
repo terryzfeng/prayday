@@ -12,8 +12,6 @@ import {
   type Keys,
   type KeySettings,
   importAccountKeys,
-  loadAccountKeyFromLocal,
-  writeAccountKeysToLocal,
   quickCompareKeySettings,
   extractKeysWithDataPassphrase,
 } from "./keys";
@@ -24,8 +22,13 @@ import {
   generateDataPassphraseDerivedKeyDerivationParams,
   wrapAccountKey,
 } from "./encryption";
+import {
+  writeKeysToLocal,
+  loadKeysFromLocal,
+  loadAccountKeyFromLocal,
+} from "../local-database/keys-db";
 
-const LOCAL_ACCOUNT_KEY = "account";
+const GUEST_ID = "guest";
 
 export default class Account {
   // Firebase UID or Guest Local ID
@@ -221,12 +224,14 @@ export default class Account {
   /**
    * Save all of keys to local storage
    */
-  static saveKeysToLocal(account: Account): boolean {
-    // TODO: no op for now
-    return true;
-    // TODO: If no keys.key, don't save the keys
-    writeAccountKeysToLocal(account.getFullId(), account.keys);
-    return true;
+  static async saveKeysToLocal(account: Account): Promise<boolean> {
+    try {
+      await writeKeysToLocal(account.getFullId(), account.keys);
+      return true;
+    } catch (error: unknown) {
+      console.log("Failed to save keys to local:", (error as Error).message);
+    }
+    return false;
   }
 
   /**
@@ -311,8 +316,8 @@ export default class Account {
   }
 
   /**
-   * Take in a new account and initialize relevant services with keys
-   * If no keys, load from localStorage or request.
+   * Take in a new account and initialize relevant services with keys.key
+   * If no keys.key, load from local database or intialized = false;
    */
   static async initializeServices(account: Account): Promise<boolean> {
     let initialized = false;
@@ -325,6 +330,7 @@ export default class Account {
       // Don't have an account key, e2ee is on, try to pull key from local
       const loadedLocalKey = await loadAccountKeyFromLocal(account.getFullId());
       if (loadedLocalKey) {
+        console.log("Loaded key from local");
         account.keys.key = loadedLocalKey;
         Account.initializePrayers(account);
         initialized = true;
@@ -377,12 +383,7 @@ export default class Account {
       }
     } else {
       // ESTABLISH GUEST (local) ACCOUNT
-      account = await loadAccountFromLocal();
-      if (account === null) {
-        // Create a new local account
-        account = await Account.createNewLocalAccount();
-        Account.saveKeysToLocal(account);
-      }
+      account = (await loadGuestAccount()) ?? (await createNewGuestAccount());
     }
 
     // Uninitialize past services, initialize new services with new keys
@@ -392,34 +393,34 @@ export default class Account {
   }
 }
 
+//------------------------------------------------------------------------------
+// GUEST ACCOUNT FUNCTIONS
+//------------------------------------------------------------------------------
 /**
- * Take a full id and extract the id and location of the account
- * @param fullId full id of account
+ * Create and return a new local guest account
+ * @param id
+ * @returns Promise<Account>
  */
-function parseIdFromFull(fullId: string): {
-  id: string;
-  isCloudAccount: boolean;
-} {
-  const fullIdVector = fullId.split("@");
-  return {
-    id: fullIdVector[0],
-    isCloudAccount: fullIdVector[1] === "cloud",
-  };
+async function createNewGuestAccount(): Promise<Account> {
+  const keys = await generateNewKeys();
+  const guest = new Account(GUEST_ID, /*isCloudAccount=*/ false, "Guest", keys);
+  Account.saveKeysToLocal(guest);
+  return guest;
 }
 
 /**
- * Load guest account from localStorage
- * @returns local guest account
+ * Load guest account from local database.
+ * Always use "guest@local" as the local guest acount full id.
+ * @returns Account local guest account
  */
-async function loadAccountFromLocal(): Promise<Account | null> {
-  const fullId = localStorage.getItem(LOCAL_ACCOUNT_KEY);
-  if (fullId === null) {
+async function loadGuestAccount(): Promise<Account | null> {
+  try {
+    const guestKeys = await loadKeysFromLocal(GUEST_ID + "@local");
+    if (guestKeys === null) {
+      return null;
+    }
+    return new Account(GUEST_ID, /*isCloudAccount=*/ false, "Guest", guestKeys);
+  } catch (_: unknown) {
     return null;
   }
-
-  // TODO: Load actual keys
-  const keys = await generateNewKeys();
-
-  const id = parseIdFromFull(fullId).id;
-  return new Account(id, /*isCloudAccount=*/ false, "Guest", keys);
 }

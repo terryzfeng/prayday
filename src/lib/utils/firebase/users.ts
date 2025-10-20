@@ -15,7 +15,7 @@ import {
   where,
 } from "firebase/firestore";
 import { db } from "./config";
-import { midnight as midnight } from "../date-utils";
+import { midnight } from "../date-utils";
 import { USER_HISTORY_SIZE } from "lib/stores/userHistoryStore";
 import { type KeySettings } from "../account/keys";
 import {
