@@ -93,8 +93,8 @@ async function getAccountSettingsFromServer(
       };
     }
     throw new Error("User account settings not found");
-  } catch (error: unknown) {
-    return { success: false, error: (error as Error).message };
+  } catch (_: unknown) {
+    return { success: false, error: "Failed to sync user account with server, may be offline."}
   }
 }
 
@@ -132,7 +132,7 @@ export async function getAccountSettings(
         },
       };
     }
-    throw new Error();
+    throw new Error("User account settings not in firebase cache");
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error: unknown) {
     // If not in cache, fall back to server
@@ -153,11 +153,11 @@ export async function getAccountSettings(
       };
     }
     // Otherwise we failed to initialize firebase account settings when we had
-    // a firebase account
+    // a firebase account. May be offline
     return {
       success: false,
       error:
-        "Failed to load user account settings. Please contact Prayday support.",
+        "Failed to get account settings from server, may be offline. Please try again later. If the issue persists, please contact Prayday support.",
     };
   }
 }
@@ -216,6 +216,7 @@ export async function queryPrayerHistory(userId: string) {
 
 /**
  * Add a prayer history entry on a specific day. Default date is today.
+ * TODO: This may not work in offline mode. May be broken.
  * @param userId userId
  * @param date date which user prayer, default today
  */

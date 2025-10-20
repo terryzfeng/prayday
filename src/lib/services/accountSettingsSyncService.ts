@@ -11,11 +11,8 @@ export async function getAccountSettingsAsync(
 ) {
   try {
     const firebaseAccountSettingsResult = await getAccountSettingsFromServer;
-    console.log("Account sync'd from server");
-    if (
-      firebaseAccountSettingsResult.success &&
-      firebaseAccountSettingsResult.data !== undefined
-    ) {
+    if (firebaseAccountSettingsResult.success) {
+      console.log("Account sync'd with server");
       const firebaseAccountSettings =
         firebaseAccountSettingsResult.data.firebaseAccountSettings;
       const keys = await importAccountKeys(
@@ -27,9 +24,9 @@ export async function getAccountSettingsAsync(
         keys,
       );
     } else {
-      throw new Error();
+      throw new Error(firebaseAccountSettingsResult.error);
     }
-  } catch (_: unknown) {
-    console.warn("Failed to get account settings from server, may be offline");
+  } catch (error: unknown) {
+    console.warn((error as Error).message);
   }
 }
