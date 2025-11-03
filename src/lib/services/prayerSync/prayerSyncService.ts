@@ -19,12 +19,11 @@ export interface PrayerChange {
 }
 
 export interface PrayerSyncService {
-  initialize(userId: string): Promise<void>;
-  uninitialize(): void;
+  initialize(): Promise<void>;
   update(
     prayerOperation: PrayerOperation,
     prayerRequest: PrayerRequest,
     updateType: PrayerUpdateType | undefined,
   ): void;
-  pull(): PrayerRequest[];
+  writeToPrayerStore(): void;
 }

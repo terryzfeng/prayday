@@ -1,10 +1,10 @@
-import { praydayDB, DB_STORES } from "./prayday-db";
+import type PrayerRequest from "../prayer-request";
 import {
-  createPrayerFromSerializedPrayer,
-  serializePrayerWithAccountId,
-  type SerializedPrayerRequest,
-} from "lib/utils/serialized-prayer-request";
-import PrayerRequest from "lib/utils/prayer-request";
+  deserializeLocalPrayerRequest,
+  serializePrayerRequest,
+  type LocalPrayerRequest,
+} from "./local-prayer-request";
+import { praydayDB, DB_STORES } from "./prayday-db";
 
 /**
  * Indexed DB Database Configuration
@@ -23,13 +23,17 @@ export async function writePrayerRequestToLocal(
 ): Promise<void> {
   const db = await praydayDB;
 
+  const serialized = serializePrayerRequest(accountId, prayerRequest);
+  if (!serialized.success) {
+    throw new Error(`Failed to serialize PrayerRequest: ${serialized.error}`);
+  }
+
   return new Promise((resolve, reject) => {
     const transaction = db.transaction([STORE_NAME], "readwrite");
     const store = transaction.objectStore(STORE_NAME);
 
-    const request = store.put(
-      serializePrayerWithAccountId(accountId, prayerRequest),
-    );
+    // Use the serialized data (which is in serialized.data)
+    const request = store.put(serialized.data);
 
     request.onerror = () => {
       reject(new Error(`Failed to save PrayerRequest: ${request.error}`));
@@ -62,24 +66,27 @@ export async function getAllPrayerRequestsFromLocal(
     };
 
     request.onsuccess = () => {
-      const serializedPrayers = request.result as SerializedPrayerRequest[];
-      // Will ignore accountId in SerializedPrayerRequest as it doesn't get kept
-      const prayerRequests = serializedPrayers
-        .map(createPrayerFromSerializedPrayer)
-        .filter((prayer) => prayer !== null);
-      resolve(prayerRequests);
+      const localPrayers = request.result as LocalPrayerRequest[];
+      const localPrayerRequests = localPrayers
+        .map((localPrayer) => {
+          if (localPrayer.accountId === accountId) {
+            return deserializeLocalPrayerRequest(localPrayer);
+          } else {
+            return null;
+          }
+        })
+        .filter((prayerRequest) => prayerRequest !== null);
+      resolve(localPrayerRequests);
     };
   });
 }
 
 /**
  * Delete a PrayerReqest from IndexedDB.
- * @param accountId Unique identifier for the account
  * @param PrayerRequest to delete
  * @returns Promise<void>
  */
 export async function deletePrayerRequestFromLocal(
-  accountId: string,
   prayerUUID: string,
 ): Promise<void> {
   const db = await praydayDB;
@@ -87,7 +94,7 @@ export async function deletePrayerRequestFromLocal(
     const transaction = db.transaction([STORE_NAME], "readwrite");
     const store = transaction.objectStore(STORE_NAME);
 
-    const request = store.delete([accountId, prayerUUID]);
+    const request = store.delete(prayerUUID);
 
     request.onerror = () => {
       reject(new Error(`Failed to delete PrayerRequest: ${request.error}`));

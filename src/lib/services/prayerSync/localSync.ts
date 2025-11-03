@@ -1,39 +1,41 @@
 /**
  * Sync and save prayers for a local account (guest) to Local (indexedDB)
  */
-import PrayerRequest from "../../utils/prayer-request";
 import {
   PrayerOperation,
+  PrayerUpdateType,
   type PrayerSyncService,
-  type PrayerUpdateType,
 } from "./prayerSyncService";
 import {
   deletePrayerRequestFromLocal,
   getAllPrayerRequestsFromLocal,
   writePrayerRequestToLocal,
 } from "lib/utils/local-database/prayer-db";
+import PrayerRequest from "lib/utils/prayer-request";
+import { PrayerStore } from "lib/stores/prayerStore";
 
 export class LocalSyncService implements PrayerSyncService {
-  private userId: string | null = null;
+  private userId: string;
+  private accountKey: CryptoKey;
   private incomingPrayers: PrayerRequest[] = [];
 
-  async initialize(userId: string): Promise<void> {
+  constructor(userId: string, accountKey: CryptoKey) {
     this.userId = userId;
+    this.accountKey = accountKey;
+  }
+
+  async initialize(): Promise<void> {
     try {
-      this.incomingPrayers = await getAllPrayerRequestsFromLocal(userId);
+      this.incomingPrayers = await getAllPrayerRequestsFromLocal(this.userId);
     } catch {
       this.incomingPrayers = [];
     }
+    this.writeToPrayerStore();
     return Promise.resolve();
   }
 
-  uninitialize(): void {
-    this.userId = null;
-  }
-
   /**
-   * Writes all PrayerStore prayers to LocalStorage
-   *
+   * Write a PrayerRequest to IndexedDB
    * @param prayerOperation
    * @param prayerRequest
    * @param updateType
@@ -41,23 +43,52 @@ export class LocalSyncService implements PrayerSyncService {
   update(
     prayerOperation: PrayerOperation,
     prayerRequest: PrayerRequest,
-    _updateType: PrayerUpdateType | undefined,
+    updateType: PrayerUpdateType | undefined,
   ): void {
-    if (this.userId === null) return;
     switch (prayerOperation) {
       case PrayerOperation.CREATE:
+        // Mutates prayerRequest adding protectedPrayer
+        prayerRequest
+          .encrypt(this.accountKey)
+          .then(() => writePrayerRequestToLocal(this.userId, prayerRequest));
+        break;
       case PrayerOperation.UPDATE:
+        if (updateType === PrayerUpdateType.PRAYER_TEXT) {
+          // Mutates prayerRequest adding protectedPrayer
+          prayerRequest.encrypt(this.accountKey).then(() => {
+            writePrayerRequestToLocal(this.userId, prayerRequest);
+          });
+        }
         writePrayerRequestToLocal(this.userId, prayerRequest);
         break;
       case PrayerOperation.DELETE:
-        deletePrayerRequestFromLocal(this.userId, prayerRequest.uuid);
+        deletePrayerRequestFromLocal(prayerRequest.uuid);
         break;
       default:
         console.warn("Invalid prayer change.");
     }
   }
 
-  pull(): PrayerRequest[] {
-    return this.incomingPrayers;
+  async writeToPrayerStore() {
+    // Wait until all prayers decrypted, or decrypt was attempted
+    await Promise.all(
+      this.incomingPrayers.map((prayer) => prayer.decrypt(this.accountKey)),
+    );
+
+    const decrypted: PrayerRequest[] = [];
+    const stillEncrypted: PrayerRequest[] = [];
+
+    for (const prayer of this.incomingPrayers) {
+      // If successfully decrypted, prayer field should now be filled.
+      if (prayer.prayer !== undefined) {
+        decrypted.push(prayer);
+      } else {
+        stillEncrypted.push(prayer);
+      }
+    }
+    // Add decrypted prayers to PrayerStore
+    PrayerStore.mergePrayers(decrypted);
+    // Update incoming prayers with what is remaining
+    this.incomingPrayers = stillEncrypted;
   }
 }

@@ -4,16 +4,15 @@
  * This singleton local database instance is shared across the application for
  * local key storage and prayer data.
  */
-
 const DB_NAME = "praydayDB";
-const DB_VERSION = 2;
+const DB_VERSION = 1;
 export const DB_STORES = {
   KEYS: {
     name: "keys",
   },
   PRAYERS: {
     name: "prayers",
-    keyPath: ["accountId", "uuid"],
+    keyPath: "uuid",
   },
 };
 
@@ -42,15 +41,16 @@ function initializeDB(): Promise<IDBDatabase> {
         db.createObjectStore(DB_STORES.KEYS.name);
       }
 
-      // Create PRAYERS store with indexes
+      // Create PRAYERS store with uuid as primary key
       if (!db.objectStoreNames.contains(DB_STORES.PRAYERS.name)) {
         const prayersStore = db.createObjectStore(DB_STORES.PRAYERS.name, {
-          keyPath: DB_STORES.PRAYERS.keyPath,
+          keyPath: "uuid",
         });
 
-        // Add indexes for efficient querying
+        // Index for querying prayers by account
         prayersStore.createIndex("accountId", "accountId", { unique: false });
-        // prayersStore.createIndex('answered', ['accountId', 'answered'], { unique: false });
+        // Optional: Add more indexes based on your query patterns
+        // prayersStore.createIndex("answered", ["accountId", "answered"], { unique: false });
       }
     };
   });

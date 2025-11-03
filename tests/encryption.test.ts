@@ -175,7 +175,7 @@ describe("Text Encryption/Decryption", () => {
 
       const decrypted = await decryptText(wrongKey, encrypted);
 
-      expect(decrypted).toBe("");
+      expect(decrypted).toBe(null);
     });
 
     test("should return empty string for corrupted data", async () => {
@@ -190,7 +190,7 @@ describe("Text Encryption/Decryption", () => {
 
       const decrypted = await decryptText(testKey, corruptedData);
 
-      expect(decrypted).toBe("");
+      expect(decrypted).toBe(null);
     });
 
     test("should handle large text", async () => {

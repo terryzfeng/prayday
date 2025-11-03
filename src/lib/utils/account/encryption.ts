@@ -180,18 +180,18 @@ export function encryptText(
  * API to decrypt text
  * @param key CryptoKey User's account key
  * @param encryptedData EncryptedData containined text (prayer)
- * @returns Promise<string>
+ * @returns Promise<string | null>
  */
 export async function decryptText(
   key: CryptoKey,
   encryptedData: EncryptedData,
-): Promise<string> {
+): Promise<string | null> {
   try {
     return bufferToStr(await decrypt(key, encryptedData));
   } catch (error: unknown) {
     // If decrypt fails, the key is invalid
     console.error("Decrypt Text Failed", (error as Error).message);
-    return "";
+    return null;
   }
 }
 

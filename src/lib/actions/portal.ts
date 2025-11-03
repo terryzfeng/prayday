@@ -28,15 +28,19 @@ import { tick } from "svelte";
 /**
  * Creates a portal to render an element at a target location.
  *
- * @param {HTMLElement} el - The element to render in the portal.
- * @param {string|HTMLElement} target - The target location where the element
- * ``will be rendered. Can be a CSS selector string or an HTMLElement.
- * @return {Object} An object containing the update and destroy methods for
- * ``the portal.
+ * @param el The element to render in the portal.
+ * @param target The target location where the element
+ * will be rendered. Can be a CSS selector string or an HTMLElement.
+ * @return An object containing the update and destroy methods for
+ * the portal.
  */
-export const portal = (el, target = "div") => {
-  let targetEl;
-  const update = async (/** @type {string|HTMLElement} */ newTarget) => {
+export const portal = (
+  el: HTMLElement,
+  target: string | HTMLElement = "div",
+) => {
+  let targetEl: Element | null;
+
+  async function update(newTarget: string | HTMLElement) {
     target = newTarget;
     if (typeof target === "string") {
       targetEl = document.querySelector(target);
@@ -56,11 +60,14 @@ export const portal = (el, target = "div") => {
     }
     targetEl.appendChild(el);
     el.hidden = false;
-  };
+  }
 
-  const destroy = () => el.parentNode && el.parentNode.removeChild(el);
+  function destroy() {
+    if (el.parentNode) {
+      el.parentNode.removeChild(el);
+    }
+  }
 
-  // noinspection JSIgnoredPromiseFromCall
   update(target);
 
   return {

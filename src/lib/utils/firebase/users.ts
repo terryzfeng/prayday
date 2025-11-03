@@ -94,7 +94,10 @@ async function getAccountSettingsFromServer(
     }
     throw new Error("User account settings not found");
   } catch (_: unknown) {
-    return { success: false, error: "Failed to sync user account with server, may be offline."}
+    return {
+      success: false,
+      error: "Failed to sync user account with server, may be offline.",
+    };
   }
 }
 

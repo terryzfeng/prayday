@@ -1,5 +1,5 @@
 import type { User as FirebaseAuthUser } from "firebase/auth";
-import { prayerSync } from "lib/services/prayerSync/prayerSyncManager";
+import { prayerSyncManager } from "lib/services/prayerSync/prayerSyncManager";
 import { PrayerStore } from "lib/stores/prayerStore";
 import { getAccountSettingsAsync } from "lib/services/accountSettingsSyncService";
 import {
@@ -79,6 +79,10 @@ export default class Account {
   //----------------------------------------------------------------------------
   // Getters
   //----------------------------------------------------------------------------
+  getAccountKey(): CryptoKey | undefined {
+    return this.keys.key;
+  }
+
   getFullId(): string {
     return this.id + (this.isCloudAccount ? "@cloud" : "@local");
   }
@@ -268,35 +272,38 @@ export default class Account {
   }
 
   /**
-   * Connect an account to prayer sync services and do an initial load.
-   * Load pulled prayers into view.
+   * Connect an account to prayer sync services and do an initial pull
+   * Load protected prayers and save them to the account prayer buffer (encrypted)
+   * Decrypt them and load them into the prayer store
    * TODO: Check if we need to await on this (await initializePrayers),
    *       might be able to spin off on a new thread
    * @param account
    */
   static async initializePrayers(account: Account) {
-    if (!account.initialized) {
-      await prayerSync.initialize(account);
-      // TODO: Check if it is safe to do this here post encryption
-      PrayerStore.setPrayers(prayerSync.pull());
-    } else {
-      PrayerStore.mergePrayers(prayerSync.pull());
+    // Don't re-initialize on async initial, if already done on cache initialize
+    if (account.keys.key === undefined || account.initialized) {
+      return;
     }
+    await prayerSyncManager.initialize(
+      account.id,
+      account.isCloudAccount,
+      account.keys.key,
+    );
   }
 
   /**
    * Disconnect account from services like prayer sync
    */
   static uninitializeServices() {
-    if (prayerSync.isInitialized()) {
-      prayerSync.uninitialize();
+    if (prayerSyncManager.isInitialized()) {
+      prayerSyncManager.uninitialize();
       PrayerStore.clearStorage();
     }
   }
 
   /**
    * Use Firebase account pulled from server to initialize services that weren't
-   * able to be initialized on intical cache load.
+   * able to be initialized during the initial cache load.
    * Don't do anything if keys are the same.
    * @param account account pulled from server
    * @param keys keys pulled from server, potentially new

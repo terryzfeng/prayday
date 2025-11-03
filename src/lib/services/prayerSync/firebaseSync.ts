@@ -11,15 +11,15 @@ import { PrayerStore } from "lib/stores/prayerStore";
 import PrayerRequest from "lib/utils/prayer-request";
 import { userHistoryService } from "../userHistoryService";
 import {
-  createPrayerFromSerializedPrayer,
-  serializePrayer,
-} from "../../utils/serialized-prayer-request";
-import {
   PrayerOperation,
   PrayerUpdateType,
   type PrayerChange,
   type PrayerSyncService,
 } from "./prayerSyncService";
+import {
+  deserializeFirebasePrayerRequest,
+  serializePrayerRequest,
+} from "lib/utils/firebase/firebase-prayer-request";
 
 /**
  * Service for synchronizing prayer data between the local PrayerStore and Firebase Firestore.
@@ -34,6 +34,7 @@ export class FirebaseSyncService implements PrayerSyncService {
   private initialized = false;
   private initialSync = true;
   private userId: string = "";
+  private accountKey: CryptoKey;
 
   // Queue for handling snapshots during sync operations
   private pendingSnapshots: QuerySnapshot[] = [];
@@ -49,15 +50,19 @@ export class FirebaseSyncService implements PrayerSyncService {
   private maxRetries = 3;
   private retryDelay = 1000;
 
+  constructor(userId: string, accountKey: CryptoKey) {
+    this.userId = userId;
+    this.accountKey = accountKey;
+  }
+
   /**
    * Initializes the prayer sync service for a given user.
    * Sets up a real-time listener for prayer data in Firestore and synchronizes
    * it with the local PrayerStore
    * @param userId The ID of the user whose prayers are to be synced.
    */
-  async initialize(userId: string) {
-    if (this.initialized || userId === "") return;
-    this.userId = userId;
+  async initialize(): Promise<void> {
+    if (this.initialized) return;
 
     this.initialSyncPromise = new Promise<void>((resolve, _) => {
       this.initialSyncResolve = resolve;
@@ -72,9 +77,8 @@ export class FirebaseSyncService implements PrayerSyncService {
         this.pendingSnapshots.push(snapshot);
         return;
       }
-
+      // Process immediately
       this.processSnapshot(snapshot);
-
       while (this.pendingSnapshots.length > 0) {
         const snapshot = this.pendingSnapshots.shift()!;
         this.processSnapshot(snapshot);
@@ -85,6 +89,7 @@ export class FirebaseSyncService implements PrayerSyncService {
     userHistoryService.initialize(this.userId);
 
     await this.initialSyncPromise;
+    this.writeToPrayerStore();
 
     this.initialized = true;
   }
@@ -101,14 +106,14 @@ export class FirebaseSyncService implements PrayerSyncService {
       `Pending writes: ${snapshot.metadata.hasPendingWrites}`,
     );
 
-    // On initial sync, we pull all Firebase prayers
+    // On initial sync (snapshot), we pull all Firebase prayers
     if (this.initialSync) {
       console.log("Initial load", snapshot.docChanges());
 
-      const firebasePrayers = snapshot.docs.map((doc) => {
+      const firebasePrayers = snapshot.docs.flatMap((doc) => {
         const data = doc.data();
-        const prayer = createPrayerFromSerializedPrayer(data)!;
-        return prayer;
+        const prayerResult = deserializeFirebasePrayerRequest(data);
+        return prayerResult.success ? [prayerResult.data] : [];
       });
       this.incomingPrayers.push(...firebasePrayers);
       if (this.initialSyncResolve) {
@@ -120,17 +125,23 @@ export class FirebaseSyncService implements PrayerSyncService {
       // On subsequent snapshots, we get individually updated prayers
       console.log("Subsequent load", snapshot.docChanges());
 
+      console.log("snapshot change size", snapshot.docChanges().length);
+
       snapshot.docChanges().forEach((change) => {
         const data = change.doc.data();
         if (change.type === "removed") {
           this.removeIncomingPrayer(data.uuid);
           PrayerStore.deletePrayer(data.uuid);
         } else {
-          const incomingPrayer = createPrayerFromSerializedPrayer(data)!;
-          this.incomingPrayers.push(incomingPrayer);
-          this.mergeFirebaseToPrayerStore();
+          const prayerResult = deserializeFirebasePrayerRequest(data);
+          if (prayerResult.success) {
+            // Push the prayerRequest in prayerResult to incoming
+            this.incomingPrayers.push(prayerResult.data);
+          }
         }
       });
+      // TODO: moved this from if (prayerResult.success)
+      this.writeToPrayerStore();
     }
 
     this.syncing = false;
@@ -237,8 +248,12 @@ export class FirebaseSyncService implements PrayerSyncService {
             batch.delete(prayerRef);
             break;
           case PrayerOperation.CREATE: {
-            const prayer = prayerChange.prayerRequest;
-            batch.set(prayerRef, serializePrayer(prayer));
+            const prayerRequest = prayerChange.prayerRequest;
+            await prayerRequest.encrypt(this.accountKey);
+            const serialized = serializePrayerRequest(prayerRequest);
+            if (serialized.success) {
+              batch.set(prayerRef, serialized.data);
+            }
             break;
           }
           case PrayerOperation.UPDATE:
@@ -257,8 +272,11 @@ export class FirebaseSyncService implements PrayerSyncService {
             } else if (
               prayerChange.updateType === PrayerUpdateType.PRAYER_TEXT
             ) {
+              const prayerRequest = prayerChange.prayerRequest;
+              await prayerRequest.encrypt(this.accountKey);
               batch.update(prayerRef, {
-                prayer: prayerChange.prayerRequest.prayer,
+                prayer: prayerRequest.prayer,
+                protectedPrayer: prayerRequest.protectedPrayer,
               });
             }
             break;
@@ -296,19 +314,27 @@ export class FirebaseSyncService implements PrayerSyncService {
     }
   }
 
-  /**
-   * Merges incoming prayers from Firestore into the local PrayerStore.
-   */
-  private mergeFirebaseToPrayerStore() {
-    PrayerStore.mergePrayers(this.incomingPrayers);
-    this.incomingPrayers.length = 0;
-  }
+  async writeToPrayerStore() {
+    // Wait until all prayers decrypted, or decrypt was attempted
+    await Promise.all(
+      this.incomingPrayers.map((prayer) => prayer.decrypt(this.accountKey)),
+    );
 
-  /**
-   * Pull incomingPrayers from Firestore
-   */
-  pull(): PrayerRequest[] {
-    return this.incomingPrayers;
+    const decrypted: PrayerRequest[] = [];
+    const stillEncrypted: PrayerRequest[] = [];
+
+    for (const prayer of this.incomingPrayers) {
+      // If successfully decrypted, prayer field should now be filled.
+      if (prayer.prayer !== undefined) {
+        decrypted.push(prayer);
+      } else {
+        stillEncrypted.push(prayer);
+      }
+    }
+    // Add decrypted prayers to PrayerStore
+    PrayerStore.mergePrayers(decrypted);
+    // Update incoming prayers with what is remaining
+    this.incomingPrayers = stillEncrypted;
   }
 
   /**

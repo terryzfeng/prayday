@@ -1,5 +1,4 @@
-import Account from "../../utils/account/account";
-import type PrayerRequest from "../../utils/prayer-request";
+import type PrayerRequest from "lib/utils/prayer-request";
 import { FirebaseSyncService } from "./firebaseSync";
 import { LocalSyncService } from "./localSync";
 import type {
@@ -22,30 +21,30 @@ class PrayerSyncManager {
     this.syncType = null;
   }
 
-  async initialize(account: Account) {
+  async initialize(
+    userId: string,
+    isCloudAccount: boolean,
+    accountKey: CryptoKey,
+  ): Promise<void> {
     if (this.syncService !== null) {
       console.error("Prayer sync service already initialized");
       return;
     }
 
-    const prayerSyncServiceType = account.isCloudAccount
+    const prayerSyncServiceType = isCloudAccount
       ? SyncServiceType.FIREBASE
       : SyncServiceType.LOCAL;
 
     if (prayerSyncServiceType === SyncServiceType.FIREBASE) {
-      const firebaseSyncService = new FirebaseSyncService();
-      await firebaseSyncService.initialize(account.id);
-      if (this.syncService === null) {
-        this.syncService = firebaseSyncService;
-        this.syncType = SyncServiceType.FIREBASE;
-      }
+      const firebaseSyncService = new FirebaseSyncService(userId, accountKey);
+      await firebaseSyncService.initialize();
+      this.syncService = firebaseSyncService;
+      this.syncType = SyncServiceType.FIREBASE;
     } else if (prayerSyncServiceType === SyncServiceType.LOCAL) {
-      const localSyncService = new LocalSyncService();
-      await localSyncService.initialize(account.id);
-      if (this.syncService === null) {
-        this.syncService = localSyncService;
-        this.syncType = SyncServiceType.LOCAL;
-      }
+      const localSyncService = new LocalSyncService(userId, accountKey);
+      await localSyncService.initialize();
+      this.syncService = localSyncService;
+      this.syncType = SyncServiceType.LOCAL;
     }
     // Ensure service initialized
     if (this.syncService === null) {
@@ -58,7 +57,6 @@ class PrayerSyncManager {
       console.error("Prayer sync service not initialized");
       return;
     }
-    this.syncService.uninitialize();
     this.syncService = null;
     this.syncType = null;
   }
@@ -71,10 +69,6 @@ class PrayerSyncManager {
     this.syncService?.update(prayerOperation, prayerRequest, updateType);
   }
 
-  pull(): PrayerRequest[] {
-    return this.syncService?.pull() ?? [];
-  }
-
   isInitialized() {
     return this.syncService !== null;
   }
@@ -84,4 +78,4 @@ class PrayerSyncManager {
   }
 }
 
-export const prayerSync = new PrayerSyncManager();
+export const prayerSyncManager = new PrayerSyncManager();

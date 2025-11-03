@@ -1,7 +1,7 @@
 import { writable, derived, get } from "svelte/store";
 import PrayerRequest from "lib/utils/prayer-request";
 import { incrementGlobalPrayerCount } from "../utils/firebase/prayer-stats";
-import { prayerSync } from "../services/prayerSync/prayerSyncManager";
+import { prayerSyncManager } from "../services/prayerSync/prayerSyncManager";
 import {
   PrayerOperation,
   PrayerUpdateType,
@@ -20,8 +20,8 @@ function createPrayerStore() {
     addPrayer: (prayer: string) =>
       update((prayers) => {
         const newPrayer = new PrayerRequest(prayer);
-        prayerSync.update(PrayerOperation.CREATE, newPrayer);
-        localStorage.setItem(STORAGE_DATE_KEY, new Date().toISOString());
+        prayerSyncManager.update(PrayerOperation.CREATE, newPrayer);
+        // localStorage.setItem(STORAGE_DATE_KEY, new Date().toISOString());
         return [...prayers, newPrayer];
       }),
     incrementPrayCount: (uuid: string) =>
@@ -29,18 +29,14 @@ function createPrayerStore() {
         prayers.map((p) => {
           if (p.uuid === uuid) {
             incrementGlobalPrayerCount();
-            const updatedPrayer = {
-              ...p,
-              prayCount: p.prayCount + 1,
-              lastPrayed: new Date(),
-            };
-            prayerSync.update(
+            p.prayCount++;
+            p.lastPrayed = new Date();
+            prayerSyncManager.update(
               PrayerOperation.UPDATE,
-              updatedPrayer,
+              p,
               PrayerUpdateType.PRAY_COUNT,
             );
-            localStorage.setItem(STORAGE_DATE_KEY, new Date().toISOString());
-            return updatedPrayer;
+            // localStorage.setItem(STORAGE_DATE_KEY, new Date().toISOString());
           }
           return p;
         }),
@@ -49,13 +45,12 @@ function createPrayerStore() {
       update((prayers) =>
         prayers.map((p) => {
           if (p.uuid === uuid) {
-            const updatedPrayer = { ...p, answered: !p.answered };
-            prayerSync.update(
+            p.answered = !p.answered;
+            prayerSyncManager.update(
               PrayerOperation.UPDATE,
-              updatedPrayer,
+              p,
               PrayerUpdateType.ANSWERED_STATE,
             );
-            return updatedPrayer;
           }
           return p;
         }),
@@ -66,7 +61,7 @@ function createPrayerStore() {
       update((prayers) => {
         const updatedPrayers = prayers.filter((p) => {
           if (p.uuid === uuid) {
-            prayerSync.update(PrayerOperation.DELETE, p);
+            prayerSyncManager.update(PrayerOperation.DELETE, p);
             return false; // Exclude the matched prayer
           }
           return true; // Keep other prayers
