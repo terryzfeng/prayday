@@ -47,11 +47,10 @@ export interface PrayHistoryItem {
 // Firebase Key Settings
 //------------------------------------------------------------------------------
 /**
- * Write key settings to firebase. Will return true or false once successfully
- * written. Note that this will not work if device is offline.
+ * Write key settings to firebase. Will return Promise<void> with resolve if 
+ * successful, hang indefinitely if failure.
  * @param userId
  * @param keySettings
- * @returns
  */
 export async function uploadKeySettings(
   userId: string,
