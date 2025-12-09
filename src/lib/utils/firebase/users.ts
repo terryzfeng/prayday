@@ -47,7 +47,7 @@ export interface PrayHistoryItem {
 // Firebase Key Settings
 //------------------------------------------------------------------------------
 /**
- * Write key settings to firebase. Will return Promise<void> with resolve if 
+ * Write key settings to firebase. Will return Promise<void> with resolve if
  * successful, hang indefinitely if failure.
  * @param userId
  * @param keySettings

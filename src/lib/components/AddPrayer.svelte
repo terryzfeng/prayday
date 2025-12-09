@@ -96,7 +96,12 @@
     on:focusout={resetSize}
     bind:this={textArea}
   ></textarea>
-  <Button text="Add" onClick={submitPrayer} title="Add prayer [Enter]" disabled={$accountRequiresDataPassphrase}/>
+  <Button
+    text="Add"
+    onClick={submitPrayer}
+    title="Add prayer [Enter]"
+    disabled={$accountRequiresDataPassphrase}
+  />
 </div>
 
 <style>

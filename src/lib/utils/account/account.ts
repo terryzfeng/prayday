@@ -28,9 +28,15 @@ import {
   loadAccountKeyFromLocal,
 } from "../local-database/keys-db";
 import { collection, doc, getDoc, getDocs, setDoc } from "firebase/firestore";
-import { deserializeFirebaseKeySettings, type FirebaseKeySettings } from "../firebase/firebase-key-settings";
+import {
+  deserializeFirebaseKeySettings,
+  type FirebaseKeySettings,
+} from "../firebase/firebase-key-settings";
 import { db } from "../firebase/config";
-import { deserializeFirebasePrayerRequest, serializePrayerRequest } from "../firebase/firebase-prayer-request";
+import {
+  deserializeFirebasePrayerRequest,
+  serializePrayerRequest,
+} from "../firebase/firebase-prayer-request";
 
 const GUEST_ID = "guest";
 

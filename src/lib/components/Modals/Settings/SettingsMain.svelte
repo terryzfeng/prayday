@@ -37,7 +37,7 @@
       <h2 class="h2">
         <span>Manage Your Account</span>
       </h2>
-      {#if accountRequiresDataPassphrase}
+      {#if $accountRequiresDataPassphrase}
         <SettingsItem
           headline="Unlock Prayers"
           description="Prayers are currently encrypted"
