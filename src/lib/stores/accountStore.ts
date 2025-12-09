@@ -51,7 +51,7 @@ function createAccountStore() {
   const { subscribe, set, update } = writable<Account | undefined>(undefined);
 
   // Initialize the store with the current auth state
-  onAuthStateChanged(auth, async (firebaseAuthUser) => {
+  onAuthStateChanged(auth, async (firebaseAuthUser: User | null) => {
     let account = undefined;
     if (firebaseAuthUser) {
       // Site load and user is logged in

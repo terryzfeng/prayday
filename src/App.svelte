@@ -1,13 +1,13 @@
 <script lang="ts">
   import Header from "lib/components/Header/Header.svelte";
   import AddPrayer from "lib/components/AddPrayer.svelte";
-  import PrayerList from "lib/components/PrayerList.svelte";
+  import PraydayMain from "lib/components/PraydayMain.svelte";
 </script>
 
 <main class="container relative">
   <Header />
   <AddPrayer />
-  <PrayerList />
+  <PraydayMain />
 </main>
 
 <style lang="postcss">

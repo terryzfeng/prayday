@@ -4,6 +4,7 @@
   import { onMount } from "svelte";
   import { account } from "lib/stores/accountStore";
   import { playFx } from "lib/utils/audio-host";
+  import { accountRequiresDataPassphrase } from "../stores/accountRequiresDataPassphrase";
 
   let prayerInput = "";
   let textArea;
@@ -95,7 +96,7 @@
     on:focusout={resetSize}
     bind:this={textArea}
   ></textarea>
-  <Button text="Add" onClick={submitPrayer} title="Add prayer [Enter]" />
+  <Button text="Add" onClick={submitPrayer} title="Add prayer [Enter]" disabled={$accountRequiresDataPassphrase}/>
 </div>
 
 <style>
