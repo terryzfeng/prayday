@@ -29,20 +29,22 @@
   <!-- About Contant -->
   <div class="w-full space-y-6">
     <div class="space-y-3">
-      <h1 class="h1 line-section">What is Prayday?</h1>
+      <h1 class="h1 line-section">Welcome to Prayday!</h1>
       <p class="text-gray-600 leading-relaxed">
-        Prayday is a personal prayer companion app that organizes prayer
-        requests and reminds you to pray! Create a prayer card with a topic that
-        you want to pray for: a personal prayer item, a prayer request for a
-        friend, or even a prayer of thanksgiving! Prayday will highlight a topic
-        most in need of prayer. Just remember to pray everyday!
+        Prayday is a personal prayer companion app that organizes your prayer
+        requests and reminds you to pray! Create prayer cards with topics that
+        you want to pray for: personal prayer items, prayer requests for
+        friends, or even reminders of thanksgiving! Prayday will highlight a
+        topic most in need of prayer. Just remember to pray everyday!
       </p>
       <p class="text-gray-600 leading-relaxed">
         <em>
-          Rejoice always, pray continually, give thanks in all circumstances;
-          for this is God's will for you in Christ Jesus.
+          Do not be anxious about anything, but in every situation, by prayer
+          and petition, with thanksgiving, present your requests to God. And the
+          peace of God, which transcends all understanding, will guard your
+          hearts and your minds in Christ Jesus.
         </em><br />
-        <span class="text-gray-400">1 Thessalonians 5:16-18</span>
+        <span class="text-gray-400">Philippians 4:6-7</span>
       </p>
     </div>
 
@@ -82,7 +84,7 @@
             href="https://forms.gle/fmPFUiL6cckn2yoM7"
             class="text-blue-500 hover:text-blue-600"
             target="_blank">here</a
-          > to share your feedback and experience!
+          > to share your feedback, report a bug, or reach Prayday support.
         </p>
       </div>
 
@@ -93,6 +95,9 @@
       >
         View Privacy Policy
       </button>
+
+      <!-- Spacer -->
+      <p></p>
     </div>
   </div>
 </div>

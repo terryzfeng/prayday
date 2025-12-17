@@ -26,9 +26,10 @@
     <div class="space-y-4 text-gray-600 leading-relaxed">
       <p>
         Prayday always encrypts your data to keep it secure. Advanced Prayer
-        Protection is an optional feature that enables end-to-end encryption to
-        ensure that your prayers can only be decrypted on your trusted devices,
-        protecting your information even in the case of a data breach.
+        Protection is an optional feature that enables additional end-to-end
+        encryption to ensure that your prayers can only be decrypted on your
+        trusted devices, protecting your information even in the case of a data
+        breach.
       </p>
       {#if !$e2eeEnabledStore}
         <p>

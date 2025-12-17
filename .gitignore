@@ -25,6 +25,3 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-
-# vscodevim
-vscodevim.vim-1.30.0.vsix

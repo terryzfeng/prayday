@@ -20,7 +20,7 @@
   <!-- Privacy Policy Content -->
   <div class="space-y-6">
     <p class="text-gray-600 leading-relaxed">
-      Prayday is committed to protecting your privacy. We collect two types of
+      Prayday is committed to protecting your privacy. We store two types of
       data:
     </p>
     <ol class="list-decimal list-outside ml-6 space-y-6 text-gray-600">
@@ -37,17 +37,16 @@
         <strong>Personal Prayer Data</strong>
         <p class="mt-2">
           For users who create an account, we store prayer requests and related
-          information on our servers to enable access across your devices. This
-          data is private and accessible only to you. <strong
-            >Prayer is a personal journey.</strong
-          >
+          information on our servers to enable access across all your devices.
+          This data is private and accessible only to you.
+          <strong>Prayer is a personal journey.</strong>
         </p>
       </li>
     </ol>
     <p class="text-gray-600 space-y-4">
-      Additionally, Prayday is available for use without creating an account.
-      All prayer data will be cached locally to your browser. Simply create an
-      account to save your prayers at any time.
+      Additionally, Prayday can be used without creating an account. Prayer data
+      will be saved locally to your browser, but may not persist if browser
+      cache is cleared. Create an account to save your prayers at any time.
     </p>
     <p class="text-gray-600 space-y-4">
       We do not sell, share, or disclose your personal data to any third

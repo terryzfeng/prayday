@@ -61,12 +61,12 @@
     <div class="space-y-3">
       <p class="text-gray-600 text-sm">
         Create a secure data passphrase. This data passphrase will be required
-        to view your prayers.
+        to unlock and view your prayers.
       </p>
       <div
         class="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg text-sm"
       >
-        <strong>Important:</strong> If you forget this data passphrase, your prayers
+        <strong>Important:</strong> If you forget your data passphrase, your prayers
         cannot be recovered. Please store your data passphrase in a safe place.
       </div>
     </div>
