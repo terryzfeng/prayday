@@ -11,13 +11,13 @@
 
   const prayerPlaceholders = [
     "Pray for patience with family",
-    "Holy Spirit, would you be with me today",
-    "Grant me wisdom to glorify You today",
+    "Holy Spirit, would you guide me and walk with me today",
+    "Grant me wisdom that only comes from You",
     "Lord, I pray for courage and strength",
-    "Help me to love others more",
+    "Help me to love You",
     "Pray for work and upcoming tests",
-    "Help me to trust in You",
-    "Forgive me for sinning against You",
+    "In all things, in all my life, You are God",
+    "Help me to reflect, confess, and turn away from my sin",
     "Thank you Lord for today is a new day",
     "Thank you God for you are good",
     "Fill me with peace through this difficult time",

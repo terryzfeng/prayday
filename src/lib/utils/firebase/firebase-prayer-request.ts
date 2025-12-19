@@ -1,4 +1,4 @@
-import type { Bytes } from "firebase/firestore";
+import { Bytes } from "firebase/firestore";
 import { bytesToEncryptedData, encryptedDataToBytes } from "./bytes";
 import type { Result } from "../result";
 import PrayerRequest from "../prayer-request";
@@ -6,7 +6,7 @@ import PrayerRequest from "../prayer-request";
 // Firebase representation of a PrayerRequest
 export interface FirebasePrayerRequest {
   uuid: string;
-  prayer: string;
+  // prayer: string; // DEPRECATED
   prayCount: number;
   date: string;
   lastPrayed: string;
@@ -27,13 +27,12 @@ export function validateFirebasePrayerRequest(
   return (
     data &&
     typeof data.uuid === "string" &&
-    typeof data.prayer === "string" &&
     typeof data.prayCount === "number" &&
     typeof data.date === "string" &&
     typeof data.lastPrayed === "string" &&
-    typeof data.answered === "boolean"
-    // data.protectedPrayerIV instanceof Uint8Array &&
-    // data.protectedPrayerData instanceof Uint8Array
+    typeof data.answered === "boolean" &&
+    data.protectedPrayerIV instanceof Bytes &&
+    data.protectedPrayerData instanceof Bytes
   );
 }
 
@@ -51,7 +50,7 @@ export function deserializeFirebasePrayerRequest(
   return {
     success: true,
     data: new PrayerRequest(
-      data.prayer,
+      undefined,
       data.uuid,
       data.prayCount,
       new Date(data.date),
@@ -85,7 +84,6 @@ export function serializePrayerRequest(
     success: true,
     data: {
       uuid: prayerRequest.uuid,
-      prayer: prayerRequest.prayer,
       prayCount: prayerRequest.prayCount,
       date: prayerRequest.date.toISOString(),
       lastPrayed: prayerRequest.lastPrayed.toISOString(),

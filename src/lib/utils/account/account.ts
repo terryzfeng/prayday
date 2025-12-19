@@ -27,17 +27,6 @@ import {
   loadKeysFromLocal,
   loadAccountKeyFromLocal,
 } from "../local-database/keys-db";
-import { collection, doc, getDoc, getDocs, setDoc } from "firebase/firestore";
-import {
-  deserializeFirebaseKeySettings,
-  type FirebaseKeySettings,
-} from "../firebase/firebase-key-settings";
-import { db } from "../firebase/config";
-import {
-  deserializeFirebasePrayerRequest,
-  serializePrayerRequest,
-} from "../firebase/firebase-prayer-request";
-
 const GUEST_ID = "guest";
 
 export default class Account {
@@ -441,55 +430,3 @@ async function loadGuestAccount(): Promise<Account | null> {
     return null;
   }
 }
-
-// async function generateAccountKeys(uid: string) {
-//   const newKeys = await generateNewKeys();
-//   const keySettings = newKeys.keySettings;
-//   console.log(uid, keySettings);
-//   await uploadKeySettings(uid, keySettings);
-//   return true;
-// }
-// // eslint-disable-next-line @typescript-eslint/no-explicit-any
-// (window as any).generateAccountKeys = generateAccountKeys;
-
-// async function encryptAllPrayers(uid: string) {
-//   // Get the account keySettings from firebase
-//   const keySettingsRef = doc(db, "users", uid, "keys", "keySettings");
-//   const keySettingsDoc = await getDoc(keySettingsRef);
-//   const keySettings = deserializeFirebaseKeySettings(keySettingsDoc.data() as FirebaseKeySettings);
-//   // Convert into keys
-//   const keys = await importAccountKeys(keySettings);
-//   console.log(keys);
-//   // Get all prayers from firebase
-//   const prayersRef = collection(db, "users", uid, "prayers");
-//   const prayersSnapshot = await getDocs(prayersRef);
-//   const fetchedPrayerRequests = prayersSnapshot.docs.map((doc) => {
-//     const result = deserializeFirebasePrayerRequest(doc.data());
-//     if (result.success) {
-//       return result.data;
-//     } else {
-//       return null;
-//     }
-//   }).filter((prayerRequest) => prayerRequest !== null);
-//   console.log(fetchedPrayerRequests);
-//   // Encrypt them
-//   if (keys.key === undefined) return;
-//   for (const prayerRequest of fetchedPrayerRequests) {
-//     await prayerRequest.encrypt(keys.key);
-//   }
-//   const encryptedPrayerRequests = fetchedPrayerRequests;
-//   console.log(encryptedPrayerRequests);
-//   // Serialize the prayerRequest
-//   const serializedPrayerRequests = encryptedPrayerRequests.map((prayerRequest) => {
-//     return serializePrayerRequest(prayerRequest).data;
-//   });
-//   console.log(serializedPrayerRequests);
-//   // Upload to firebase
-//   for (const serializedPrayerRequest of serializedPrayerRequests) {
-//     const prayerRequestRef = doc(db, "users", uid, "prayers", serializedPrayerRequest.uuid);
-//     await setDoc(prayerRequestRef, serializedPrayerRequest);
-//   }
-// }
-
-// // eslint-disable-next-line @typescript-eslint/no-explicit-any
-// (window as any).encryptAllPrayers = encryptAllPrayers;

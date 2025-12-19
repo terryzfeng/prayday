@@ -135,4 +135,4 @@ export async function clearAllLocalKeys(): Promise<void> {
 }
 
 // TODO: Add a clear cache button in the future
-(window as any).clearAllLocalKeys = clearAllLocalKeys;
+// (window as any).clearAllLocalKeys = clearAllLocalKeys;
