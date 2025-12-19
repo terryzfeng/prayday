@@ -1,11 +1,11 @@
 <script lang="ts">
   import PrayerList from "lib/components/PrayerList.svelte";
-  import { accountRequiresDataPassphrase } from "lib/stores/accountRequiresDataPassphrase";
+  import { accountPrayersLocked } from "lib/stores/accountPrayersLocked";
   import { showDataPassphraseModalStore } from "lib/stores/e2eeEnabledStore";
 </script>
 
 <div>
-  {#if $accountRequiresDataPassphrase}
+  {#if $accountPrayersLocked}
     <div class="text-center py-2 text-gray-400 space-y-2">
       Your Prayers are currently encrypted.
       <br />

@@ -50,9 +50,17 @@ export async function establishCloudAccount(
 function createAccountStore() {
   const { subscribe, set, update } = writable<Account | undefined>(undefined);
 
+  // Custom setAccount method to also initialize stores
+  const setAccount = (account: Account | undefined) => {
+    if (account) {
+      e2eeEnabledStore.set(account.isE2EEEnabled());
+    }
+    set(account);
+  };
+
   // Initialize the store with the current auth state
   onAuthStateChanged(auth, async (firebaseAuthUser: User | null) => {
-    let account = undefined;
+    let account: Account | undefined = undefined;
     if (firebaseAuthUser) {
       // Site load and user is logged in
       const firebaseAccountSettingsPromise = await getAccountSettings(
@@ -85,14 +93,12 @@ function createAccountStore() {
       account = await Account.establishAccount(/*isCloudAccount=*/ false);
     }
 
-    set(account);
+    setAccount(account);
   });
 
   return {
     subscribe,
-    setAccount: (account: Account) => {
-      set(account);
-    },
+    setAccount: setAccount,
     updateAccount: (name: string, email: string, newKeys: Keys) => {
       update((account) => {
         if (account === undefined) return;
@@ -111,7 +117,6 @@ function createAccountStore() {
       const success = await account.changeDataPassphrase(dataPassphrase);
       if (success) {
         e2eeEnabledStore.set(account.isE2EEEnabled());
-        // set(account)
       }
       return success;
     },
@@ -123,7 +128,6 @@ function createAccountStore() {
       const success = await account.removeDataPassphrase(dataPassphrase);
       if (success) {
         e2eeEnabledStore.set(account.isE2EEEnabled());
-        // set(account)
       }
       return success;
     },
@@ -134,7 +138,7 @@ function createAccountStore() {
       }
       const success = await account.deriveAndUnwrapAccountKey(dataPassphrase);
       if (success) {
-        set(account);
+        setAccount(account);
       }
       return success;
     },

@@ -7,7 +7,7 @@
     e2eeEnabledStore,
     showDataPassphraseModalStore,
   } from "lib/stores/e2eeEnabledStore";
-  import { accountRequiresDataPassphrase } from "lib/stores/accountRequiresDataPassphrase";
+  import { accountPrayersLocked } from "lib/stores/accountPrayersLocked";
 
   export let onNavigate: (page: string) => void;
   export let onClose: () => void;
@@ -37,7 +37,7 @@
       <h2 class="h2">
         <span>Manage Your Account</span>
       </h2>
-      {#if $accountRequiresDataPassphrase}
+      {#if $accountPrayersLocked}
         <SettingsItem
           headline="Unlock Prayers"
           description="Prayers are currently encrypted"

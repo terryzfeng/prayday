@@ -1,4 +1,4 @@
-<!-- src/lib/components/auth/SignUpModal.svelte -->
+<!-- lib/components/auth/SignUpModal.svelte -->
 <script lang="ts">
   import { signUp } from "lib/utils/firebase/auth";
   import Modal from "./Modal.svelte";
