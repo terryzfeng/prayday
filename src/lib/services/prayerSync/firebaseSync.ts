@@ -1,6 +1,7 @@
 import {
   collection,
   doc,
+  DocumentReference,
   increment,
   onSnapshot,
   QuerySnapshot,
@@ -206,7 +207,7 @@ export class FirebaseSyncService implements PrayerSyncService {
    * @param prayerUUID The UUID of the prayer.
    * @returns A Firestore DocumentReference.
    */
-  private getPrayerRef(prayerUUID: string) {
+  private getPrayerRef(prayerUUID: string): DocumentReference {
     return doc(db, "users", this.userId, "prayers", prayerUUID);
   }
 

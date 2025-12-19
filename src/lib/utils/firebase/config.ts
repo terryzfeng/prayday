@@ -2,8 +2,6 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import {
   CACHE_SIZE_UNLIMITED,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  disableNetwork,
   initializeFirestore,
   persistentLocalCache,
   persistentMultipleTabManager,
@@ -27,5 +25,7 @@ export const db = initializeFirestore(app, {
     cacheSizeBytes: CACHE_SIZE_UNLIMITED,
   }),
 });
+
 // For debugging or offline simulation
+// import { disableNetwork } from "firebase/firestore";
 // disableNetwork(db);

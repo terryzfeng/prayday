@@ -16,7 +16,7 @@ import {
 let loggedIntoCloudAccount = false;
 
 /**
- * Estblish a cloud account. This is used in onAuthStateChanged for log-in,
+ * Establish a cloud account. This is used in onAuthStateChanged for log-in,
  * or manually called after sign up.
  */
 export async function establishCloudAccount(

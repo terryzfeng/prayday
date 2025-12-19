@@ -82,7 +82,7 @@ export async function getAllPrayerRequestsFromLocal(
 }
 
 /**
- * Delete a PrayerReqest from IndexedDB.
+ * Delete a PrayerRequest from IndexedDB.
  * @param PrayerRequest to delete
  * @returns Promise<void>
  */

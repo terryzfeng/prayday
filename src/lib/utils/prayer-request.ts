@@ -56,7 +56,7 @@ export default class PrayerRequest {
   }
 
   /**
-   * Decrypt a PrayerRequst protectedPrayer and write it to prayer
+   * Decrypt the PrayerRequst by decrypting the protectedPrayer field and writing to the prayer field
    * @param accountKey decryption key
    * @returns true if success, false otherwise
    */
