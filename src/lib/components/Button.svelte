@@ -2,6 +2,7 @@
   export let text = "";
   export let onClick = () => {};
   export let color = "orange";
+  export let backgroundColor = "";
   export let title = "";
   export let className = "";
   export let disabled = false;
@@ -12,7 +13,7 @@
 
   // Default style with disabled states
   const buttonClasses = `
-    bg-${color}-100 
+    bg-${backgroundColor || color}-100 
     text-${color}-400/90 
     shadow-[inset_2px_2px_4px_0px_rgba(0,0,0,0.08),inset_-2px_-2px_4px_0px_rgba(255,255,255,0.8)]
     hover:shadow-[inset_3px_3px_6px_0px_rgba(0,0,0,0.08),inset_-3px_-3px_6px_0px_rgba(255,255,255,0.8)]

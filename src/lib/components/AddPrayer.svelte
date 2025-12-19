@@ -2,21 +2,22 @@
   import Button from "lib/components/Button.svelte";
   import { PrayerStore } from "lib/stores/prayerStore";
   import { onMount } from "svelte";
-  import { user } from "lib/stores/auth";
+  import { account } from "lib/stores/accountStore";
   import { playFx } from "lib/utils/audio-host";
+  import { accountPrayersLocked } from "../stores/accountPrayersLocked";
 
   let prayerInput = "";
   let textArea;
 
   const prayerPlaceholders = [
     "Pray for patience with family",
-    "Holy Spirit, would you be with me today",
-    "Grant me wisdom to glorify You today",
+    "Holy Spirit, would you guide me and walk with me today",
+    "Grant me wisdom that only comes from You",
     "Lord, I pray for courage and strength",
-    "Help me to love others more",
+    "Help me to love You",
     "Pray for work and upcoming tests",
-    "Help me to trust in You",
-    "Forgive me for sinning against You",
+    "In all things, in all my life, You are God",
+    "Help me to reflect, confess, and turn away from my sin",
     "Thank you Lord for today is a new day",
     "Thank you God for you are good",
     "Fill me with peace through this difficult time",
@@ -48,8 +49,9 @@
    * Auto-resize the textarea for long prayer input
    * @param event oninput event
    */
-  function autoResize(event: { target: any }) {
-    const textarea = event.target;
+  // @eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function autoResize(event: Event) {
+    const textarea = event.currentTarget as HTMLTextAreaElement;
     textarea.style.height = "auto"; // Reset height to recalculate
     textarea.style.height = `${textarea.scrollHeight}px`; // Set height to match content
   }
@@ -58,8 +60,9 @@
    * Reset textarea size if empty and not focused
    * @param event
    */
-  function resetSize(event: { target: any }) {
-    const textarea = event.target;
+  // @eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function resetSize(event: Event) {
+    const textarea = event.currentTarget as HTMLTextAreaElement;
     if (prayerInput.trim().length === 0) {
       textarea.style.height = "4rem";
     }
@@ -78,8 +81,8 @@
 
 <div class="w-full p-5">
   <label class="block text-gray-700 font-semibold mb-2" for="pray-input">
-    {#if $user.user}
-      Hi {$user.userData.name}! Add a prayer request:
+    {#if $account?.isCloudAccount}
+      Hi {$account?.name}! Add a prayer request:
     {:else}
       Prayer request:
     {/if}
@@ -93,7 +96,12 @@
     on:focusout={resetSize}
     bind:this={textArea}
   ></textarea>
-  <Button text="Add" onClick={submitPrayer} title="Add prayer [Enter]" />
+  <Button
+    text="Add"
+    onClick={submitPrayer}
+    title="Add prayer [Enter]"
+    disabled={$accountPrayersLocked}
+  />
 </div>
 
 <style>

@@ -30,8 +30,8 @@ async function getAudioBufferFromUrl(
     const arrayBuffer = await response.arrayBuffer();
     const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
     return audioBuffer;
-  } catch (error: any) {
-    throw new Error(`Failed to load audio ${url}: ${error.message}`);
+  } catch (error: unknown) {
+    throw new Error(`Failed to load audio ${url}: ${(error as Error).message}`);
   }
 }
 
@@ -45,11 +45,7 @@ async function loadMultipleAudioFiles(
   const buffers: { [key: string]: AudioBuffer } = {};
   const promises = Object.entries(files).map(async ([key, filename]) => {
     const url = audioUrl + filename;
-    try {
-      buffers[key] = await getAudioBufferFromUrl(audioContext, url);
-    } catch (error) {
-      throw error;
-    }
+    buffers[key] = await getAudioBufferFromUrl(audioContext, url);
   });
 
   await Promise.all(promises);

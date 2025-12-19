@@ -8,3 +8,32 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+html {
+  background-color: white;
+}
+
+.title {
+  @apply text-2xl font-semibold text-gray-700;
+}
+
+.line-section {
+  @apply border-b border-gray-200 pb-2;
+}
+
+.h1 {
+  @apply text-2xl font-semibold text-gray-700;
+}
+
+.h2 {
+  @apply text-lg font-medium text-gray-800;
+}
+
+/* Components */
+.modal-page {
+  @apply flex w-full flex-col items-center space-y-6 py-2 pb-4 px-2;
+}
+
+.prayday-title {
+  @apply text-5xl font-black font-title select-none text-transparent bg-clip-text bg-gradient-to-b from-blue-300 to-blue-400;
+}

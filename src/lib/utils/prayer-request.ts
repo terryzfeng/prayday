@@ -1,23 +1,39 @@
 /**
  * Define a Prayer Request Object
  */
+import {
+  decryptText,
+  encryptText,
+  type EncryptedData,
+} from "./account/encryption";
 import { getDaysFromToday } from "./date-utils";
 
 export default class PrayerRequest {
-  public prayer: string;
+  public prayer?: string;
   public uuid: string;
   public prayCount: number;
   public date: Date;
   public lastPrayed: Date;
   public answered: boolean;
+  public protectedPrayer?: EncryptedData;
 
+  /**
+   * Construct a Prayer Request
+   * @param prayer prayer text
+   * @param uuid for prayer
+   * @param prayCount number of times prayer has been prayed
+   * @param date date created
+   * @param lastPrayed date last prayed
+   * @param answered boolean is prayer has been answered
+   */
   constructor(
-    prayer: string,
+    prayer?: string,
     uuid: string = crypto.randomUUID(),
     prayCount: number = 0,
     date: Date = new Date(),
     lastPrayed: Date = date,
     answered: boolean = false,
+    protectedPrayer?: EncryptedData,
   ) {
     this.prayer = prayer;
     this.uuid = uuid;
@@ -25,8 +41,38 @@ export default class PrayerRequest {
     this.date = date;
     this.lastPrayed = lastPrayed;
     this.answered = answered;
+    this.protectedPrayer = protectedPrayer;
   }
 
+  /**
+   * Encrypt a PrayerRequest prayer and write it to protectedPrayer
+   * @param accountKey encryption key
+   */
+  async encrypt(accountKey: CryptoKey) {
+    if (this.prayer === undefined) {
+      return;
+    }
+    this.protectedPrayer = await encryptText(accountKey, this.prayer);
+  }
+
+  /**
+   * Decrypt the PrayerRequst by decrypting the protectedPrayer field and writing to the prayer field
+   * @param accountKey decryption key
+   * @returns true if success, false otherwise
+   */
+  async decrypt(accountKey: CryptoKey) {
+    if (this.protectedPrayer === undefined) {
+      return;
+    }
+    const prayerText = await decryptText(accountKey, this.protectedPrayer);
+    if (prayerText) {
+      this.prayer = prayerText;
+    }
+  }
+
+  //----------------------------------------------------------------------------
+  // Static Functions
+  //----------------------------------------------------------------------------
   /**
    * Algorithm to sort PrayerRequests.
    * @param a PrayerRequest A
@@ -73,7 +119,9 @@ export default class PrayerRequest {
   }
 
   /**
-   * Return the merge of two conflicting prayer requests.
+   * Resolve PrayerRequest merge conflicts, merge remote into local
+   * @param localPrayer PrayerRequest local
+   * @param remotePrayer PrayerRequest remote
    * @returns a merged PrayerRequest
    */
   static resolveConflict(
@@ -83,16 +131,19 @@ export default class PrayerRequest {
     if (localPrayer === undefined) {
       return remotePrayer;
     }
-    return {
-      ...localPrayer,
-      prayCount: Math.max(localPrayer.prayCount, remotePrayer.prayCount),
-      lastPrayed: new Date(
+    return new PrayerRequest(
+      remotePrayer.prayer,
+      remotePrayer.uuid,
+      Math.max(localPrayer.prayCount, remotePrayer.prayCount),
+      remotePrayer.date,
+      new Date(
         Math.max(
           localPrayer.lastPrayed.getTime(),
           remotePrayer.lastPrayed.getTime(),
         ),
       ),
-      answered: remotePrayer.answered,
-    };
+      remotePrayer.answered,
+      remotePrayer.protectedPrayer,
+    );
   }
 }

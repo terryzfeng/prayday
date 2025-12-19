@@ -12,7 +12,7 @@ type Filter = (prayer: PrayerRequest) => boolean;
 /*
  * Filters for PrayerStore
  */
-let filterBank: Map<string, Filter> = new Map([
+const filterBank: Map<string, Filter> = new Map([
   ["hideAnswered", (prayer: PrayerRequest) => !prayer.answered],
 ]);
 
@@ -26,7 +26,7 @@ function loadFilterStates(): boolean[] {
     if (savedStates.length !== filterBank.size) throw new Error();
 
     return savedStates;
-  } catch (error) {
+  } catch (_: unknown) {
     console.warn(
       "Error loading localStorage filter states. Initializing defaults",
     );
@@ -40,7 +40,7 @@ function createFilterStatesStore() {
   subscribe((filterStates) => {
     try {
       localStorage.setItem(FILTER_STATES_KEY, JSON.stringify(filterStates));
-    } catch (error) {
+    } catch (_: unknown) {
       console.error("Error saving filters to localStorage");
     }
   });

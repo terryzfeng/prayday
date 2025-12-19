@@ -1,7 +1,7 @@
-<!-- src/lib/components/auth/SignUpModal.svelte -->
+<!-- lib/components/auth/SignUpModal.svelte -->
 <script lang="ts">
   import { signUp } from "lib/utils/firebase/auth";
-  import Modal from "../Modal.svelte";
+  import Modal from "./Modal.svelte";
   import Button from "../Button.svelte";
 
   export let showSignUp: (state: boolean) => void;
@@ -23,6 +23,9 @@
       if (password !== password2) {
         throw new Error("Passwords do not match. Please try again.");
       }
+      if (password.length < 8) {
+        throw new Error("Password must be at least 8 characters long.");
+      }
 
       const result = await signUp(email, password, name);
 
@@ -36,8 +39,8 @@
       } else {
         throw new Error(result.error);
       }
-    } catch (error: any) {
-      errorMessage = error.message;
+    } catch (error: unknown) {
+      errorMessage = (error as Error).message;
     } finally {
       loading = false;
     }
@@ -106,6 +109,7 @@
             placeholder="Email"
             bind:value={email}
             required
+            autocomplete="email"
             class="text-sm w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-300"
             disabled={loading}
           />
@@ -117,7 +121,7 @@
             placeholder="Password"
             bind:value={password}
             required
-            minlength="6"
+            autocomplete="new-password"
             class="text-sm w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-300"
             disabled={loading}
           />
@@ -126,10 +130,10 @@
         <div class="space-y-2">
           <input
             type="password"
-            placeholder="Re-enter password"
+            placeholder="Confirm password"
             bind:value={password2}
             required
-            minlength="6"
+            autocomplete="new-password"
             class="text-sm w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-300"
             disabled={loading}
           />

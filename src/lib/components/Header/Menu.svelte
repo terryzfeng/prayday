@@ -5,11 +5,11 @@
   import SignUpModal from "../Modals/SignUpModal.svelte";
   import LogInModal from "../Modals/LogInModal.svelte";
   import ForgotPasswordModal from "../Modals/ForgotPasswordModal.svelte";
-  import AboutModal from "../Modals/AboutModal.svelte";
-  import PrivacyModal from "../Modals/PrivacyModal.svelte";
+  import AboutModal from "../Modals/About/AboutModal.svelte";
   import ProfileModal from "../Modals/ProfileModal.svelte";
-  import { user } from "lib/stores/auth";
-  import { logOut } from "lib/utils/firebase/auth";
+  import SettingsModal from "../Modals/Settings/SettingsModal.svelte";
+  import InputDataPassphrase from "../Modals/Settings/InputDataPassphrase.svelte";
+  import { account } from "lib/stores/accountStore";
   import { filterStatesStore } from "lib/stores/filterStatesStore";
 
   let isMenuOpen = false;
@@ -18,28 +18,14 @@
   let showLogIn: (state: boolean) => void;
   let showSignUp: (state: boolean) => void;
   let showForgotPassword: (state: boolean) => void;
-  let showAbout: (state: boolean) => void;
-  let showPrivacy: (state: boolean) => void;
   let showProfile: (state: boolean) => void;
+  let showInputPassphrase: (state: boolean) => void;
+
+  let openAbout: () => void;
+  let openSettings: () => void;
 
   // Filter defaults
   let hideAnsweredText = "Hide Answered";
-
-  /**
-   * Handle log out
-   */
-  async function handleLogout() {
-    try {
-      const result = await logOut();
-      if (result.success) {
-        isMenuOpen = false;
-      } else {
-        console.error("Logout failed:", result.error);
-      }
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
-  }
 
   /**
    * Close Menu Container
@@ -64,7 +50,7 @@
 </script>
 
 <!-- Dropdown menu container -->
-<div class="menu-container relative overflow-none">
+<div class="menu-container relative">
   <button
     on:click={() => (isMenuOpen = !isMenuOpen)}
     class="p-2 rounded-lg shadow-[2px_2px_4px_0px_rgba(0,0,0,0.08),-2px_-2px_4px_0px_rgba(255,255,255,0.8)] hover:shadow-[3px_3px_6px_0px_rgba(0,0,0,0.08),-3px_-3px_6px_0px_rgba(255,255,255,0.8)] active:shadow-[inset_2px_2px_4px_0px_rgba(0,0,0,0.08),inset_-2px_-2px_4px_0px_rgba(255,255,255,0.8)] transition-all duration-200"
@@ -76,9 +62,9 @@
   {#if isMenuOpen}
     <div
       transition:fade={{ duration: 75 }}
-      class="absolute right-0 mt-2 w-48 md:w-40 rounded-lg bg-white shadow-[4px_4px_8px_0px_rgba(0,0,0,0.08),-4px_-4px_8px_0px_rgba(255,255,255,0.8)] py-0 z-50"
+      class="absolute right-0 mt-2 w-48 md:w-40 rounded-lg bg-white shadow-[4px_4px_8px_0px_rgba(0,0,0,0.08),-4px_-4px_8px_0px_rgba(255,255,255,0.8)] py-0 z-50 overflow-hidden"
     >
-      {#if $user.user}
+      {#if $account!.isCloudAccount}
         <!-- Logged in state -->
         <MenuItem
           value="View Profile"
@@ -87,7 +73,7 @@
         />
         <MenuItem
           value="What is Prayday?"
-          callback={() => showAbout(true)}
+          callback={openAbout}
           bind:isMenuOpen
         />
         <MenuItem
@@ -95,13 +81,7 @@
           callback={() => filterStatesStore.toggleFilterState("hideAnswered")}
           bind:isMenuOpen
         />
-
-        <MenuItem
-          value="Log Out"
-          callback={handleLogout}
-          type="danger"
-          bind:isMenuOpen
-        />
+        <MenuItem value="Settings" callback={openSettings} bind:isMenuOpen />
       {:else}
         <!-- Logged out state -->
         <MenuItem
@@ -116,7 +96,7 @@
         />
         <MenuItem
           value="What is Prayday?"
-          callback={() => showAbout(true)}
+          callback={openAbout}
           bind:isMenuOpen
         />
       {/if}
@@ -124,10 +104,14 @@
   {/if}
 </div>
 
-<!-- Modals -->
-<AboutModal bind:showAbout bind:showPrivacy />
-<PrivacyModal bind:showPrivacy bind:showAbout />
+<!-- Menu Modals -->
 <ProfileModal bind:showProfile />
+<AboutModal bind:openAbout />
+<SettingsModal bind:openSettings />
+
 <LogInModal bind:showLogIn bind:showSignUp bind:showForgotPassword />
 <ForgotPasswordModal bind:showForgotPassword bind:showLogIn />
 <SignUpModal bind:showSignUp bind:showLogIn />
+
+<!-- Other Modals -->
+<InputDataPassphrase bind:showInputDataPassphrase={showInputPassphrase} />

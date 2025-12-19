@@ -37,8 +37,8 @@ export async function incrementGlobalPrayerCount() {
     await updateDoc(globalStatsRef, {
       globalPrayerCount: increment(1),
     });
-  } catch (error: any) {
-    console.error("Error incrementing global prayer count:", error);
+  } catch (error: unknown) {
+    console.error("Error incrementing global prayer count:", error as Error);
   }
 }
 
@@ -51,14 +51,15 @@ export async function subtractGlobalPrayerCount(amount: number) {
     await updateDoc(globalStatsRef, {
       globalPrayerCount: increment(-amount),
     });
-  } catch (error: any) {
-    console.error("Error decrementing global prayer count:", error);
+  } catch (error: unknown) {
+    console.error("Error decrementing global prayer count:", error as Error);
   }
 }
 
 /**
  * Go through every user and manually compute the number of prayers prayed.
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function calculateGlobalPrayerCount() {
   try {
     let totalCount = 0;

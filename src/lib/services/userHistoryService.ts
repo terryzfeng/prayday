@@ -74,7 +74,7 @@ class UserHistoryService {
   static parsePrayerHistory(
     prayerHistory: PrayHistoryItem[],
   ): [string[], number[]] {
-    let prayerHistoryCounts: number[] = Array(USER_HISTORY_SIZE).fill(0);
+    const prayerHistoryCounts: number[] = Array(USER_HISTORY_SIZE).fill(0);
 
     // Get recent dates
     const recentDates = recentDayDates(USER_HISTORY_SIZE);
