@@ -31,6 +31,6 @@ export async function getAccountSettingsAsync(
   } catch (error: unknown) {
     console.warn((error as Error).message);
   } finally {
-    completeTask("Async FirebaseAccountSetings Update")
+    completeTask("Async FirebaseAccountSetings Update");
   }
 }

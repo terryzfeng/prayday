@@ -1,12 +1,12 @@
-import { writable, derived } from 'svelte/store';
+import { writable, derived } from "svelte/store";
 
 const taskCount = writable(0);
 
-export const isLoading = derived(taskCount, $count => $count > 0);
+export const isLoading = derived(taskCount, ($count) => $count > 0);
 
 /**
  * Add a task with a description
- * @param _desc 
+ * @param _desc
  */
 export function addTask(_desc: string) {
   _addTask();

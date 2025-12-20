@@ -3,8 +3,20 @@
   import AboutModal from "../Modals/About/AboutModal.svelte";
   import { isLoading } from "lib/stores/isLoading";
   import { fade } from "svelte/transition";
-  
+  import { onMount } from "svelte";
+
   let openAbout: () => void;
+
+  onMount(() => {
+    // Check if user has visited before
+    const hasVisited = localStorage.getItem("hasVisitedBefore");
+
+    if (!hasVisited) {
+      // First time visitor - show the about modal
+      setTimeout(() => openAbout(), 1000); // Small delay feels more natural
+      localStorage.setItem("hasVisitedBefore", "true");
+    }
+  });
 </script>
 
 <div
@@ -14,22 +26,22 @@
   <div
     class="absolute inset-x-0 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-gray-200 to-transparent"
   ></div>
-  
+
   <!-- Subtle neumorphic effect for the entire header -->
   <div
     class="absolute inset-0 shadow-[0_2px_4px_-2px_rgba(0,0,0,0.05),0_1px_2px_-1px_rgba(0,0,0,0.02)] bg-gradient-to-b from-white to-gray-50/50"
   ></div>
-  
+
   <!-- Loading bar animation -->
   {#if $isLoading}
-    <div 
+    <div
       class="absolute inset-x-0 bottom-0 h-0.5 bg-gray-100 overflow-hidden"
       transition:fade={{ duration: 200 }}
     >
       <div class="loading-bar"></div>
     </div>
   {/if}
-  
+
   <!-- Header container -->
   <div class="relative flex w-full justify-between items-center">
     <!-- Logo Prayday -->
