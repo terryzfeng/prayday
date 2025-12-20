@@ -12,6 +12,7 @@ import {
   e2eeEnabledStore,
   showDataPassphraseModalStore,
 } from "./e2eeEnabledStore";
+import { addTask, completeTask } from "./isLoading";
 
 let loggedIntoCloudAccount = false;
 
@@ -62,6 +63,7 @@ function createAccountStore() {
   onAuthStateChanged(auth, async (firebaseAuthUser: User | null) => {
     let account: Account | undefined = undefined;
     if (firebaseAuthUser) {
+      addTask("Firebase Account Login");
       // Site load and user is logged in
       const firebaseAccountSettingsPromise = await getAccountSettings(
         firebaseAuthUser.uid,
@@ -81,6 +83,7 @@ function createAccountStore() {
         // Fallback to guest account
         account = await Account.establishAccount(/*isCloudAccount=*/ false);
       }
+      completeTask("Firebase Account Login");
     } else {
       // Switching from logged in to log out
       if (loggedIntoCloudAccount) {

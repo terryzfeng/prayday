@@ -1,4 +1,5 @@
 import { account } from "../stores/accountStore";
+import { addTask, completeTask } from "../stores/isLoading";
 import { importAccountKeys } from "../utils/account/keys";
 import type { FirebaseAccountSettingsResult } from "../utils/firebase/users";
 
@@ -10,6 +11,7 @@ export async function getAccountSettingsAsync(
   getAccountSettingsFromServer: Promise<FirebaseAccountSettingsResult>,
 ) {
   try {
+    addTask("Async FirebaseAccountSetings Update");
     const firebaseAccountSettingsResult = await getAccountSettingsFromServer;
     if (firebaseAccountSettingsResult.success) {
       console.log("Account sync'd with server");
@@ -28,5 +30,7 @@ export async function getAccountSettingsAsync(
     }
   } catch (error: unknown) {
     console.warn((error as Error).message);
+  } finally {
+    completeTask("Async FirebaseAccountSetings Update")
   }
 }
