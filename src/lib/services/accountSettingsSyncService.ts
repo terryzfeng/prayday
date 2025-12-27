@@ -14,7 +14,7 @@ export async function getAccountSettingsAsync(
     addTask("Async FirebaseAccountSetings Update");
     const firebaseAccountSettingsResult = await getAccountSettingsFromServer;
     if (firebaseAccountSettingsResult.success) {
-      console.log("Account sync'd with server");
+      // console.log("Account sync'd with server");
       const firebaseAccountSettings =
         firebaseAccountSettingsResult.data.firebaseAccountSettings;
       const keys = await importAccountKeys(

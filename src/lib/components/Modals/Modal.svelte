@@ -53,7 +53,6 @@
    */
   function handleClick(event: Event) {
     if (event.target === modalDialog) {
-      console.log("close outside");
       // Call the onClose callback instead of directly calling showModal
       if (onClose) {
         onClose();
@@ -94,7 +93,7 @@
 
   // Cleanup if component is destroyed while modal is open
   onDestroy(() => {
-    console.log("on destroy");
+    // console.log("on destroy");
     showModal(false);
   });
 </script>

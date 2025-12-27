@@ -102,14 +102,14 @@ export class FirebaseSyncService implements PrayerSyncService {
   private processSnapshot(snapshot: QuerySnapshot) {
     this.syncing = true;
 
-    console.log(
-      `Update from ${snapshot.metadata.fromCache ? "cache" : "server"}.`,
-      `Pending writes: ${snapshot.metadata.hasPendingWrites}`,
-    );
+    // console.log(
+    //   `Update from ${snapshot.metadata.fromCache ? "cache" : "server"}.`,
+    //   `Pending writes: ${snapshot.metadata.hasPendingWrites}`,
+    // );
 
     // On initial sync (snapshot), we pull all Firebase prayers
     if (this.initialSync) {
-      console.log("Initial load", snapshot.docChanges());
+      // console.log("Initial load", snapshot.docChanges());
 
       const firebasePrayers = snapshot.docs.flatMap((doc) => {
         const data = doc.data();

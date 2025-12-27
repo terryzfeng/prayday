@@ -51,7 +51,6 @@
       $e2eeEnabledStore
     ) {
       if (!isVisible) {
-        console.log("show input passphrase");
         showInputDataPassphrase(true);
         isVisible = true;
       }

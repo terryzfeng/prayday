@@ -296,7 +296,7 @@ export default class Account {
   static uninitializeServices() {
     if (prayerSyncManager.isInitialized()) {
       prayerSyncManager.uninitialize();
-      PrayerStore.clearStorage();
+      PrayerStore.clearPrayers();
     }
   }
 
@@ -336,7 +336,7 @@ export default class Account {
       // Don't have an account key, e2ee is on, try to pull key from local
       const loadedLocalKey = await loadAccountKeyFromLocal(account.getFullId());
       if (loadedLocalKey) {
-        console.log("Loaded key from local");
+        // console.log("Loaded key from local");
         account.keys.key = loadedLocalKey;
         Account.initializePrayers(account);
         initialized = true;

@@ -21,7 +21,6 @@ function createPrayerStore() {
       update((prayers) => {
         const newPrayer = new PrayerRequest(prayer);
         prayerSyncManager.update(PrayerOperation.CREATE, newPrayer);
-        // localStorage.setItem(STORAGE_DATE_KEY, new Date().toISOString());
         return [...prayers, newPrayer];
       }),
     incrementPrayCount: (uuid: string) =>
@@ -36,7 +35,6 @@ function createPrayerStore() {
               p,
               PrayerUpdateType.PRAY_COUNT,
             );
-            // localStorage.setItem(STORAGE_DATE_KEY, new Date().toISOString());
           }
           return p;
         }),
@@ -95,9 +93,7 @@ function createPrayerStore() {
     getPrayers: () => {
       return get(PrayerStore);
     },
-    // Optional: Method to clear localStorage, DANGEROUS
-    clearStorage: () => {
-      // localStorage.removeItem(STORAGE_KEY);
+    clearPrayers: () => {
       set([]);
     },
   };
