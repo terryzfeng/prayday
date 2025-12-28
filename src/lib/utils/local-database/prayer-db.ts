@@ -106,6 +106,34 @@ export async function deletePrayerRequestFromLocal(
   });
 }
 
+export async function clearAllPrayerRequestsForLocal(
+  accountId: string,
+): Promise<void> {
+  const db = await praydayDB;
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([STORE_NAME], "readwrite");
+    const store = transaction.objectStore(STORE_NAME);
+
+    const index = store.index("accountId");
+    const request = index.openCursor(IDBKeyRange.only(accountId));
+
+    request.onerror = () => {
+      reject(new Error(`Failed to clear PrayerRequests: ${request.error}`));
+    };
+    request.onsuccess = () => {
+      const cursor = request.result;
+      if (cursor) {
+        const request = store.delete(cursor.primaryKey);
+        request.onsuccess = () => {
+          cursor.continue();
+        };
+      } else {
+        resolve();
+      }
+    }
+  });
+}
+
 /**
  * Clear all PrayerRequests from IndexedDB.
  * @returns Promise<void>

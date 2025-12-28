@@ -27,7 +27,7 @@ import {
   loadKeysFromLocal,
   loadAccountKeyFromLocal,
 } from "../local-database/keys-db";
-const GUEST_ID = "guest";
+export const GUEST_ID = "guest";
 
 export default class Account {
   // Firebase UID or Guest Local ID

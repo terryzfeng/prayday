@@ -1,8 +1,10 @@
 <!-- lib/components/auth/SignUpModal.svelte -->
 <script lang="ts">
-  import { signUp } from "lib/utils/firebase/auth";
   import Modal from "./Modal.svelte";
   import Button from "../Button.svelte";
+  import { signUp } from "lib/utils/firebase/auth";
+  import { migrateGuestPrayersToCloudAccount } from "lib/services/prayerSync/migration";
+  import { PrayerStore } from "lib/stores/prayerStore";
 
   export let showSignUp: (state: boolean) => void;
   export let showLogIn: (state: boolean) => void;
@@ -27,9 +29,11 @@
         throw new Error("Password must be at least 8 characters long.");
       }
 
+      const guestPrayers = PrayerStore.getPrayers();
       const result = await signUp(email, password, name);
 
       if (result.success) {
+        migrateGuestPrayersToCloudAccount(guestPrayers);
         // Reset form
         name = "";
         email = "";
