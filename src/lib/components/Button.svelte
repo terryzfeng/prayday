@@ -6,13 +6,14 @@
   export let title = "";
   export let className = "";
   export let disabled = false;
+  export let variant: "default" | "clear" = "default";
 
   // Base classes that are always applied
   const baseClasses =
     "group relative flex h-fit w-fit flex-col items-center justify-center rounded-lg transition-all duration-200";
 
   // Default style with disabled states
-  const buttonClasses = `
+  const defaultClasses = `
     bg-${backgroundColor || color}-100 
     text-${color}-400/90 
     shadow-[inset_2px_2px_4px_0px_rgba(0,0,0,0.08),inset_-2px_-2px_4px_0px_rgba(255,255,255,0.8)]
@@ -23,6 +24,15 @@
     disabled:hover:shadow-[inset_2px_2px_4px_0px_rgba(0,0,0,0.08),inset_-2px_-2px_4px_0px_rgba(255,255,255,0.8)]
     disabled:active:translate-y-0
   `;
+
+  // Clear style (no background)
+  const clearClasses = `
+    text-${color}-500
+    hover:text-${color}-600
+    disabled:opacity-50
+  `;
+
+  const buttonClasses = variant === "clear" ? clearClasses : defaultClasses;
 </script>
 
 <button

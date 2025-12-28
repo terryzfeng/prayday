@@ -2,6 +2,7 @@
   import Header from "lib/components/Header/Header.svelte";
   import AddPrayer from "lib/components/AddPrayer.svelte";
   import PraydayMain from "lib/components/PraydayMain.svelte";
+  import ConfirmDialog from "lib/components/ConfirmDialog.svelte";
 </script>
 
 <main class="container relative">
@@ -9,6 +10,8 @@
   <AddPrayer />
   <PraydayMain />
 </main>
+
+<ConfirmDialog />
 
 <style lang="postcss">
   .container {

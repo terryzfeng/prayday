@@ -2,7 +2,8 @@ import { GUEST_ID } from "lib/utils/account/account";
 import { account } from "lib/stores/accountStore";
 import { PrayerStore } from "lib/stores/prayerStore";
 import { clearAllPrayerRequestsForLocal } from "lib/utils/local-database/prayer-db";
-import type PrayerRequest from "src/lib/utils/prayer-request";
+import type PrayerRequest from "lib/utils/prayer-request";
+import { ConfirmManager } from "lib/stores/confirmManager";
 
 /**
  * Migrate prayers from guest account to newly created cloud account.
@@ -10,13 +11,16 @@ import type PrayerRequest from "src/lib/utils/prayer-request";
  * If migrate, prayers will be copied to new cloud account and deleted from local.
  */
 export async function migrateGuestPrayersToCloudAccount(
-  guestPrayers: PrayerRequest[]
+  guestPrayers: PrayerRequest[],
 ): Promise<void> {
   // Check guest prayers and confirm migration
   if (guestPrayers.length === 0) {
-    return
+    return;
   }
-  const shouldMigrate = confirm(`It looks like you have ${guestPrayers.length} prayers saved locally. Would you like to migrate them to your new account?`);
+  const shouldMigrate = await ConfirmManager.confirm(
+    `It looks like you previously had ${guestPrayers.length} prayer request${guestPrayers.length === 1 ? "" : "s"} saved locally. Would you like to import these prayer requests over to your new account?`,
+    { title: "Import Local Prayers", confirmText: "Import" },
+  );
   if (!shouldMigrate) {
     return;
   }
@@ -24,7 +28,7 @@ export async function migrateGuestPrayersToCloudAccount(
   // Wait until new cloud account is signed in, then merge in and delete
   const unsubscribe = account.subscribe((newAccount) => {
     if (newAccount?.id && newAccount.id !== GUEST_ID) {
-      PrayerStore.mergePrayers(guestPrayers);
+      PrayerStore.mergePrayersSync(guestPrayers);
       clearAllPrayerRequestsForLocal(GUEST_ID);
       unsubscribe();
     }

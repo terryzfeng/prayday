@@ -130,7 +130,7 @@ export async function clearAllPrayerRequestsForLocal(
       } else {
         resolve();
       }
-    }
+    };
   });
 }
 

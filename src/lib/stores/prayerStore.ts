@@ -69,7 +69,7 @@ function createPrayerStore() {
       localStorage.setItem(STORAGE_DATE_KEY, new Date().toISOString());
     },
     mergePrayers: (incomingPrayers: PrayerRequest[]) =>
-      // Will merge in incomingPrayers, they are SOT
+      // Will merge in incomingPrayers into memory, they are SOT
       update((existingPrayers) => {
         // Get current prayers in prayerStore
         const currentPrayerMap = new Map(
@@ -87,6 +87,13 @@ function createPrayerStore() {
         );
         return Array.from(currentPrayerMap.values());
       }),
+    mergePrayersSync(incomingPrayers: PrayerRequest[]) {
+      // Merge in prayers into client and write incoming prayers to cloud
+      PrayerStore.mergePrayers(incomingPrayers);
+      for (const prayer of incomingPrayers) {
+        prayerSyncManager.update(PrayerOperation.CREATE, prayer);
+      }
+    },
     setPrayers: (prayers: PrayerRequest[]) => {
       set(prayers);
     },

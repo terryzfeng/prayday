@@ -8,6 +8,10 @@
 
   // Show click outside modal to close help prompt
   export let showClosePrompt = true;
+
+  // Prevent escape key from closing
+  export let preventEscapeClose = false;
+
   // Callback for when modal should close (outside click, escape key, etc.)
   export let onClose: (() => void) | undefined = undefined;
 
@@ -69,6 +73,12 @@
    */
   function handleKeydown(event: KeyboardEvent) {
     if (event.key === "Escape") {
+      // Prevent escape from closing if preventEscapeClose is true
+      if (preventEscapeClose) {
+        event.preventDefault();
+        return;
+      }
+
       // Call the onClose callback for escape key as well
       if (onClose) {
         onClose();

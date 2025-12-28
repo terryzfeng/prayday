@@ -5,8 +5,9 @@
   import xSVG from "lib/assets/x.svg";
   import { PrayerStore } from "lib/stores/prayerStore";
   import { playFx } from "lib/utils/audio-host";
-  import { userHistoryService } from "../services/userHistoryService.js";
-  import { getRelativeDate } from "../utils/date-utils";
+  import { userHistoryService } from "lib/services/userHistoryService.js";
+  import { getRelativeDate } from "lib/utils/date-utils";
+  import { ConfirmManager } from "lib/stores/confirmManager.js";
   // import { subtractGlobalPrayerCount } from "../utils/firebase/prayer-stats";
 
   export let prayer: PrayerRequest;
@@ -32,10 +33,11 @@
    * Delete the prayer on button click
    * @param MouseEvent
    */
-  function deletePrayer(event: Event) {
+  async function deletePrayer(event: Event) {
     // TODO: remove when publish
-    const confirmDelete = confirm(
+    const confirmDelete = await ConfirmManager.confirm(
       "Are you sure you want to delete this prayer request?",
+      { title: "Delete Prayer Request", warning: true, confirmText: "Delete" },
     );
     if (confirmDelete) {
       event.stopPropagation();
