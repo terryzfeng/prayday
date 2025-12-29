@@ -27,7 +27,7 @@
 
     <div>
       <div
-        class="flex items-center justify-between pb-3 border-b border-gray-200 mb-4"
+        class="flex flex-col md:flex-row md:items-center md:justify-between pb-3 border-b border-gray-200 mb-4"
       >
         <h2 class="text-lg font-semibold text-gray-900">
           Open Beta: v1.0.1-beta
@@ -98,7 +98,7 @@
 
     <div>
       <div
-        class="flex items-center justify-between pb-3 border-b border-gray-200 mb-4"
+        class="flex flex-col md:flex-row md:items-center md:justify-between pb-3 border-b border-gray-200 mb-4"
       >
         <h2 class="text-lg font-semibold text-gray-900 mb-1">
           Closed Alpha: v1.0.0-alpha
