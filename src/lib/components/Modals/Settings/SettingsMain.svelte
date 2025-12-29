@@ -12,6 +12,9 @@
   export let onNavigate: (page: string) => void;
   export let onClose: () => void;
 
+  // @ts-ignore
+  const version = import.meta.env.VERSION;
+
   /**
    * Handle log out
    */
@@ -30,31 +33,42 @@
 </script>
 
 <div class="modal-page">
-  <div class="w-full space-y-6">
+  <div class="w-full space-y-4">
     <h1 class="h1 line-section">Settings</h1>
-    <!-- Account Section -->
+    <!-- Settings Items -->
     <div class="space-y-3">
-      <h2 class="h2">
-        <span>Manage Your Account</span>
-      </h2>
-      {#if $accountPrayersLocked}
+      <!-- Account Section -->
+      <div class="space-y-2">
+        <h2 class="h2">Your Account</h2>
+        {#if $accountPrayersLocked}
+          <SettingsItem
+            headline="Unlock Prayers"
+            description="Prayers are currently encrypted"
+            onClick={() => {
+              showDataPassphraseModalStore.set(true);
+              onClose();
+            }}
+          />
+        {/if}
         <SettingsItem
-          headline="Unlock Prayers"
-          description="Prayers are currently encrypted"
-          onClick={() => {
-            showDataPassphraseModalStore.set(true);
-            onClose();
-          }}
+          headline="Advanced Prayer Protection"
+          description={$e2eeEnabledStore === true
+            ? "Manage settings"
+            : "Encrypt your prayers to keep them secure"}
+          onClick={() => onNavigate("advanced-prayer-protection")}
         />
-      {/if}
-      <SettingsItem
-        headline="Advanced Prayer Protection"
-        description={$e2eeEnabledStore === true
-          ? "Manage settings"
-          : "Encrypt your prayers to keep them secure"}
-        onClick={() => onNavigate("advanced-prayer-protection")}
-      />
+      </div>
+      <!-- More Info-->
+      <div class="space-y-2">
+        <h2 class="h2">More Info</h2>
+        <SettingsItem
+          headline={"Prayday Version"}
+          description="What's new in Prayday?"
+          onClick={() => onNavigate("version-page")}
+        />
+      </div>
     </div>
+
     <!-- Log Out Section -->
     <div class="flex space-x-3 pt-4 border-t border-gray-200">
       <Button

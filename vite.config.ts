@@ -13,9 +13,9 @@ export default defineConfig({
     },
   },
   define: {
-    meta: {
-      version: JSON.parse(readFileSync("package.json", "utf8")).version,
-    },
+    'import.meta.env.VERSION': JSON.stringify(
+      JSON.parse(readFileSync("package.json", "utf8")).version
+    ),
   },
   test: {
     expect: { requireAssertions: true },

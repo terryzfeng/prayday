@@ -75,8 +75,7 @@
       <div class="space-y-3">
         <h1 class="h1 line-section">Special Thanks</h1>
         <p class="text-gray-600 leading-relaxed">
-          Prayday is created with love for all seeking to grow closer to God in
-          prayer.
+          Prayday is created with love by Terry Feng.
         </p>
         <p class="text-gray-600 leading-relaxed">
           Click
