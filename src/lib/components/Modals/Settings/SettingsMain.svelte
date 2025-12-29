@@ -12,9 +12,6 @@
   export let onNavigate: (page: string) => void;
   export let onClose: () => void;
 
-  // @ts-ignore
-  const version = import.meta.env.VERSION;
-
   /**
    * Handle log out
    */
@@ -62,7 +59,7 @@
       <div class="space-y-2">
         <h2 class="h2">More Info</h2>
         <SettingsItem
-          headline={"Prayday Version"}
+          headline="Prayday Version"
           description="What's new in Prayday?"
           onClick={() => onNavigate("version-page")}
         />

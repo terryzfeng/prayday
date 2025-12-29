@@ -5,7 +5,7 @@
   import AdvancedPrayerProtection from "./AdvancedPrayerProtection.svelte";
   import CreateDataPassphrase from "./CreateDataPassphrase.svelte";
   import RemoveDataPassphrase from "./RemoveDataPassphrase.svelte";
-  import VersionPage from "./VersionPage.svelte"
+  import VersionPage from "./VersionPage.svelte";
 
   let modalRef: NavigableModal;
   let currentPage = "main";
@@ -16,7 +16,7 @@
     "advanced-prayer-protection": AdvancedPrayerProtection,
     "create-data-passphrase": CreateDataPassphrase,
     "remove-data-passphrase": RemoveDataPassphrase,
-    "version-page": VersionPage
+    "version-page": VersionPage,
   };
 
   // Conditionally set showClosePrompt based on current page

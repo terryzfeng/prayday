@@ -22,7 +22,7 @@
     "Thank you God for you are good",
     "Guard my heart and my mind",
     "Help me to live for Your mission",
-    "The peace of God that transcends all understanding..."
+    "The peace of God that transcends all understanding...",
   ];
   let prayerPrompt = rollPrayerPrompt();
 
