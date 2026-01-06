@@ -30,12 +30,32 @@
         class="flex flex-col md:flex-row md:items-center md:justify-between pb-3 border-b border-gray-200 mb-4"
       >
         <h2 class="text-lg font-semibold text-gray-900">
+          Official Release: v1.0.2
+        </h2>
+        <p class="text-sm text-gray-500">January 2026</p>
+      </div>
+      <ul class="space-y-4 text-gray-600">
+        <li class="flex gap-3">
+          <span class="text-blue-500">🎉</span>
+          <div>
+            <strong>Pray Everyday with Prayday</strong>
+            <p class="mt-1">
+              Watch the official trailer <a href="https://www.youtube.com/watch?v=N9q6LDpjcyw">here</a>.
+            </p>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div>
+      <div
+        class="flex flex-col md:flex-row md:items-center md:justify-between pb-3 border-b border-gray-200 mb-4"
+      >
+        <h2 class="text-lg font-semibold text-gray-900">
           Open Beta: v1.0.1-beta
         </h2>
         <p class="text-sm text-gray-500">December 2025</p>
       </div>
-      <!-- <h2 class="text-lg font-semibold text-gray-900 mb-1">What's New: v1.0.1-beta</h2>
-      <p class="text-sm text-gray-500 mb-3">December 2025</p> -->
       <ul class="space-y-4 text-gray-600">
         <li class="flex gap-3">
           <span class="text-blue-500">🔒</span>
@@ -44,19 +64,7 @@
             <p class="mt-1">
               Your prayers are now protected with industry-standard encryption.
               Enable Advanced Prayer Protection to ensure only you can read your
-              prayer requests, even on our servers. Protected by a data
-              passphrase that only you know.
-            </p>
-          </div>
-        </li>
-        <li class="flex gap-3">
-          <span class="text-blue-500">✓</span>
-          <div>
-            <strong>Enhanced Security & Privacy</strong>
-            <p class="mt-1">
-              All account data is now encrypted by default. Prayer requests are
-              stored securely using modern encryption standards, keeping your
-              personal prayers...well personal.
+              prayer requests, keeping your personal prayers...well personal.
             </p>
           </div>
         </li>
@@ -65,8 +73,7 @@
           <div>
             <strong>Improved Data Storage</strong>
             <p class="mt-1">
-              Migrated to IndexedDB for better local storage reliability and
-              performance. Your prayers load faster and persist more reliably
+              Your prayers load faster and persist more reliably
               across browser sessions.
             </p>
           </div>
@@ -74,22 +81,10 @@
         <li class="flex gap-3">
           <span class="text-blue-500">✓</span>
           <div>
-            <strong>Better Account Management</strong>
+            <strong>Offline Support</strong>
             <p class="mt-1">
-              Enhanced login and signup flows with improved error handling.
-              Seamless encryption key management for secure access across all
-              your devices.
-            </p>
-          </div>
-        </li>
-        <li class="flex gap-3">
-          <span class="text-blue-500">✓</span>
-          <div>
-            <strong>Offline Support Improvements</strong>
-            <p class="mt-1">
-              Enhanced offline caching ensures you can access and add prayers
-              even without an internet connection, with automatic sync when
-              you're back online.
+              Enhanced offline caching ensures you can access your prayers
+              even without an internet connection.
             </p>
           </div>
         </li>
@@ -101,13 +96,13 @@
         class="flex flex-col md:flex-row md:items-center md:justify-between pb-3 border-b border-gray-200 mb-4"
       >
         <h2 class="text-lg font-semibold text-gray-900 mb-1">
-          Closed Alpha: v1.0.0-alpha
+          Initial Release: v1.0.0-alpha
         </h2>
         <p class="text-sm text-gray-500">July 2025</p>
       </div>
       <ul class="space-y-4 text-gray-600">
         <li class="flex gap-3">
-          <span class="text-blue-500">✓</span>
+          <span class="text-blue-500">🙏</span>
           <div>
             <strong>Introducing Prayday</strong>
             <p class="mt-1">
@@ -131,7 +126,7 @@
           <div>
             <strong>Global Prayer Counter</strong>
             <p class="mt-1">
-              See the collective impact of our prayer community with real-time
+              See the collective impact of prayer with real-time
               updates of prayers offered worldwide.
             </p>
           </div>
