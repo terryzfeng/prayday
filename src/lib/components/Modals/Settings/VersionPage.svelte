@@ -40,7 +40,21 @@
           <div>
             <strong>Pray Everyday with Prayday</strong>
             <p class="mt-1">
-              Watch the official trailer <a href="https://www.youtube.com/watch?v=N9q6LDpjcyw">here</a>.
+              Watch the official trailer <a
+                href="https://www.youtube.com/watch?v=N9q6LDpjcyw"
+                class="text-blue-500 hover:text-blue-600"
+                target="_blank">here</a
+              >.
+            </p>
+          </div>
+        </li>
+        <li class="flex gap-3">
+          <span class="text-blue-500">✓</span>
+          <div>
+            <strong>Bug Fixes</strong>
+            <p class="mt-1">
+              Various bug fixes and UI improvements. Thanks for sharing your
+              feedback!
             </p>
           </div>
         </li>
@@ -73,8 +87,8 @@
           <div>
             <strong>Improved Data Storage</strong>
             <p class="mt-1">
-              Your prayers load faster and persist more reliably
-              across browser sessions.
+              Your prayers load faster and persist more reliably across browser
+              sessions.
             </p>
           </div>
         </li>
@@ -83,8 +97,8 @@
           <div>
             <strong>Offline Support</strong>
             <p class="mt-1">
-              Enhanced offline caching ensures you can access your prayers
-              even without an internet connection.
+              Enhanced offline caching ensures you can access your prayers even
+              without an internet connection.
             </p>
           </div>
         </li>
@@ -126,8 +140,8 @@
           <div>
             <strong>Global Prayer Counter</strong>
             <p class="mt-1">
-              See the collective impact of prayer with real-time
-              updates of prayers offered worldwide.
+              See the collective impact of prayer with real-time updates of
+              prayers offered worldwide.
             </p>
           </div>
         </li>

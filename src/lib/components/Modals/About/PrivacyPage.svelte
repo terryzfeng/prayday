@@ -38,15 +38,15 @@
         <p class="mt-2">
           For users who create an account, we store prayer requests and related
           information on our servers to enable access across all your devices.
-          This data is private and accessible only to you.
+          This data is private, encrypted, and accessible only to you.
           <strong>Prayer is a personal journey.</strong>
         </p>
       </li>
     </ol>
     <p class="text-gray-600 space-y-4">
       Additionally, Prayday can be used without creating an account. Prayer data
-      will be saved locally to your browser, but may not persist if browser
-      cache is cleared. Create an account to save your prayers at any time.
+      will be saved locally to your device, but may not persist if browser cache
+      is cleared. Create an account to save your prayers at any time.
     </p>
     <p class="text-gray-600 space-y-4">
       We do not sell, share, or disclose your personal data to any third

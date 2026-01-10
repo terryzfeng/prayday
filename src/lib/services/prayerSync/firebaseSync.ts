@@ -124,9 +124,8 @@ export class FirebaseSyncService implements PrayerSyncService {
       this.initialSync = false;
     } else {
       // On subsequent snapshots, we get individually updated prayers
-      console.log("Subsequent load", snapshot.docChanges());
-
-      console.log("snapshot change size", snapshot.docChanges().length);
+      // console.log("Subsequent load", snapshot.docChanges());
+      // console.log("snapshot change size", snapshot.docChanges().length);
 
       snapshot.docChanges().forEach((change) => {
         const data = change.doc.data();

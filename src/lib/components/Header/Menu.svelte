@@ -64,7 +64,7 @@
       transition:fade={{ duration: 75 }}
       class="absolute right-0 mt-2 w-48 md:w-40 rounded-lg bg-white shadow-[4px_4px_8px_0px_rgba(0,0,0,0.08),-4px_-4px_8px_0px_rgba(255,255,255,0.8)] py-0 z-50 overflow-hidden"
     >
-      {#if $account!.isCloudAccount}
+      {#if $account?.isCloudAccount}
         <!-- Logged in state -->
         <MenuItem
           value="View Profile"
@@ -99,6 +99,7 @@
           callback={openAbout}
           bind:isMenuOpen
         />
+        <MenuItem value="Settings" callback={openSettings} bind:isMenuOpen />
       {/if}
     </div>
   {/if}
