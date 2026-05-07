@@ -31,9 +31,9 @@
     <div class="space-y-3">
       <h1 class="h1 line-section">Welcome to Prayday!</h1>
       <p class="text-gray-600 leading-relaxed">
-        Prayday is a personal prayer companion app that helps organize your prayer
-        requests and reminds you to pray! Create prayer cards with topics that
-        you want to pray for: personal prayer items, prayer requests for
+        Prayday is a personal prayer companion app that helps organize your
+        prayer requests and reminds you to pray! Create prayer cards with topics
+        that you want to pray for: personal prayer items, prayer requests for
         friends, or even reminders of thanksgiving! Prayday will highlight a
         topic most in need of prayer. Just remember to pray everyday!
       </p>
@@ -50,22 +50,30 @@
 
     <div class="space-y-3">
       <h1 class="h1 line-section">Create an Account</h1>
-      
+
       <ul class="space-y-2 text-gray-600 leading-relaxed">
         <li class="flex items-start">
           <span class="mr-2">•</span>
-          <span><strong>Sync & Backup:</strong> Access your prayers across all your devices.</span>
+          <span
+            ><strong>Sync & Backup:</strong> Access your prayers across all your devices.</span
+          >
         </li>
         <li class="flex items-start">
           <span class="mr-2">•</span>
-          <span><strong>Privacy:</strong> End-to-end encryption ensures your prayers stay private.</span>
+          <span
+            ><strong>Privacy:</strong> End-to-end encryption ensures your prayers
+            stay private.</span
+          >
         </li>
         <li class="flex items-start">
           <span class="mr-2">•</span>
-          <span><strong>Prayer Stats:</strong> Track your progress to build consistent habits.</span>
+          <span
+            ><strong>Prayer Stats:</strong> Track your progress to build consistent
+            habits.</span
+          >
         </li>
       </ul>
-    
+
       <p class="text-gray-600 leading-relaxed pt-2">
         Sign up with Prayday and start praying!
       </p>
