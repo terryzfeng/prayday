@@ -67,13 +67,7 @@
       </ul>
     
       <p class="text-gray-600 leading-relaxed pt-2">
-      <button
-        class="text-blue-500 hover:text-blue-600"
-        on:click={() => onNavigate("sign-up")}
-      >
-        Sign up
-      </button>
-        with Prayday and keep your prayers safe! 
+        Sign up with Prayday and start praying!
       </p>
     </div>
 
