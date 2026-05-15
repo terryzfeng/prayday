@@ -124,6 +124,30 @@
   on:keydown={handleKeydown}
   use:portal
 >
+  {#if showClosePrompt}
+    <button
+      class="absolute z-10 top-2 right-2 p-2 text-gray-400 rounded-lg hover:bg-gray-100 transition-colors"
+      on:click={() => {
+        if (onClose) {
+          onClose();
+        } else {
+          showModal(false);
+        }
+      }}
+      aria-label="Close modal"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 -960 960 960"
+        fill="currentColor"
+        class="w-6 h-6"
+      >
+        <path
+          d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"
+        />
+      </svg>
+    </button>
+  {/if}
   <slot />
   {#if showClosePrompt}
     <p class="text-center text-gray-400 pb-4">Click outside to close</p>
