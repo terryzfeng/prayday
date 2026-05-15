@@ -4,8 +4,10 @@
    * Since this is a SPA, these will update the DOM dynamically.
    */
   export let title = "Prayday";
-  export let description = "A prayer app to help you organize and track prayer. Pray every day with Prayday.";
-  export let image = "https://prayday.app/favicon_io/android-chrome-512x512.png";
+  export let description =
+    "A prayer app to help you organize and track prayer. Pray every day with Prayday.";
+  export let image =
+    "https://prayday.app/favicon_io/android-chrome-512x512.png";
   export let url = "https://prayday.app/";
 </script>
 
