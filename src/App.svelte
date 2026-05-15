@@ -3,7 +3,10 @@
   import AddPrayer from "lib/components/AddPrayer.svelte";
   import PraydayMain from "lib/components/PraydayMain.svelte";
   import ConfirmDialog from "lib/components/ConfirmDialog.svelte";
+  import SEO from "lib/components/SEO.svelte";
 </script>
+
+<SEO />
 
 <main class="container relative">
   <Header />
