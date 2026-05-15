@@ -122,23 +122,6 @@
           Forgot Password
         </button>
       </div>
-
-      <div class="my-1 border-b border-gray-200"></div>
-
-      <div class="pt-2 flex flex-col justify-between items-center">
-        <div class="text-center text-sm text-gray-500">
-          <div class="pb-2">
-            Continue without an account and save prayers locally
-          </div>
-          <button
-            type="button"
-            class="text-blue-500 hover:text-blue-600 ml-1"
-            on:click={() => showLogIn(false)}
-          >
-            Create account later
-          </button>
-        </div>
-      </div>
     </div>
   </div>
 </Modal>

@@ -6,7 +6,7 @@
 </script>
 
 <div class="modal-page">
-  <!-- Version Info Header -->
+  <!-- Updates Header -->
   <div class="w-full flex items-center space-x-3 line-section">
     <button
       on:click={onBack}
@@ -15,7 +15,7 @@
     >
       <img src={backChevron} alt="Go back" class="w-5 h-5" />
     </button>
-    <h1 class="h1">Version Info</h1>
+    <h1 class="h1">What's New</h1>
   </div>
 
   <!-- Version Info Content -->
@@ -29,8 +29,54 @@
       <div
         class="flex flex-col md:flex-row md:items-center md:justify-between pb-3 border-b border-gray-200 mb-4"
       >
-        <h2 class="text-lg font-semibold text-gray-900">
-          Official Release: v1.0.2
+        <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+          May Update
+          <span
+            class="text-xs font-medium px-2 py-0.5 bg-gray-100 text-gray-500 rounded-full"
+            >v1.0.3</span
+          >
+        </h2>
+        <p class="text-sm text-gray-500">May 2026</p>
+      </div>
+      <ul class="space-y-4 text-gray-600">
+        <li class="flex gap-3">
+          <span class="text-blue-500">📖</span>
+          <div>
+            <strong
+              >"I Created a Prayer App. Here's What I Learned About Prayer."</strong
+            >
+            <p class="mt-1">
+              An article on Christian prayer and who God is, written by Terry
+              Feng. Featured on <a
+                href="https://evanklam.substack.com/p/i-created-a-prayer-app-heres-what"
+                class="text-blue-500 hover:text-blue-600"
+                target="_blank">CONNECTIONS</a
+              >.
+            </p>
+          </div>
+        </li>
+        <li class="flex gap-3">
+          <span class="text-blue-500">✓</span>
+          <div>
+            <strong>UI Updates</strong>
+            <p class="mt-1">
+              Improved user experience with new onboarding and UI.
+            </p>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div>
+      <div
+        class="flex flex-col md:flex-row md:items-center md:justify-between pb-3 border-b border-gray-200 mb-4"
+      >
+        <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+          Official Launch! 🚀
+          <span
+            class="text-xs font-medium px-2 py-0.5 bg-gray-100 text-gray-500 rounded-full"
+            >v1.0.2</span
+          >
         </h2>
         <p class="text-sm text-gray-500">January 2026</p>
       </div>
@@ -40,10 +86,11 @@
           <div>
             <strong>Pray Everyday with Prayday</strong>
             <p class="mt-1">
-              Watch the official trailer <a
+              Watch the official
+              <a
                 href="https://www.youtube.com/watch?v=N9q6LDpjcyw"
                 class="text-blue-500 hover:text-blue-600"
-                target="_blank">here</a
+                target="_blank">Prayday trailer</a
               >.
             </p>
           </div>
@@ -65,8 +112,12 @@
       <div
         class="flex flex-col md:flex-row md:items-center md:justify-between pb-3 border-b border-gray-200 mb-4"
       >
-        <h2 class="text-lg font-semibold text-gray-900">
-          Open Beta: v1.0.1-beta
+        <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+          Open Beta
+          <span
+            class="text-xs font-medium px-2 py-0.5 bg-gray-100 text-gray-500 rounded-full"
+            >v1.0.1-beta</span
+          >
         </h2>
         <p class="text-sm text-gray-500">December 2025</p>
       </div>
@@ -109,8 +160,14 @@
       <div
         class="flex flex-col md:flex-row md:items-center md:justify-between pb-3 border-b border-gray-200 mb-4"
       >
-        <h2 class="text-lg font-semibold text-gray-900 mb-1">
-          Initial Release: v1.0.0-alpha
+        <h2
+          class="text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2"
+        >
+          Alpha Release
+          <span
+            class="text-xs font-medium px-2 py-0.5 bg-gray-100 text-gray-500 rounded-full"
+            >v1.0.0-alpha</span
+          >
         </h2>
         <p class="text-sm text-gray-500">July 2025</p>
       </div>

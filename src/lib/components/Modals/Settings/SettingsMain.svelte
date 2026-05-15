@@ -63,7 +63,7 @@
         <h2 class="h2">More Info</h2>
         <SettingsItem
           headline="What's New?"
-          description="Prayday version, feature updates"
+          description="Latest Prayday version, news, and features"
           onClick={() => onNavigate("version-page")}
         />
       </div>
