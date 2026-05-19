@@ -43,12 +43,12 @@
   {#if currentRequest}
     <div class="pt-1 px-1">
       <!-- Title -->
-      <h2 id="modal-title" class="text-xl font-semibold text-gray-700 mb-2">
+      <h2 id="modal-title" class="text-xl font-semibold text-card-foreground mb-2">
         {currentRequest.title || "Confirm"}
       </h2>
 
       <!-- Message -->
-      <p id="modal-description" class="text-gray-600 mb-6">
+      <p id="modal-description" class="text-secondary-foreground mb-6">
         {currentRequest.message}
       </p>
 

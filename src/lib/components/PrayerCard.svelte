@@ -96,7 +96,7 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
   bind:this={cardElement}
-  class="relative bg-white rounded-lg shadow-sm p-3 pt-4 transition-all duration-200
+  class="relative bg-card rounded-lg shadow-sm p-3 pt-4 transition-all duration-200
   ease-in-out hover:shadow-lg hover:-translate-y-0.5 cursor-default
   {prayer.answered ? '!bg-green-50 border-2 border-green-300' : ''} 
   {highlight && !prayer.answered
@@ -125,13 +125,13 @@
   {/if}
   <div class="pt-1.5">
     <p
-      class="font-medium text-gray-900 leading-snug {highlight
+      class="font-medium text-foreground leading-snug {highlight
         ? 'font-semibold'
         : ''}"
     >
       {prayer.prayer}
     </p>
-    <div class="flex items-center gap-3 mt-3 text-xs text-gray-500">
+    <div class="flex items-center gap-3 mt-3 text-xs text-muted-foreground">
       <span class="flex items-center" title="Last prayed">
         <svg
           class="w-3 h-3 mr-1"

@@ -53,7 +53,7 @@
 <div class="menu-container relative">
   <button
     on:click={() => (isMenuOpen = !isMenuOpen)}
-    class="p-2 rounded-lg shadow-[2px_2px_4px_0px_rgba(0,0,0,0.08),-2px_-2px_4px_0px_rgba(255,255,255,0.8)] hover:shadow-[3px_3px_6px_0px_rgba(0,0,0,0.08),-3px_-3px_6px_0px_rgba(255,255,255,0.8)] active:shadow-[inset_2px_2px_4px_0px_rgba(0,0,0,0.08),inset_-2px_-2px_4px_0px_rgba(255,255,255,0.8)] transition-all duration-200"
+    class="p-2 rounded-lg shadow-neu-raised hover:shadow-neu-raised-hover active:shadow-neu-pressed transition-all duration-200"
     aria-label="Menu"
   >
     <img src={menuSVG} alt="Menu" class="w-5 h-5" />
@@ -62,7 +62,7 @@
   {#if isMenuOpen}
     <div
       transition:fade={{ duration: 75 }}
-      class="absolute right-0 mt-2 w-48 md:w-40 rounded-lg bg-white shadow-[4px_4px_8px_0px_rgba(0,0,0,0.08),-4px_-4px_8px_0px_rgba(255,255,255,0.8)] py-0 z-50 overflow-hidden"
+      class="absolute right-0 mt-2 w-48 md:w-40 rounded-lg bg-background shadow-neu-overlay py-0 z-50 overflow-hidden"
     >
       {#if $account?.isCloudAccount}
         <!-- Logged in state -->

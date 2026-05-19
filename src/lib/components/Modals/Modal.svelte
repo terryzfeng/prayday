@@ -109,11 +109,11 @@
 </script>
 
 <dialog
-  class="fixed inset-0 px-6 pt-6 m-auto !scroll-top bg-white w-full max-w-[90%] md:max-w-xl max-h-[80%] md:max-h-[75vh]
+  class="fixed inset-0 px-6 pt-6 m-auto !scroll-top bg-background w-full max-w-[90%] md:max-w-xl max-h-[80%] md:max-h-[75vh]
     rounded-xl overflow-x-hidden overflow-y-auto
-    shadow-[8px_8px_16px_0px_rgba(0,0,0,0.08),-8px_-8px_16px_0px_rgba(255,255,255,0.8)]
-    border border-gray-100
-    backdrop:bg-white/50 backdrop:backdrop-blur-sm
+    shadow-neu-modal
+    border border-border
+    backdrop:bg-background/50 backdrop:backdrop-blur-sm
     focus:outline-none"
   class:closing={isClosing}
   aria-modal="true"
@@ -126,7 +126,7 @@
 >
   {#if showClosePrompt}
     <button
-      class="absolute z-10 top-2 right-2 p-2 text-gray-400 rounded-lg hover:bg-gray-100 transition-colors"
+      class="absolute z-10 top-2 right-2 p-2 text-muted-foreground rounded-lg hover:bg-secondary transition-colors"
       on:click={() => {
         if (onClose) {
           onClose();
@@ -150,7 +150,7 @@
   {/if}
   <slot />
   {#if showClosePrompt}
-    <p class="text-center text-gray-400 pb-4">Click outside to close</p>
+    <p class="text-center text-muted-foreground pb-4">Click outside to close</p>
   {:else}
     <div class="h-6"></div>
   {/if}

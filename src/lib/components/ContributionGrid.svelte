@@ -16,7 +16,7 @@
    * @param count
    */
   function getColor(count: number): string {
-    if (count === 0) return "bg-gray-100";
+    if (count === 0) return "bg-secondary";
     if (count <= 2) return "bg-blue-200";
     if (count <= 4) return "bg-blue-300";
     if (count <= 6) return "bg-blue-400";
@@ -61,27 +61,27 @@
   }
 </script>
 
-<div class="w-full bg-white rounded-lg pt-4 pb-2">
+<div class="w-full bg-card rounded-lg pt-4 pb-2">
   <div class="flex flex-col sm:flex-row sm:justify-between align-middle pb-2">
     <div class="items-center pb-1 sm:pb-2">
-      <span class="text-gray-600 font-medium"
+      <span class="text-secondary-foreground font-medium"
         >{recentDayTotal} prayers in the last month</span
       >
     </div>
     <!-- Legend -->
     <div class="flex items-center space-x-1 self-start py-1">
-      <span class="text-xs text-gray-500">Less</span>
+      <span class="text-xs text-muted-foreground">Less</span>
       {#each [0, 2, 4, 6, 8] as level (level)}
         <div class="w-3 h-3 rounded-sm {getColor(level)}"></div>
       {/each}
-      <span class="text-xs text-gray-500">More</span>
+      <span class="text-xs text-muted-foreground">More</span>
     </div>
   </div>
 
   <!-- Weekday headers -->
   <div class="grid grid-cols-7 gap-1 mb-1">
     {#each weekdays as day (day)}
-      <div class="text-xs text-gray-400 text-center">{day}</div>
+      <div class="text-xs text-muted-foreground text-center">{day}</div>
     {/each}
   </div>
 

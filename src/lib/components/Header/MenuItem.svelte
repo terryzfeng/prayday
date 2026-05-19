@@ -7,9 +7,9 @@
 
   // Map types to styles
   const styles = {
-    normal: "text-gray-700 hover:bg-blue-50",
+    normal: "text-card-foreground hover:bg-accent",
     danger: "text-red-500 hover:bg-red-50",
-    label: "text-gray-500 font-semibold text-md cursor-default",
+    label: "text-muted-foreground font-semibold text-md cursor-default",
   };
 </script>
 

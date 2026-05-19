@@ -22,19 +22,19 @@
 
     <!-- Stats Grid -->
     <div class="grid grid-cols-2 md:grid-cols-3 gap-4 w-full">
-      <div class="bg-gray-50 p-4 rounded-lg text-center">
-        <p class="text-3xl font-bold text-gray-400">{$unansweredCount}</p>
-        <p class="text-sm text-gray-600">Open Prayer Requests</p>
+      <div class="bg-muted p-4 rounded-lg text-center">
+        <p class="text-3xl font-bold text-muted-foreground">{$unansweredCount}</p>
+        <p class="text-sm text-secondary-foreground">Open Prayer Requests</p>
       </div>
-      <div class="bg-gray-50 p-4 rounded-lg text-center">
+      <div class="bg-muted p-4 rounded-lg text-center">
         <p class="text-3xl font-bold text-blue-400">{$prayerCount}</p>
-        <p class="text-sm text-gray-600">Total Times Prayed</p>
+        <p class="text-sm text-secondary-foreground">Total Times Prayed</p>
       </div>
       <div
-        class="bg-gray-50 p-4 rounded-lg text-center md:col-span-1 col-span-2"
+        class="bg-muted p-4 rounded-lg text-center md:col-span-1 col-span-2"
       >
         <p class="text-3xl font-bold text-green-400">{$answeredCount}</p>
-        <p class="text-sm text-gray-600">Prayers Answered</p>
+        <p class="text-sm text-secondary-foreground">Prayers Answered</p>
       </div>
     </div>
 

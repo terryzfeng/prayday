@@ -8,7 +8,7 @@
    * @param count prayer count
    */
   function getColor(count: number): string {
-    if (count === 0) return "bg-gray-100";
+    if (count === 0) return "bg-secondary";
     if (count <= 2) return "bg-blue-200";
     if (count <= 4) return "bg-blue-300";
     if (count <= 6) return "bg-blue-400";
@@ -39,9 +39,9 @@
 >
   <div
     class="w-8 h-8 sm:w-10 sm:h-10 rounded-sm
-        {dayCount >= 0 ? getColor(dayCount) : 'bg-gray-50'} 
+        {dayCount >= 0 ? getColor(dayCount) : 'bg-muted'} 
         {dayCount == -1 ? 'opacity-50' : ''} 
-        {dayCount >= 0 ? 'hover:ring-2 hover:ring-gray-300' : ''} 
+        {dayCount >= 0 ? 'hover:ring-2 hover:ring-border-strong' : ''} 
         transition-all duration-150"
   ></div>
 
@@ -49,7 +49,7 @@
   {#if dayCount >= 0 && showPopover}
     <div
       class="absolute text-xs bottom-full mb-1 left-1/2 transform
-      -translate-x-1/2 w-auto p-1.5 bg-gray-400 text-white rounded-md
+      -translate-x-1/2 w-auto p-1.5 bg-foreground text-background rounded-md
       opacity-100 transition-opacity duration-200"
     >
       <p class="whitespace-nowrap">{dayCount} prayers on {dateName}</p>

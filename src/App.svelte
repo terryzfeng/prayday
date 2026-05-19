@@ -18,6 +18,6 @@
 
 <style lang="postcss">
   .container {
-    @apply mx-auto flex flex-col min-h-screen w-full md:w-[768px] md:border border-dashed border-blue-100;
+    @apply mx-auto flex flex-col min-h-screen w-full md:w-[768px] md:border border-dashed border-border-strong;
   }
 </style>

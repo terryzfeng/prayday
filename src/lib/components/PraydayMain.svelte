@@ -6,7 +6,7 @@
 
 <div>
   {#if $accountPrayersLocked}
-    <div class="text-center py-2 text-gray-400 space-y-2">
+    <div class="text-center py-2 text-muted-foreground space-y-2">
       Your Prayers are currently encrypted.
       <br />
       <button

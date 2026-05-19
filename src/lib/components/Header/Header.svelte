@@ -20,22 +20,22 @@
 </script>
 
 <div
-  class="h-12 w-full px-4 flex justify-between items-center select-none bg-white z-20 sticky top-0 drop-shadow-sm"
+  class="h-12 w-full px-4 flex justify-between items-center select-none bg-background z-20 sticky top-0 drop-shadow-sm"
 >
   <!-- Neumorphic bottom shadow container -->
   <div
-    class="absolute inset-x-0 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-gray-200 to-transparent"
+    class="absolute inset-x-0 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-border to-transparent"
   ></div>
 
   <!-- Subtle neumorphic effect for the entire header -->
   <div
-    class="absolute inset-0 shadow-[0_2px_4px_-2px_rgba(0,0,0,0.05),0_1px_2px_-1px_rgba(0,0,0,0.02)] bg-gradient-to-b from-white to-gray-50/50"
+    class="absolute inset-0 shadow-[0_2px_4px_-2px_rgba(0,0,0,0.05),0_1px_2px_-1px_rgba(0,0,0,0.02)] bg-gradient-to-b from-background to-muted/50"
   ></div>
 
   <!-- Loading bar animation -->
   {#if $isLoading}
     <div
-      class="absolute inset-x-0 bottom-0 h-0.5 bg-gray-100 overflow-hidden"
+      class="absolute inset-x-0 bottom-0 h-0.5 bg-secondary overflow-hidden"
       transition:fade={{ duration: 200 }}
     >
       <div class="loading-bar"></div>

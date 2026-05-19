@@ -82,7 +82,7 @@
 </script>
 
 <div class="w-full p-5">
-  <label class="block text-gray-700 font-semibold mb-2" for="pray-input">
+  <label class="block text-card-foreground font-semibold mb-2" for="pray-input">
     {#if $account?.isCloudAccount}
       Hi {$account?.name}! Add a prayer request:
     {:else}
@@ -90,7 +90,7 @@
     {/if}
   </label>
   <textarea
-    class="text-sm font-mono custom-input w-full h-16 min-h-16 px-4 py-2 mb-2 border-2 border-gray-300 rounded-lg shadow-sm transition-all duration-300 ease-in-out transform focus:-translate-y-1 focus:border-orange-300 focus:outline-orange-300 hover:shadow-lg hover:border-orange-300 focus:outline-0 bg-gray-50"
+    class="text-sm font-mono custom-input w-full h-16 min-h-16 px-4 py-2 mb-2 border-2 border-border-strong rounded-lg shadow-sm transition-all duration-300 ease-in-out transform focus:-translate-y-1 focus:border-orange-300 focus:outline-orange-300 hover:shadow-lg hover:border-orange-300 focus:outline-0 bg-muted text-foreground placeholder:text-muted-foreground"
     placeholder={prayerPrompt}
     id="pray-input"
     bind:value={prayerInput}

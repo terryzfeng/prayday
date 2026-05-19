@@ -14,7 +14,7 @@
     <div class="flex items-center space-x-3 line-section">
       <button
         on:click={onBack}
-        class="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+        class="p-2 rounded-lg hover:bg-secondary transition-colors"
         aria-label="Go back"
       >
         <img src={backChevron} alt="Go back" class="w-5 h-5" />
@@ -23,7 +23,7 @@
     </div>
 
     <!-- APP Content -->
-    <div class="space-y-4 text-gray-600 leading-relaxed">
+    <div class="space-y-4 text-secondary-foreground leading-relaxed">
       <p>
         Prayday always encrypts your data to keep it secure. Advanced Prayer
         Protection is an optional feature that enables additional end-to-end

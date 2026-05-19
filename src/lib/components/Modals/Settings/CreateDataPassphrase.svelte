@@ -48,7 +48,7 @@
     <div class="flex items-center space-x-3 line-section">
       <button
         on:click={onBack}
-        class="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+        class="p-2 rounded-lg hover:bg-secondary transition-colors"
         aria-label="Go back"
         disabled={loading}
       >
@@ -59,7 +59,7 @@
 
     <!-- Description -->
     <div class="space-y-3">
-      <p class="text-gray-600 text-sm">
+      <p class="text-secondary-foreground text-sm">
         Create a secure data passphrase. This data passphrase will be required
         to unlock and view your prayers.
       </p>
@@ -98,7 +98,7 @@
         <div class="space-y-2">
           <label
             for="passphrase"
-            class="block text-sm font-medium text-gray-700"
+            class="block text-sm font-medium text-card-foreground"
           >
             Enter Data Passphrase
           </label>
@@ -117,7 +117,7 @@
         <div class="space-y-2">
           <label
             for="confirm-passphrase"
-            class="block text-sm font-medium text-gray-700"
+            class="block text-sm font-medium text-card-foreground"
           >
             Confirm Data Passphrase
           </label>

@@ -41,7 +41,7 @@
     </div>
 
     <!-- Log Out Section -->
-    <div class="flex space-x-3 pt-4 border-t border-gray-200">
+    <div class="flex space-x-3 pt-4 border-t border-border">
       <Button
         color="red"
         text="Log Out"

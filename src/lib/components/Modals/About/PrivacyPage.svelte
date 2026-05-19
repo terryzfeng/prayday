@@ -9,7 +9,7 @@
   <div class="w-full flex items-center space-x-3 line-section">
     <button
       on:click={onBack}
-      class="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+      class="p-2 rounded-lg hover:bg-secondary transition-colors"
       aria-label="Go back"
     >
       <img src={backChevron} alt="Go back" class="w-5 h-5" />
@@ -19,11 +19,11 @@
 
   <!-- Privacy Policy Content -->
   <div class="space-y-6">
-    <p class="text-gray-600 leading-relaxed">
+    <p class="text-secondary-foreground leading-relaxed">
       Prayday is committed to protecting your privacy. We store two types of
       data:
     </p>
-    <ol class="list-decimal list-outside ml-6 space-y-6 text-gray-600">
+    <ol class="list-decimal list-outside ml-6 space-y-6 text-secondary-foreground">
       <li>
         <strong>Global Prayer Count</strong>
         <p class="mt-2">
@@ -43,12 +43,12 @@
         </p>
       </li>
     </ol>
-    <p class="text-gray-600 space-y-4">
+    <p class="text-secondary-foreground space-y-4">
       Additionally, Prayday can be used without creating an account. Prayer data
       will be saved locally to your device, but may not persist if browser cache
       is cleared. Create an account to save your prayers at any time.
     </p>
-    <p class="text-gray-600 space-y-4">
+    <p class="text-secondary-foreground space-y-4">
       We do not sell, share, or disclose your personal data to any third
       parties. Our servers use industry-standard encryption and security
       measures to protect your information. We continuously review and update

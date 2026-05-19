@@ -104,7 +104,7 @@
       </form>
 
       <div class="pt-4 flex flex-col justify-between items-center text-sm">
-        <div class="text-center text-gray-500 pb-2">
+        <div class="text-center text-secondary-foreground pb-2">
           Don't have an account?
           <button
             type="button"

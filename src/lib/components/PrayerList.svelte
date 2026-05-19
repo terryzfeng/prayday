@@ -18,7 +18,7 @@
 
 <div class="prayer-grid">
   {#if sortedPrayers.length === 0}
-    <div class="text-center py-8 text-gray-400">
+    <div class="text-center py-8 text-muted-foreground">
       Add a Prayer Request to get started
     </div>
   {:else}

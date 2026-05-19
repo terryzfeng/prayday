@@ -70,7 +70,7 @@
     <div class="w-full max-w-sm space-y-4">
       <div class="space-y-2 flex flex-col justify-center text-center">
         <h2 class="text-xl font-semibold text-center">Sign Up</h2>
-        <div class="pb-2 text-sm text-gray-500">
+        <div class="pb-2 text-sm text-secondary-foreground">
           Save and sync prayers across devices!
         </div>
       </div>
@@ -152,7 +152,7 @@
       </form>
 
       <div class="pt-4 flex flex-col justify-between items-center">
-        <div class="text-center text-sm text-gray-500 pb-2">
+        <div class="text-center text-sm text-secondary-foreground pb-2">
           Already have an account?
           <button
             type="button"
@@ -165,10 +165,10 @@
         </div>
       </div>
 
-      <!-- <div class="my-1 border-b border-gray-200"></div>
+      <!-- <div class="my-1 border-b border-border"></div>
 
       <div class="pt-2 flex flex-col justify-between items-center">
-        <div class="text-center text-sm text-gray-500">
+        <div class="text-center text-sm text-secondary-foreground">
           <div class="pb-2">
             Continue without an account and save prayers locally
           </div>

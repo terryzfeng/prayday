@@ -10,7 +10,7 @@
   <div class="w-full flex items-center space-x-3 line-section">
     <button
       on:click={onBack}
-      class="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+      class="p-2 rounded-lg hover:bg-secondary transition-colors"
       aria-label="Go back"
     >
       <img src={backChevron} alt="Go back" class="w-5 h-5" />
@@ -20,25 +20,25 @@
 
   <!-- Version Info Content -->
   <div class="space-y-6">
-    <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
-      <p class="text-sm text-gray-500 mb-1">Current Version</p>
-      <p class="text-2xl font-semibold text-gray-900">v{version}</p>
+    <div class="bg-muted rounded-lg p-4 border border-border">
+      <p class="text-sm text-secondary-foreground mb-1">Current Version</p>
+      <p class="text-2xl font-semibold text-foreground">v{version}</p>
     </div>
 
     <div>
       <div
-        class="flex flex-col md:flex-row md:items-center md:justify-between pb-3 border-b border-gray-200 mb-4"
+        class="flex flex-col md:flex-row md:items-center md:justify-between pb-3 border-b border-border mb-4"
       >
-        <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-          May Update
+        <h2 class="text-lg font-semibold text-foreground flex items-center gap-2">
+          May Updates
           <span
-            class="text-xs font-medium px-2 py-0.5 bg-gray-100 text-gray-500 rounded-full"
+            class="text-xs font-medium px-2 py-0.5 bg-secondary text-secondary-foreground rounded-full"
             >v1.0.3</span
           >
         </h2>
-        <p class="text-sm text-gray-500">May 2026</p>
+        <p class="text-sm text-secondary-foreground">May 2026</p>
       </div>
-      <ul class="space-y-4 text-gray-600">
+      <ul class="space-y-4 text-secondary-foreground">
         <li class="flex gap-3">
           <span class="text-blue-500">📖</span>
           <div>
@@ -69,18 +69,18 @@
 
     <div>
       <div
-        class="flex flex-col md:flex-row md:items-center md:justify-between pb-3 border-b border-gray-200 mb-4"
+        class="flex flex-col md:flex-row md:items-center md:justify-between pb-3 border-b border-border mb-4"
       >
-        <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+        <h2 class="text-lg font-semibold text-foreground flex items-center gap-2">
           Official Launch! 🚀
           <span
-            class="text-xs font-medium px-2 py-0.5 bg-gray-100 text-gray-500 rounded-full"
+            class="text-xs font-medium px-2 py-0.5 bg-secondary text-secondary-foreground rounded-full"
             >v1.0.2</span
           >
         </h2>
-        <p class="text-sm text-gray-500">January 2026</p>
+        <p class="text-sm text-secondary-foreground">January 2026</p>
       </div>
-      <ul class="space-y-4 text-gray-600">
+      <ul class="space-y-4 text-secondary-foreground">
         <li class="flex gap-3">
           <span class="text-blue-500">🎉</span>
           <div>
@@ -110,18 +110,18 @@
 
     <div>
       <div
-        class="flex flex-col md:flex-row md:items-center md:justify-between pb-3 border-b border-gray-200 mb-4"
+        class="flex flex-col md:flex-row md:items-center md:justify-between pb-3 border-b border-border mb-4"
       >
-        <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+        <h2 class="text-lg font-semibold text-foreground flex items-center gap-2">
           Open Beta
           <span
-            class="text-xs font-medium px-2 py-0.5 bg-gray-100 text-gray-500 rounded-full"
+            class="text-xs font-medium px-2 py-0.5 bg-secondary text-secondary-foreground rounded-full"
             >v1.0.1-beta</span
           >
         </h2>
-        <p class="text-sm text-gray-500">December 2025</p>
+        <p class="text-sm text-secondary-foreground">December 2025</p>
       </div>
-      <ul class="space-y-4 text-gray-600">
+      <ul class="space-y-4 text-secondary-foreground">
         <li class="flex gap-3">
           <span class="text-blue-500">🔒</span>
           <div>
@@ -158,20 +158,20 @@
 
     <div>
       <div
-        class="flex flex-col md:flex-row md:items-center md:justify-between pb-3 border-b border-gray-200 mb-4"
+        class="flex flex-col md:flex-row md:items-center md:justify-between pb-3 border-b border-border mb-4"
       >
         <h2
-          class="text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2"
+          class="text-lg font-semibold text-foreground mb-1 flex items-center gap-2"
         >
           Alpha Release
           <span
-            class="text-xs font-medium px-2 py-0.5 bg-gray-100 text-gray-500 rounded-full"
+            class="text-xs font-medium px-2 py-0.5 bg-secondary text-secondary-foreground rounded-full"
             >v1.0.0-alpha</span
           >
         </h2>
-        <p class="text-sm text-gray-500">July 2025</p>
+        <p class="text-sm text-secondary-foreground">July 2025</p>
       </div>
-      <ul class="space-y-4 text-gray-600">
+      <ul class="space-y-4 text-secondary-foreground">
         <li class="flex gap-3">
           <span class="text-blue-500">🙏</span>
           <div>
@@ -214,6 +214,6 @@
       </ul>
     </div>
 
-    <div class="pt-4 border-t border-gray-200"></div>
+    <div class="pt-4 border-t border-border"></div>
   </div>
 </div>

@@ -16,12 +16,12 @@
   const defaultClasses = `
     bg-${backgroundColor || color}-100 
     text-${color}-400/90 
-    shadow-[inset_2px_2px_4px_0px_rgba(0,0,0,0.08),inset_-2px_-2px_4px_0px_rgba(255,255,255,0.8)]
-    hover:shadow-[inset_3px_3px_6px_0px_rgba(0,0,0,0.08),inset_-3px_-3px_6px_0px_rgba(255,255,255,0.8)]
-    active:shadow-[inset_4px_4px_8px_0px_rgba(0,0,0,0.12),inset_-2px_-2px_3px_0px_rgba(255,255,255,0.6)]
+    shadow-neu-pressed
+    hover:shadow-neu-pressed-hover
+    active:shadow-neu-pressed-active
     active:translate-y-0.5
     disabled:opacity-50
-    disabled:hover:shadow-[inset_2px_2px_4px_0px_rgba(0,0,0,0.08),inset_-2px_-2px_4px_0px_rgba(255,255,255,0.8)]
+    disabled:hover:shadow-neu-pressed
     disabled:active:translate-y-0
   `;
 

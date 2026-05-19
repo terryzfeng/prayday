@@ -42,7 +42,7 @@
     <div class="flex items-center space-x-3 line-section">
       <button
         on:click={onBack}
-        class="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+        class="p-2 rounded-lg hover:bg-secondary transition-colors"
         aria-label="Go back"
         disabled={loading}
       >
@@ -53,7 +53,7 @@
 
     <!-- Description -->
     <div class="space-y-3">
-      <p class="text-gray-600 text-sm">
+      <p class="text-secondary-foreground text-sm">
         Are you sure you want to disable Advanced Prayer Protection? Your
         prayers will no longer be end-to-end encrypted.
       </p>
@@ -92,7 +92,7 @@
         <div class="space-y-2">
           <label
             for="passphrase"
-            class="block text-sm font-medium text-gray-700"
+            class="block text-sm font-medium text-card-foreground"
           >
             Enter Current Data Passphrase
           </label>

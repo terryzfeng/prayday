@@ -46,7 +46,7 @@
     <div class="w-full max-w-sm space-y-4">
       <div class="space-y-2 flex flex-col justify-center text-center">
         <h2 class="text-xl font-semibold text-center">Forgot Password</h2>
-        <div class="pb-2 text-sm text-gray-500">
+        <div class="pb-2 text-sm text-secondary-foreground">
           Reset your Prayday password
         </div>
       </div>
@@ -85,7 +85,7 @@
       </form>
 
       <div class="pt-4 flex flex-col justify-between items-center text-sm">
-        <div class="text-center// text-gray-500 pb-2">
+        <div class="text-center// text-secondary-foreground pb-2">
           Return to <button
             type="button"
             class="text-blue-500 hover:text-blue-600 ml-0.5"

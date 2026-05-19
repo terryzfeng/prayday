@@ -73,7 +73,7 @@
     <div class="w-full max-w-sm space-y-4">
       <div class="space-y-2 flex flex-col justify-center text-center">
         <h2 class="text-xl font-semibold text-center">Enter Data Passphrase</h2>
-        <div class="pb-2 text-sm text-gray-500">
+        <div class="pb-2 text-sm text-secondary-foreground">
           Enter your data passphrase to access your protected prayers.
         </div>
       </div>
