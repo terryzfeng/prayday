@@ -58,6 +58,17 @@
           />
         </div>
       {/if}
+      <!-- Appearance Section (cloud accounts only) -->
+      {#if $account?.isCloudAccount}
+        <div class="space-y-2">
+          <h2 class="h2">Appearance</h2>
+          <SettingsItem
+            headline="Theme"
+            description="Light, Dark, or System Default"
+            onClick={() => onNavigate("theme-settings")}
+          />
+        </div>
+      {/if}
       <!-- More Info-->
       <div class="space-y-2">
         <h2 class="h2">More Info</h2>

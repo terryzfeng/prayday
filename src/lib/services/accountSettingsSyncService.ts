@@ -24,6 +24,7 @@ export async function getAccountSettingsAsync(
         firebaseAccountSettings.name,
         firebaseAccountSettings.email,
         keys,
+        firebaseAccountSettings.settings,
       );
     } else {
       throw new Error(firebaseAccountSettingsResult.error);

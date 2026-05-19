@@ -1,4 +1,5 @@
 import type { User as FirebaseAuthUser } from "firebase/auth";
+import { type UserSettings, DEFAULT_USER_SETTINGS, parseUserSettings } from "../settings";
 import { prayerSyncManager } from "lib/services/prayerSync/prayerSyncManager";
 import { PrayerStore } from "lib/stores/prayerStore";
 import { getAccountSettingsAsync } from "lib/services/accountSettingsSyncService";
@@ -40,6 +41,8 @@ export default class Account {
   initialized: boolean;
   // Account Keys for encryption/decryption
   private keys: Keys;
+  // Account Settings
+  public settings: UserSettings;
 
   // Firebase Auth fields
   private firebaseAuthUser: FirebaseAuthUser | undefined;
@@ -58,6 +61,7 @@ export default class Account {
     this.name = name;
     this.initialized = false;
     this.keys = keys;
+    this.settings = DEFAULT_USER_SETTINGS;
 
     // Optional
     this.firebaseAuthUser = firebaseAuthUser;
@@ -73,6 +77,10 @@ export default class Account {
 
   setEmail(email: string) {
     this.email = email;
+  }
+
+  setSettings(settings: UserSettings) {
+    this.settings = settings;
   }
 
   //----------------------------------------------------------------------------
@@ -249,7 +257,7 @@ export default class Account {
     firebaseAccountSettings: FirebaseAccountSettings,
     keys: Keys,
   ): Account {
-    return new Account(
+    const account = new Account(
       firebaseAuthUser.uid,
       /*isCloudAccount=*/ true,
       firebaseAccountSettings.name,
@@ -257,6 +265,13 @@ export default class Account {
       firebaseAuthUser,
       firebaseAccountSettings.email,
     );
+    // Hydrate persisted settings from Firestore (with validation fallback)
+    if (firebaseAccountSettings.settings) {
+      account.setSettings(
+        parseUserSettings(firebaseAccountSettings.settings),
+      );
+    }
+    return account;
   }
 
   /**

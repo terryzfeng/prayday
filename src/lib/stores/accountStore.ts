@@ -3,10 +3,12 @@ import { auth } from "lib/utils/firebase/config";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import {
   getAccountSettings,
+  uploadUserSettings,
   type FirebaseAccountSettings,
   type FirebaseAccountSettingsResult,
 } from "../utils/firebase/users";
 import Account from "../utils/account/account";
+import { type UserSettings, DEFAULT_USER_SETTINGS, applyTheme, parseUserSettings } from "../utils/settings";
 import type { Keys, KeySettings } from "../utils/account/keys";
 import {
   e2eeEnabledStore,
@@ -55,6 +57,12 @@ function createAccountStore() {
   const setAccount = (account: Account | undefined) => {
     if (account) {
       e2eeEnabledStore.set(account.isE2EEEnabled());
+      // Theme settings are cloud-only; guests always get the default
+      if (account.isCloudAccount) {
+        applyTheme(account.settings.theme);
+      } else {
+        applyTheme(DEFAULT_USER_SETTINGS.theme);
+      }
     }
     set(account);
   };
@@ -102,15 +110,33 @@ function createAccountStore() {
   return {
     subscribe,
     setAccount: setAccount,
-    updateAccount: (name: string, email: string, newKeys: Keys) => {
+    updateAccount: (name: string, email: string, newKeys: Keys, settings?: UserSettings) => {
       update((account) => {
         if (account === undefined) return;
         account.setName(name);
         account.setEmail(email);
+        if (settings) {
+          const validated = parseUserSettings(settings);
+          account.setSettings(validated);
+          applyTheme(validated.theme);
+        }
         Account.asyncInitializeServices(account, newKeys);
         e2eeEnabledStore.set(account.isE2EEEnabled());
         return account;
       });
+    },
+    updateSettings: async (settings: UserSettings) => {
+      const currentAccount = get({ subscribe });
+      if (currentAccount === undefined) return;
+      currentAccount.setSettings(settings);
+      setAccount(currentAccount);
+      if (currentAccount.isCloudAccount) {
+        try {
+          await uploadUserSettings(currentAccount.id, settings);
+        } catch (error) {
+          console.error("Failed to upload settings", error);
+        }
+      }
     },
     async enableE2EE(dataPassphrase: string): Promise<boolean> {
       const account = get(this);

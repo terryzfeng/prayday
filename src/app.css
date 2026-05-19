@@ -10,7 +10,7 @@
 }
 
 html {
-  background-color: white;
+  @apply bg-white dark:bg-gray-900;
 }
 
 .title {

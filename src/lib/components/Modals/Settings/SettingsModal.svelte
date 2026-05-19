@@ -6,6 +6,7 @@
   import CreateDataPassphrase from "./CreateDataPassphrase.svelte";
   import RemoveDataPassphrase from "./RemoveDataPassphrase.svelte";
   import VersionPage from "./VersionPage.svelte";
+  import ThemeSettings from "./ThemeSettings.svelte";
 
   let modalRef: NavigableModal;
   let currentPage = "main";
@@ -17,6 +18,7 @@
     "create-data-passphrase": CreateDataPassphrase,
     "remove-data-passphrase": RemoveDataPassphrase,
     "version-page": VersionPage,
+    "theme-settings": ThemeSettings,
   };
 
   // Conditionally set showClosePrompt based on current page
@@ -52,6 +54,8 @@
       <RemoveDataPassphrase onBack={navigateBack} />
     {:else if currentPage === "version-page"}
       <VersionPage onBack={navigateBack} />
+    {:else if currentPage === "theme-settings"}
+      <ThemeSettings onBack={navigateBack} />
     {/if}
   </svelte:fragment>
 </NavigableModal>

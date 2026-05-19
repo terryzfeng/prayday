@@ -24,6 +24,7 @@ import {
   type FirebaseKeySettings,
 } from "./firebase-key-settings";
 import { type Result } from "lib/utils/result";
+import { type UserSettings } from "../settings";
 
 export type FirebaseAccountSettingsResult = Result<{
   firebaseAccountSettings: FirebaseAccountSettings;
@@ -32,10 +33,12 @@ export type FirebaseAccountSettingsResult = Result<{
   getAccountSettingsFromServer?: Promise<FirebaseAccountSettingsResult>;
 }>;
 
+
 // Firebase Firestore User Doc Account Settings
 export interface FirebaseAccountSettings {
   name: string;
   email: string;
+  settings?: UserSettings;
 }
 
 export interface PrayHistoryItem {
@@ -162,6 +165,16 @@ export async function getAccountSettings(
         "Failed to get account settings from server, may be offline. Please try again later. If the issue persists, please contact Prayday support.",
     };
   }
+}
+
+export async function uploadUserSettings(
+  userId: string,
+  settings: UserSettings,
+): Promise<void> {
+  const userDocRef = doc(db, "users", userId);
+  return updateDoc(userDocRef, {
+    settings: settings,
+  });
 }
 
 // Create a firebase user account settings and keys
