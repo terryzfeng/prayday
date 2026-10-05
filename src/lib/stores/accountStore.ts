@@ -8,7 +8,12 @@ import {
   type FirebaseAccountSettingsResult,
 } from "../utils/firebase/users";
 import Account from "../utils/account/account";
-import { type UserSettings, DEFAULT_USER_SETTINGS, applyTheme, parseUserSettings } from "../utils/settings";
+import {
+  type UserSettings,
+  DEFAULT_USER_SETTINGS,
+  applyTheme,
+  parseUserSettings,
+} from "../utils/settings";
 import type { Keys, KeySettings } from "../utils/account/keys";
 import {
   e2eeEnabledStore,
@@ -110,7 +115,12 @@ function createAccountStore() {
   return {
     subscribe,
     setAccount: setAccount,
-    updateAccount: (name: string, email: string, newKeys: Keys, settings?: UserSettings) => {
+    updateAccount: (
+      name: string,
+      email: string,
+      newKeys: Keys,
+      settings?: UserSettings,
+    ) => {
       update((account) => {
         if (account === undefined) return;
         account.setName(name);

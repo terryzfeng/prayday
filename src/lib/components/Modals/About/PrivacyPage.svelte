@@ -23,7 +23,9 @@
       Prayday is committed to protecting your privacy. We store two types of
       data:
     </p>
-    <ol class="list-decimal list-outside ml-6 space-y-6 text-secondary-foreground">
+    <ol
+      class="list-decimal list-outside ml-6 space-y-6 text-secondary-foreground"
+    >
       <li>
         <strong>Global Prayer Count</strong>
         <p class="mt-2">

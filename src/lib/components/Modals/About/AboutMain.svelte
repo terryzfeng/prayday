@@ -22,7 +22,9 @@
   <h1 class="prayday-title animate-fade-in py-1">Prayday</h1>
 
   <div class="text-center space-y-2">
-    <div class="text-lg font-medium text-muted-foreground">Worldwide Prayer Count</div>
+    <div class="text-lg font-medium text-muted-foreground">
+      Worldwide Prayer Count
+    </div>
     <p class="text-4xl font-bold text-blue-500">{prayerCount}</p>
   </div>
 

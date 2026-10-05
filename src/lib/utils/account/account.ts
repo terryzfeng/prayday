@@ -1,5 +1,9 @@
 import type { User as FirebaseAuthUser } from "firebase/auth";
-import { type UserSettings, DEFAULT_USER_SETTINGS, parseUserSettings } from "../settings";
+import {
+  type UserSettings,
+  DEFAULT_USER_SETTINGS,
+  parseUserSettings,
+} from "../settings";
 import { prayerSyncManager } from "lib/services/prayerSync/prayerSyncManager";
 import { PrayerStore } from "lib/stores/prayerStore";
 import { getAccountSettingsAsync } from "lib/services/accountSettingsSyncService";
@@ -267,9 +271,7 @@ export default class Account {
     );
     // Hydrate persisted settings from Firestore (with validation fallback)
     if (firebaseAccountSettings.settings) {
-      account.setSettings(
-        parseUserSettings(firebaseAccountSettings.settings),
-      );
+      account.setSettings(parseUserSettings(firebaseAccountSettings.settings));
     }
     return account;
   }

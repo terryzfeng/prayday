@@ -33,7 +33,6 @@ export type FirebaseAccountSettingsResult = Result<{
   getAccountSettingsFromServer?: Promise<FirebaseAccountSettingsResult>;
 }>;
 
-
 // Firebase Firestore User Doc Account Settings
 export interface FirebaseAccountSettings {
   name: string;

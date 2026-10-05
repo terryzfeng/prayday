@@ -10,25 +10,25 @@
     -moz-osx-font-smoothing: grayscale;
 
     /* Exact Tailwind Gray Palette Mappings */
-    --background: 0 0% 100%;       /* white */
-    --foreground: 221 39% 11%;     /* gray-900 */
-    
-    --card: 0 0% 100%;             /* white */
-    --card-foreground: 217 19% 27%;/* gray-700 */
-    
-    --muted: 210 20% 98%;          /* gray-50 */
-    --muted-foreground: 218 11% 65%;/* gray-400 */
-    
-    --secondary: 220 14% 96%;      /* gray-100 */
+    --background: 0 0% 100%; /* white */
+    --foreground: 221 39% 11%; /* gray-900 */
+
+    --card: 0 0% 100%; /* white */
+    --card-foreground: 217 19% 27%; /* gray-700 */
+
+    --muted: 210 20% 98%; /* gray-50 */
+    --muted-foreground: 218 11% 65%; /* gray-400 */
+
+    --secondary: 220 14% 96%; /* gray-100 */
     --secondary-foreground: 215 14% 34%; /* gray-600 */
 
-    --accent: 214 100% 97%;        /* blue-50 */
+    --accent: 214 100% 97%; /* blue-50 */
     --accent-foreground: 221 39% 11%; /* gray-900 */
 
-    --border: 220 13% 91%;         /* gray-200 */
-    --border-strong: 215 14% 84%;  /* gray-300 */
-    
-    --ring: 221 83% 53%;           /* blue-500ish */
+    --border: 220 13% 91%; /* gray-200 */
+    --border-strong: 215 14% 84%; /* gray-300 */
+
+    --ring: 221 83% 53%; /* blue-500ish */
   }
 
   .dark {
@@ -46,23 +46,23 @@
   .title {
     @apply text-2xl font-semibold text-card-foreground;
   }
-  
+
   .line-section {
     @apply border-b border-border pb-2;
   }
-  
+
   .h1 {
     @apply text-2xl font-semibold text-card-foreground;
   }
-  
+
   .h2 {
     @apply text-lg font-medium text-foreground;
   }
-  
+
   .modal-page {
     @apply flex w-full flex-col items-center space-y-6 py-2 pb-4 px-2;
   }
-  
+
   .prayday-title {
     @apply text-5xl font-black font-title select-none text-transparent bg-clip-text bg-gradient-to-b from-blue-300 to-blue-400;
   }

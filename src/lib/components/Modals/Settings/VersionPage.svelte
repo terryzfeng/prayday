@@ -29,7 +29,9 @@
       <div
         class="flex flex-col md:flex-row md:items-center md:justify-between pb-3 border-b border-border mb-4"
       >
-        <h2 class="text-lg font-semibold text-foreground flex items-center gap-2">
+        <h2
+          class="text-lg font-semibold text-foreground flex items-center gap-2"
+        >
           May Updates
           <span
             class="text-xs font-medium px-2 py-0.5 bg-secondary text-secondary-foreground rounded-full"
@@ -71,7 +73,9 @@
       <div
         class="flex flex-col md:flex-row md:items-center md:justify-between pb-3 border-b border-border mb-4"
       >
-        <h2 class="text-lg font-semibold text-foreground flex items-center gap-2">
+        <h2
+          class="text-lg font-semibold text-foreground flex items-center gap-2"
+        >
           Official Launch! 🚀
           <span
             class="text-xs font-medium px-2 py-0.5 bg-secondary text-secondary-foreground rounded-full"
@@ -112,7 +116,9 @@
       <div
         class="flex flex-col md:flex-row md:items-center md:justify-between pb-3 border-b border-border mb-4"
       >
-        <h2 class="text-lg font-semibold text-foreground flex items-center gap-2">
+        <h2
+          class="text-lg font-semibold text-foreground flex items-center gap-2"
+        >
           Open Beta
           <span
             class="text-xs font-medium px-2 py-0.5 bg-secondary text-secondary-foreground rounded-full"
