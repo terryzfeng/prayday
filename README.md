@@ -1,47 +1,80 @@
-# Svelte + TS + Vite
+# Prayday 🙏
 
-This template should help get you started developing with Svelte and TypeScript in Vite.
+A personal prayer companion app to organize prayer requests and cultivate a daily prayer habit.
 
-## Recommended IDE Setup
+Live at **[prayday.app](https://prayday.app/)**
 
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
+## Contributors
 
-## Need an official Svelte framework?
+- Andy Feng
+- Terry Feng
 
-Check out [SvelteKit](https://github.com/sveltejs/kit#readme), which is also powered by Vite. Deploy anywhere with its serverless-first approach and adapt to various platforms, with out of the box support for TypeScript, SCSS, and Less, and easily-added support for mdsvex, GraphQL, PostCSS, Tailwind CSS, and more.
+## Features
 
-## Technical considerations
+- **Prayer Tracker**: Create prayer cards with reminders and priority highlighting.
+- **End-to-End Encryption**: Optional zero-knowledge client-side encryption (AES-256-GCM).
+- **Prayer Habits**: Monthly activity contribution grid and statistics.
+- **Sync & Offline**: Works offline with local IndexedDB storage; syncs across devices with an account.
+- **Themes & PWA**: Dark/Light mode support and installable on iOS/Android.
 
-**Why use this over SvelteKit?**
+## Tech Stack
 
-- It brings its own routing solution which might not be preferable for some users.
-- It is first and foremost a framework that just happens to use Vite under the hood, not a Vite app.
+- **Frontend**: Svelte 5, TypeScript, Tailwind CSS, Vite
+- **Backend / Database**: Firebase (Auth, Firestore, Hosting), IndexedDB
+- **Testing**: Vitest
 
-This template contains as little as possible to get started with Vite + TypeScript + Svelte, while taking into account the developer experience with regards to HMR and intellisense. It demonstrates capabilities on par with the other `create-vite` templates and is a good starting point for beginners dipping their toes into a Vite + Svelte project.
+## Testing
 
-Should you later need the extended capabilities and extensibility provided by SvelteKit, the template has been structured similarly to SvelteKit so that it is easy to migrate.
+Tests are powered by **Vitest** for native Node `webcrypto` support, enabling direct testing of the Web Crypto API pipeline (AES-256-GCM, PBKDF2) without mock libraries or jsdom crypto polyfills.
 
-**Why `global.d.ts` instead of `compilerOptions.types` inside `jsconfig.json` or `tsconfig.json`?**
+*Migrated from Jest to Vitest for faster test execution and more comprehensive native Web Crypto API support.*
 
-Setting `compilerOptions.types` shuts out all other types not explicitly listed in the configuration. Using triple-slash references keeps the default TypeScript setting of accepting type information from the entire workspace, while also adding `svelte` and `vite/client` type information.
+## Security and System Architecture
 
-**Why include `.vscode/extensions.json`?**
+- [Client-Side System Architecture & Data Synchronization Flow Diagram](https://docs.google.com/document/d/1DMa3jbmf0ILEq5pmgwmhic27rksiHKOx7Vtg8Gft_c8/edit?usp=sharing)
 
-Other templates indirectly recommend extensions via the README, but this file allows VS Code to prompt the user to install the recommended extension upon opening the project.
+## Getting Started
 
-**Why enable `allowJs` in the TS template?**
+### Prerequisites
 
-While `allowJs: false` would indeed prevent the use of `.js` files in the project, it does not prevent the use of JavaScript syntax in `.svelte` files. In addition, it would force `checkJs: false`, bringing the worst of both worlds: not being able to guarantee the entire codebase is TypeScript, and also having worse typechecking for the existing JavaScript. In addition, there are valid use cases in which a mixed codebase may be relevant.
+- Node.js (v20+)
+- npm
 
-**Why is HMR not preserving my local component state?**
+### Setup
 
-HMR state preservation comes with a number of gotchas! It has been disabled by default in both `svelte-hmr` and `@sveltejs/vite-plugin-svelte` due to its often surprising behavior. You can read the details [here](https://github.com/rixo/svelte-hmr#svelte-hmr).
+```bash
+# Clone the repository
+git clone https://github.com/terryzfeng/prayday.git
+cd prayday
 
-If you have state that's important to retain within a component, consider creating an external store which would not be replaced by HMR.
+# Install dependencies
+npm install
 
-```ts
-// store.ts
-// An extremely simple external store
-import { writable } from 'svelte/store'
-export default writable(0)
+# Setup environment variables
+cp .env.example .env
 ```
+
+### Development
+
+```bash
+# Start dev server
+npm run dev
+
+# Run tests
+npm run test:unit -- --run
+
+# Type check
+npm run check
+
+# Build for production
+npm run build
+```
+
+## License
+
+Copyright (c) 2024 Terry Feng. All rights reserved.
+
+This source code and related assets are proprietary and confidential. 
+Unauthorized copying, modification, distribution, public display, or 
+use of this software, via any medium, is strictly prohibited without the 
+prior written permission of the copyright owner.
